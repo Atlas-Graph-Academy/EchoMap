@@ -107,7 +107,8 @@
         /* 1. THE MEMORY (IMAGE SECTION) */
         .memory-card {
             position: absolute;
-            top: 100px;
+            top: 140px;
+            /* Moved down */
             left: 40px;
             width: 160px;
             height: 200px;
@@ -145,22 +146,76 @@
             animation: pulse 3s infinite ease-in-out;
         }
 
-        /* The little Echo user icons next to the pin */
-        .pin-avatars {
+        /* --- STICKER COMPONENT --- */
+        .memory-sticker {
             position: absolute;
-            left: 30px;
-            top: 0;
+            top: -50px;
+            /* Positioned ABOVE the card */
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
-            flex-direction: row;
+            align-items: center;
+            gap: 6px;
+            z-index: 30;
+            white-space: nowrap;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
         }
 
-        .mini-avatar {
-            width: 18px;
-            height: 18px;
+        .sticker-avatar {
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            background: #555;
-            border: 1px solid #fff;
-            margin-left: -8px;
+            border: 2px solid #fff;
+            background-color: #333;
+            background-size: cover;
+            /* Overlap name tag slightly */
+            z-index: 2;
+        }
+
+        .sticker-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sticker-name {
+            background: #fff;
+            color: #000;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-left: -12px;
+            /* Pull behind avatar */
+            padding-left: 16px;
+            /* Space for avatar */
+            z-index: 1;
+        }
+
+        .sticker-reactions {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .reaction-emoji {
+            font-size: 20px;
+            line-height: 1;
+            filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
+        }
+
+        .reaction-emoji:nth-child(2) {
+            margin-left: -6px;
+            /* Slight Overlap */
+        }
+
+        .reaction-count {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            font-style: italic;
+            margin-left: 4px;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
         }
 
         /* 3. THE CONNECTION (SVG LINE) */
@@ -346,6 +401,18 @@
             <div class="memory-card">
                 <!-- Using a moody atmospheric image -->
                 <img src="image/manga.png" class="memory-image" alt="Memory">
+
+                <!-- The Sticker (Now Above) -->
+                <div class="memory-sticker">
+                    <div class="sticker-avatar"
+                        style="background-image: url('https://api.dicebear.com/7.x/notionists/svg?seed=Felix')"></div>
+                    <div class="sticker-name">Felix</div>
+                    <div class="sticker-reactions">
+                        <div class="reaction-emoji">🎩</div>
+                        <div class="reaction-emoji">🥶</div>
+                        <span class="reaction-count">x4</span>
+                    </div>
+                </div>
             </div>
 
             <!-- The Navigator (Center Bottom) -->
@@ -571,10 +638,6 @@
         const pinHtml = `
             <div class="map-pin">
                 <img src="image/B2.png" class="pin-icon" alt="Beacon">
-                <div class="pin-avatars">
-                    <div class="mini-avatar" style="background-image: url('https://api.dicebear.com/7.x/avataaars/svg?seed=A')"></div>
-                    <div class="mini-avatar" style="background-image: url('https://api.dicebear.com/7.x/avataaars/svg?seed=B')"></div>
-                </div>
             </div>
         `;
         const customIcon = L.divIcon({
@@ -590,7 +653,7 @@
 
         function updateTether() {
             const cardAnchorX = 40 + 160;
-            const cardAnchorY = 100 + 200;
+            const cardAnchorY = 140 + 200; // Updated for new card top (140px)
             const pinPoint = map.latLngToContainerPoint(marker.getLatLng());
             lineElement.setAttribute('x1', cardAnchorX);
             lineElement.setAttribute('y1', cardAnchorY);
