@@ -457,91 +457,118 @@
             }
         }
 
-        /* --- TUNER (Drift Control) --- */
+        /* --- ORB BUTTON (Optimized Tune In Control) --- */
+
+        /* Define state colors matching the new design system */
+        :root {
+            --warm-orange: #FF9F68;
+            /* Idle / Human */
+            --cyber-teal: #64FFDA;
+            /* Locating / Machine */
+        }
+
+        /* Container */
         .resonance-control {
             position: absolute;
             bottom: 60px;
-            /* Specific placement */
             left: 50%;
             transform: translateX(-50%);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
             cursor: pointer;
             z-index: 100;
             pointer-events: auto;
         }
 
-        .tuner-ring {
-            width: 80px;
-            height: 80px;
+        /* The Orb (Main Trigger) */
+        .orb-button {
             position: relative;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+
+            /* Glassmorphism Base */
+            background: var(--glass-surface);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+
             display: flex;
             justify-content: center;
             align-items: center;
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.3s ease, border-color 0.5s ease;
         }
 
-        .tuner-ticks {
+        /* The Inner Soul (Glowing Dot) */
+        .orb-soul {
+            width: 12px;
+            height: 12px;
+            background-color: var(--warm-orange);
+            border-radius: 50%;
+            box-shadow: 0 0 15px var(--warm-orange);
+            transition: all 0.5s ease;
+            z-index: 2;
+        }
+
+        /* The Rotating Ring (The Radar) */
+        .orb-ring {
             position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            animation: radar-spin 12s linear infinite;
-            opacity: 0.6;
-        }
-
-        .tick-circle {
-            fill: none;
-            stroke: var(--gold-primary);
-            stroke-width: 1.5;
-            stroke-dasharray: 1 6;
-            /* Dotted line like a dial */
-            stroke-linecap: round;
-        }
-
-        .tuner-knob-core {
-            width: 48px;
-            height: 48px;
             border-radius: 50%;
-            background: linear-gradient(145deg, rgba(30, 30, 30, 0.8), rgba(10, 10, 10, 0.8));
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 179, 138, 0.3);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow:
-                0 10px 30px rgba(0, 0, 0, 0.5),
-                inset 0 0 20px rgba(255, 179, 138, 0.05);
-            z-index: 2;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px dashed rgba(255, 179, 138, 0.3);
+            box-sizing: border-box;
+            transition: all 0.5s ease;
+            animation: slow-drift 10s linear infinite;
         }
 
-        .signal-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--gold-primary);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--gold-glow);
-            animation: signal-pulse 3s infinite;
+        /* The "NEXT" Label (Micro-copy) */
+        .orb-label {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 10px;
+            letter-spacing: 2px;
+            font-weight: 600;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            font-family: var(--font-ui);
         }
 
-        /* Hover interactions */
-        .resonance-control:hover .tuner-knob-core {
-            border-color: var(--gold-primary);
-            box-shadow: 0 0 25px rgba(230, 106, 69, 0.2);
-            transform: scale(1.1);
-        }
+        /* --- INTERACTION: Active / Locating (via .is-hunting class) --- */
 
-        .resonance-control:hover .tuner-ticks {
-            opacity: 1;
-            filter: drop-shadow(0 0 5px var(--gold-glow));
-        }
-
-        .resonance-control:active .tuner-knob-core {
+        .resonance-control.is-hunting .orb-button {
             transform: scale(0.95);
+            border-color: rgba(100, 255, 218, 0.3);
         }
 
-        @keyframes radar-spin {
+        .resonance-control.is-hunting .orb-soul {
+            background-color: var(--cyber-teal);
+            box-shadow: 0 0 25px var(--cyber-teal), 0 0 50px var(--cyber-teal);
+            transform: scale(0.8);
+            animation: pulse-fast 0.8s ease-in-out infinite;
+        }
+
+        .resonance-control.is-hunting .orb-ring {
+            border-color: var(--cyber-teal);
+            border-style: solid;
+            border-top-color: transparent;
+            border-left-color: transparent;
+            animation: spin-fast 0.6s linear infinite;
+        }
+
+        .resonance-control.is-hunting .orb-label {
+            color: var(--cyber-teal);
+            text-shadow: 0 0 8px rgba(100, 255, 218, 0.5);
+            letter-spacing: 3px;
+        }
+
+        /* --- Animations --- */
+        @keyframes slow-drift {
             from {
                 transform: rotate(0deg);
             }
@@ -551,40 +578,28 @@
             }
         }
 
-        @keyframes signal-pulse {
-            0% {
-                transform: scale(1);
-                opacity: 0.6;
-                box-shadow: 0 0 0 transparent;
+        @keyframes spin-fast {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse-fast {
+
+            0%,
+            100% {
+                opacity: 0.5;
+                transform: scale(0.8);
             }
 
             50% {
-                transform: scale(1.2);
                 opacity: 1;
-                box-shadow: 0 0 15px var(--gold-glow);
-            }
-
-            100% {
                 transform: scale(1);
-                opacity: 0.6;
-                box-shadow: 0 0 0 transparent;
             }
-        }
-
-        .orb-label {
-            font-family: var(--font-ui);
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.7);
-            text-shadow: 0 0 10px rgba(255, 200, 100, 0.3);
-            transition: color 0.3s;
-        }
-
-        .resonance-control:hover .orb-label {
-            color: #fff;
-            text-shadow: 0 0 15px rgba(255, 220, 150, 0.8);
         }
 
         /* Icon Animation - Removed as we use dots/ticks now */
@@ -874,17 +889,13 @@
             <!-- The Navigator (Center Bottom) -->
             <div class="resonance-prompt">✨ High resonance detected nearby...</div>
 
-            <!-- The Resonance Tuner (Drift Control) -->
-            <div class="resonance-control" onclick="seekNextSignal()">
-                <div class="tuner-ring">
-                    <svg class="tuner-ticks" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="46" class="tick-circle" />
-                    </svg>
-                    <div class="tuner-knob-core">
-                        <div class="signal-dot"></div>
-                    </div>
+            <!-- The Optimized Orb Button (Tune In Control) -->
+            <div class="resonance-control" id="orbControl" onclick="seekNextSignal()">
+                <div class="orb-button">
+                    <div class="orb-ring"></div>
+                    <div class="orb-soul"></div>
                 </div>
-                <span class="orb-label">TUNE IN</span>
+                <div class="orb-label" id="orbLabel">NEXT</div>
             </div>
 
             <!-- The Stats (Bottom Right - The "Dock") -->
@@ -1319,16 +1330,21 @@
 
         // --- SEEK NEXT SIGNAL LOGIC ---
         function seekNextSignal() {
-            // 1. Calculate next index
+            const orbControl = document.getElementById('orbControl');
+            const orbLabel = document.getElementById('orbLabel');
+
+            // Prevent double clicking
+            if (orbControl && orbControl.classList.contains('is-hunting')) return;
+
+            // 1. Enter Hunting State
+            if (orbControl) orbControl.classList.add('is-hunting');
+
+            // Haptic feedback (Mobile)
+            if (navigator.vibrate) navigator.vibrate(15);
+
+            // 2. Calculate next index
             currentMemoryIndex = (currentMemoryIndex + 1) % memoryStreams.length;
             const data = memoryStreams[currentMemoryIndex];
-
-            // 2. UI Feedback (Knob spin)
-            const knob = document.querySelector('.tuner-knob-core');
-            const label = document.querySelector('.orb-label');
-
-            if (knob) knob.style.transform = 'scale(0.9) rotate(90deg)';
-            if (label) label.innerText = "TUNING...";
 
             // 3. Start Transition (Fade Out)
             const memoryCard = document.querySelector('.memory-card');
@@ -1351,7 +1367,7 @@
                 easeLinearity: 0.2
             });
 
-            // 5. Update Content & Fade In after short delay
+            // 5. Update Content & Fade In after delay (simulating the search)
             setTimeout(() => {
                 // Update Memory Image
                 document.querySelector('.memory-image').src = data.image;
@@ -1381,17 +1397,17 @@
                 // Update Beacon Title
                 if (beaconName) beaconName.innerText = data.user.beaconName;
 
-                // Reset Knob
-                if (knob) knob.style.transform = '';
-
                 // Fade In
                 memoryCard.style.opacity = '1';
                 memoryCard.style.transform = 'translateY(0px) scale(1)';
 
-                // Reset Label
-                if (label) label.innerText = "TUNE IN";
+                // Success Haptic
+                if (navigator.vibrate) navigator.vibrate([40, 20, 40]);
 
-            }, 500);
+                // 6. Exit Hunting State
+                if (orbControl) orbControl.classList.remove('is-hunting');
+
+            }, 1500);
         }
     </script>
 </body>
