@@ -10,7 +10,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <link
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap"
         rel="stylesheet">
     <style>
         :root {
@@ -20,7 +20,7 @@
             --glass-bg: rgba(20, 20, 20, 0.6);
             --glass-warm: rgba(20, 20, 20, 0.6);
 
-            --font-display: 'Cormorant Garamond', serif;
+            --font-display: 'Montserrat', sans-serif;
             --font-ui: 'Inter', sans-serif;
         }
 
@@ -378,17 +378,16 @@
         }
 
         .stat-count {
-            font-size: 14px;
+            font-family: var(--font-display);
+            font-size: 20px;
             font-weight: 700;
-            line-height: 1.4;
-            letter-spacing: 0.5px;
+            line-height: 1.2;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
             display: block;
-            margin-top: 8px;
+            margin-top: 6px;
             color: var(--gold-primary);
-            font-family: var(--font-display);
-            font-size: 18px;
-            letter-spacing: 1px;
         }
 
         .stat-label {
@@ -416,8 +415,11 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 8px;
-            margin-bottom: 6px;
+            gap: 10px;
+            /* Slightly more gap for the pin */
+            margin-bottom: 4px;
+            max-width: 340px;
+            /* Constrain to screen */
         }
 
         .title-pin-icon {
@@ -429,14 +431,17 @@
 
         .beacon-name {
             font-family: var(--font-display);
-            font-size: 32px;
-            font-weight: 400;
+            font-size: 28px;
+            /* Calibrated to fit on one line */
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            line-height: 0.9;
+            letter-spacing: 0.1em;
+            line-height: 1;
             margin: 0;
-            text-shadow: 0 0 20px rgba(230, 106, 69, 0.4);
+            text-shadow: 0 0 25px rgba(230, 106, 69, 0.3);
             color: #fff;
+            white-space: nowrap;
+            /* Force one line */
         }
 
         /* Animation */
