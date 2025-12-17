@@ -432,6 +432,69 @@
         .signal-seeker:active {
             transform: translateX(-50%) scale(0.96);
         }
+
+        /* --- DEV NAVIGATION --- */
+        .nav-overlay {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            pointer-events: auto;
+            font-family: var(--font-main);
+        }
+
+        .nav-toggle {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            backdrop-filter: blur(8px);
+            transition: all 0.2s;
+        }
+
+        .nav-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-color: var(--neon-green);
+        }
+
+        .nav-menu {
+            position: absolute;
+            top: 40px;
+            right: 0;
+            background: rgba(10, 10, 10, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 8px;
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 160px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-menu.visible {
+            display: flex;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            transition: all 0.2s;
+            display: block;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--neon-green);
+        }
     </style>
 </head>
 
@@ -521,6 +584,23 @@
 
         </div>
     </div>
+
+    <!-- Dev Navigation -->
+    <div class="nav-overlay">
+        <button class="nav-toggle" onclick="toggleNav()">☰ Pages</button>
+        <div class="nav-menu" id="navMenu">
+            <a href="main.html" class="nav-link">Main</a>
+            <a href="main_time_variant.html" class="nav-link">Main (Time Variant)</a>
+            <a href="main_bignumber_withHeads.html" class="nav-link">Main (Big Number)</a>
+            <a href="map_view.html" class="nav-link">Map View (Clean)</a>
+        </div>
+    </div>
+
+    <script>
+        function toggleNav() {
+            document.getElementById('navMenu').classList.toggle('visible');
+        }
+    </script>
 
     <script>
         // --- CONFIGURATION ---
