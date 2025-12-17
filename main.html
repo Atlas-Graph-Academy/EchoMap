@@ -144,6 +144,7 @@
             align-items: center;
             justify-content: center;
             pointer-events: auto;
+            position: relative;
         }
 
         .pin-icon {
@@ -151,7 +152,38 @@
             height: 80px;
             object-fit: contain;
             filter: drop-shadow(0 0 15px var(--gold-primary));
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            /* Hidden in Overview */
+            transform: scale(0.5);
+        }
+
+        .glow-point-main {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--gold-primary);
+            border-radius: 50%;
+            box-shadow: 0 0 15px var(--gold-primary), 0 0 30px var(--gold-glow);
+            transition: all 0.5s ease;
+            opacity: 1;
+            /* Visible in Overview */
+            transform: scale(1);
+            animation: light-pulse 2s infinite alternate;
+            z-index: 1;
+        }
+
+        /* Detail Mode: Show Image, Hide Glow */
+        body.detail-mode .pin-icon {
+            opacity: 1;
+            transform: scale(1);
             animation: pulse 3s infinite ease-in-out;
+        }
+
+        body.detail-mode .glow-point-main {
+            opacity: 0;
+            transform: scale(0.5);
+            animation: none;
         }
 
         /* --- LIGHTHOUSE MODE BEACONS --- */
@@ -243,6 +275,23 @@
             background-size: cover;
             /* Overlap name tag slightly */
             z-index: 2;
+            /* Soul Glow - Narrative: He is "alive" in this memory */
+            box-shadow: 0 0 10px rgba(255, 179, 138, 0.4);
+            animation: soul-breathe 4s ease-in-out infinite;
+        }
+
+        @keyframes soul-breathe {
+
+            0%,
+            100% {
+                box-shadow: 0 0 8px rgba(255, 179, 138, 0.3);
+                border-color: rgba(255, 255, 255, 0.9);
+            }
+
+            50% {
+                box-shadow: 0 0 18px rgba(230, 106, 69, 0.6), 0 0 35px rgba(255, 179, 138, 0.2);
+                border-color: #fff;
+            }
         }
 
         .sticker-content {
@@ -408,80 +457,118 @@
             }
         }
 
-        /* --- RESONANCE ORB (Drift Control) --- */
+        /* --- TUNER (Drift Control) --- */
         .resonance-control {
             position: absolute;
-            bottom: 40px;
+            bottom: 60px;
+            /* Specific placement */
             left: 50%;
             transform: translateX(-50%);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
+            gap: 16px;
             cursor: pointer;
             z-index: 100;
             pointer-events: auto;
         }
 
-        .orb-core {
-            width: 68px;
-            height: 68px;
-            border-radius: 50%;
-            background: rgba(255, 179, 138, 0.05);
-            /* Very subtle glass */
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 179, 138, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--gold-primary);
-            box-shadow:
-                0 0 20px rgba(0, 0, 0, 0.2),
-                inset 0 0 20px rgba(255, 179, 138, 0.1);
-            transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+        .tuner-ring {
+            width: 80px;
+            height: 80px;
             position: relative;
-            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* Inner light bloom */
-        .orb-core::after {
-            content: '';
+        .tuner-ticks {
             position: absolute;
-            top: 50%;
-            left: 50%;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle, var(--gold-primary) 0%, transparent 60%);
-            opacity: 0;
-            transform: translate(-50%, -50%) scale(0.5);
-            transition: all 0.4s ease;
+            animation: radar-spin 12s linear infinite;
+            opacity: 0.6;
         }
 
-        .resonance-control:hover .orb-core {
-            transform: scale(1.1);
+        .tick-circle {
+            fill: none;
+            stroke: var(--gold-primary);
+            stroke-width: 1.5;
+            stroke-dasharray: 1 6;
+            /* Dotted line like a dial */
+            stroke-linecap: round;
+        }
+
+        .tuner-knob-core {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, rgba(30, 30, 30, 0.8), rgba(10, 10, 10, 0.8));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 179, 138, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.5),
+                inset 0 0 20px rgba(255, 179, 138, 0.05);
+            z-index: 2;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .signal-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--gold-primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--gold-glow);
+            animation: signal-pulse 3s infinite;
+        }
+
+        /* Hover interactions */
+        .resonance-control:hover .tuner-knob-core {
             border-color: var(--gold-primary);
-            box-shadow: 0 0 30px rgba(230, 106, 69, 0.4);
-            background: rgba(255, 179, 138, 0.1);
+            box-shadow: 0 0 25px rgba(230, 106, 69, 0.2);
+            transform: scale(1.1);
         }
 
-        .resonance-control:hover .orb-core::after {
-            opacity: 0.2;
-            transform: translate(-50%, -50%) scale(1.2);
+        .resonance-control:hover .tuner-ticks {
+            opacity: 1;
+            filter: drop-shadow(0 0 5px var(--gold-glow));
         }
 
-        .resonance-control:active .orb-core {
+        .resonance-control:active .tuner-knob-core {
             transform: scale(0.95);
         }
 
-        .orb-label {
-            font-family: var(--font-ui);
-            font-size: 11px;
-            font-weight: 500;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.6);
-            transition: color 0.3s;
+        @keyframes radar-spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes signal-pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.6;
+                box-shadow: 0 0 0 transparent;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 1;
+                box-shadow: 0 0 15px var(--gold-glow);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 0.6;
+                box-shadow: 0 0 0 transparent;
+            }
         }
 
         .orb-label {
@@ -490,26 +577,17 @@
             font-weight: 600;
             letter-spacing: 3px;
             text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.9);
-            text-shadow: 0 0 10px rgba(255, 200, 100, 0.6);
+            color: rgba(255, 255, 255, 0.7);
+            text-shadow: 0 0 10px rgba(255, 200, 100, 0.3);
             transition: color 0.3s;
         }
 
         .resonance-control:hover .orb-label {
             color: #fff;
-            text-shadow: 0 0 15px rgba(255, 220, 150, 1);
+            text-shadow: 0 0 15px rgba(255, 220, 150, 0.8);
         }
 
-        /* Icon Animation */
-        .orb-core svg {
-            z-index: 2;
-            transition: transform 0.4s ease;
-            filter: drop-shadow(0 0 5px var(--gold-glow));
-        }
-
-        .resonance-control:hover svg {
-            transform: translateX(2px);
-        }
+        /* Icon Animation - Removed as we use dots/ticks now */
 
         /* --- RESONANCE PROMPT (Radar) --- */
         .resonance-prompt {
@@ -796,17 +874,17 @@
             <!-- The Navigator (Center Bottom) -->
             <div class="resonance-prompt">✨ High resonance detected nearby...</div>
 
-            <!-- The Resonance Orb (Drift Control) -->
+            <!-- The Resonance Tuner (Drift Control) -->
             <div class="resonance-control" onclick="seekNextSignal()">
-                <div class="orb-core">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M13 5L20 12L13 19" />
-                        <path d="M5 12H19" />
-                        <path d="M5 5C5 5 2 8 2 12C2 16 5 19 5 19" opacity="0.5" />
+                <div class="tuner-ring">
+                    <svg class="tuner-ticks" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="46" class="tick-circle" />
                     </svg>
+                    <div class="tuner-knob-core">
+                        <div class="signal-dot"></div>
+                    </div>
                 </div>
-                <span class="orb-label">Next Echo</span>
+                <span class="orb-label">TUNE IN</span>
             </div>
 
             <!-- The Stats (Bottom Right - The "Dock") -->
@@ -1038,7 +1116,8 @@
         // --- PIN & TETHER LOGIC ---
         const pinHtml = `
             <div class="map-pin">
-                <img src="image/B2.png" class="pin-icon" alt="Beacon">
+                <div class="glow-point-main"></div>
+                <img src="image/B1.png" class="pin-icon" alt="Beacon">
             </div>
         `;
         const customIcon = L.divIcon({
@@ -1088,12 +1167,21 @@
 
         function updateTether() {
             const cardAnchorX = 40 + 160;
-            const cardAnchorY = 140 + 200; // Updated for new card top (140px)
+            const cardAnchorY = 140 + 200; // Bottom-Right of Card
+
+            // Get Pin Center
             const pinPoint = map.latLngToContainerPoint(marker.getLatLng());
+
+            // Calculate Top-Left of Pin (assuming 80x80 pin, center anchored)
+            // Center is (0,0) relative to anchor. Top-Left is -40,-40.
+            // We'll target slightly inside the corner for visuals (-30)
+            const pinTargetX = pinPoint.x - 30;
+            const pinTargetY = pinPoint.y - 30;
+
             lineElement.setAttribute('x1', cardAnchorX);
             lineElement.setAttribute('y1', cardAnchorY);
-            lineElement.setAttribute('x2', pinPoint.x);
-            lineElement.setAttribute('y2', pinPoint.y);
+            lineElement.setAttribute('x2', pinTargetX);
+            lineElement.setAttribute('y2', pinTargetY);
         }
 
         // --- VISIBILITY & LIGHTHOUSE LOGIC ---
@@ -1178,31 +1266,132 @@
         });
         map.on('zoom', updateVisibility);
         map.on('viewreset', updateTether);
-        updateTether();
+        updateVisibility(); // Ensure initial state is correct regarding zoom level
 
         setTimeout(() => {
             map.flyTo(missionCoords, 16, { animate: true, duration: 3 });
         }, 1000);
 
+        // --- MEMORY STREAMS (CHANNELS) ---
+        const memoryStreams = [
+            {
+                id: 0,
+                image: 'image/manga.png',
+                building: 'image/B1.png',
+                coords: missionCoords, // Mission District
+                user: {
+                    name: 'Felix',
+                    avatar: 'https://api.dicebear.com/7.x/notionists/svg?seed=Felix',
+                    reactions: ['🎩', '🥶'],
+                    count: 'x4',
+                    beaconName: 'MISSION DISTRICT'
+                }
+            },
+            {
+                id: 1,
+                image: 'image/manga2.gif',
+                building: 'image/B2.png',
+                coords: [37.7609, -122.4350], // Castro Style Location
+                user: {
+                    name: 'Aria',
+                    avatar: 'https://api.dicebear.com/7.x/notionists/svg?seed=Aria',
+                    reactions: ['⚡', '✨'],
+                    count: 'x12',
+                    beaconName: 'CASTRO TOWER'
+                }
+            },
+            {
+                id: 2,
+                image: 'image/manga3.png',
+                building: 'image/B3.png',
+                coords: [37.780, -122.405], // SoMa Style Location
+                user: {
+                    name: 'Zen',
+                    avatar: 'https://api.dicebear.com/7.x/notionists/svg?seed=Zen',
+                    reactions: ['🌊', '🎹'],
+                    count: 'x8',
+                    beaconName: 'SOMA HUB'
+                }
+            }
+        ];
+
+        let currentMemoryIndex = 0; // Starts at 0 (Felix/B1)
+
         // --- SEEK NEXT SIGNAL LOGIC ---
         function seekNextSignal() {
-            if (!allMemories || allMemories.length === 0) return;
+            // 1. Calculate next index
+            currentMemoryIndex = (currentMemoryIndex + 1) % memoryStreams.length;
+            const data = memoryStreams[currentMemoryIndex];
 
-            // Visual feedback on button (optional here as css handles hover)
-            const btn = document.querySelector('.signal-seeker');
-            btn.style.opacity = '0.5';
-            setTimeout(() => btn.style.opacity = '1', 200);
+            // 2. UI Feedback (Knob spin)
+            const knob = document.querySelector('.tuner-knob-core');
+            const label = document.querySelector('.orb-label');
 
-            // Pick random target
-            const randomIndex = Math.floor(Math.random() * allMemories.length);
-            const target = allMemories[randomIndex];
+            if (knob) knob.style.transform = 'scale(0.9) rotate(90deg)';
+            if (label) label.innerText = "TUNING...";
 
-            // Fly
-            map.flyTo([target.lat, target.lng], 16, {
+            // 3. Start Transition (Fade Out)
+            const memoryCard = document.querySelector('.memory-card');
+            const pinIcon = document.querySelector('.map-pin .pin-icon');
+            const beaconName = document.querySelector('.beacon-name');
+            const stickerName = document.querySelector('.sticker-name');
+            const stickerAvatar = document.querySelector('.sticker-avatar');
+            const stickerReactions = document.querySelector('.sticker-reactions');
+
+            // Add a transition class to blur/fade
+            memoryCard.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+            memoryCard.style.opacity = '0';
+            memoryCard.style.transform = 'translateY(10px) scale(0.95)';
+
+            // 4. Update Marker Position & Fly
+            marker.setLatLng(data.coords); // <--- IMPORTANT: Move pin to new location
+            map.flyTo(data.coords, 16, {
                 animate: true,
-                duration: 2.0,
-                easeLinearity: 0.1
+                duration: 1.5,
+                easeLinearity: 0.2
             });
+
+            // 5. Update Content & Fade In after short delay
+            setTimeout(() => {
+                // Update Memory Image
+                document.querySelector('.memory-image').src = data.image;
+
+                // Update User Info
+                if (stickerAvatar) stickerAvatar.style.backgroundImage = `url('${data.user.avatar}')`;
+                if (stickerName) stickerName.innerText = data.user.name;
+
+                // Update Reactions
+                if (stickerReactions) {
+                    stickerReactions.innerHTML = `
+                        <div class="reaction-emoji">${data.user.reactions[0]}</div>
+                        <div class="reaction-emoji">${data.user.reactions[1]}</div>
+                        <span class="reaction-count">${data.user.count}</span>
+                    `;
+                }
+
+                // Update Building Pin in the map
+                if (pinIcon) {
+                    pinIcon.src = data.building;
+                    // Reset animation to make it pop
+                    pinIcon.style.animation = 'none';
+                    pinIcon.offsetHeight; /* trigger reflow */
+                    pinIcon.style.animation = 'pulse 3s infinite ease-in-out';
+                }
+
+                // Update Beacon Title
+                if (beaconName) beaconName.innerText = data.user.beaconName;
+
+                // Reset Knob
+                if (knob) knob.style.transform = '';
+
+                // Fade In
+                memoryCard.style.opacity = '1';
+                memoryCard.style.transform = 'translateY(0px) scale(1)';
+
+                // Reset Label
+                if (label) label.innerText = "TUNE IN";
+
+            }, 500);
         }
     </script>
 </body>

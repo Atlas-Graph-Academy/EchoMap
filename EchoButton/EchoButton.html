@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+        :root {
+            --primary-glow: #ffb38a;
+            /* 你的品牌橙金色 */
+            --signal-blue: #aeeeff;
+            /* 代表信号的电光蓝，与橙色形成冷暖对比 */
+            --glass-bg: rgba(20, 20, 20, 0.6);
+        }
+
+        body {
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* 容器定位 */
+        .tune-in-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 1. The Signal Tag (预告信号) 
+           这是“诱饵”。它必须看起来像是雷达刚刚捕获到的信息。
+        */
+        .signal-tag {
+            background: rgba(174, 238, 255, 0.1);
+            border: 1px solid rgba(174, 238, 255, 0.3);
+            color: var(--signal-blue);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            /* 悬浮在按钮上方 */
+
+            /* 这种发光让它看起来是从按钮里投射出来的全息影像 */
+            box-shadow: 0 0 15px rgba(174, 238, 255, 0.15);
+            backdrop-filter: blur(4px);
+
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            /* 微弱的浮动动画 */
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* 信号前面的小点，模拟雷达锁定 */
+        .signal-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--signal-blue);
+            border-radius: 50%;
+            animation: blink 1.5s infinite;
+        }
+
+        /* 2. The Core Button (核心按钮) 
+           它是物理世界的接口。深邃、有质感。
+        */
+        .dial-button {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+
+            /* 材质：深色玻璃 + 内部光源 */
+            background: radial-gradient(circle at 50% 50%, #2a2a2a 0%, #000 100%);
+            border: 1px solid rgba(255, 179, 138, 0.3);
+
+            position: relative;
+            cursor: pointer;
+
+            /* 外部的呼吸光晕 */
+            box-shadow:
+                0 0 0 1px rgba(0, 0, 0, 1),
+                /* 黑圈隔离 */
+                0 0 30px rgba(255, 179, 138, 0.15);
+            /* 橙色辉光 */
+
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 按钮中心的图标：从简单的点变成波纹 */
+        .dial-icon {
+            width: 24px;
+            height: 24px;
+            opacity: 0.9;
+        }
+
+        /* 3. The Ripple Ring (刻度环) 
+           你原来的虚线圈，我把它做成动态的声波。
+        */
+        .ripple-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 1px dashed rgba(255, 179, 138, 0.4);
+            opacity: 0.5;
+            pointer-events: none;
+
+            /* 像雷达一样旋转 */
+            animation: spin 10s linear infinite;
+        }
+
+        /* 交互反馈：按下时 */
+        .dial-button:active {
+            transform: scale(0.92);
+            background: radial-gradient(circle at 50% 50%, #3a2a20 0%, #1a1a1a 100%);
+            box-shadow:
+                0 0 0 1px rgba(255, 179, 138, 0.6),
+                0 0 50px rgba(255, 179, 138, 0.4);
+        }
+
+        /* 文字标签 */
+        .label-text {
+            margin-top: 12px;
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 500;
+        }
+
+        /* 动画定义 */
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-4px);
+            }
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.4;
+                transform: scale(0.8);
+            }
+        }
+
+        @keyframes spin {
+            from {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+
+            to {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="tune-in-container">
+
+        <!-- 1. 预告信号 (The Hook) -->
+        <!-- 这里展示 Next Signal 的具体信息 -->
+        <div class="signal-tag">
+            <div class="signal-dot"></div>
+            <span>Signal: Melancholy • 0.3mi</span>
+        </div>
+
+        <!-- 2. 按钮本体 (The Trigger) -->
+        <div class="dial-button">
+            <!-- 旋转的刻度环 -->
+            <div class="ripple-ring"></div>
+
+            <!-- 中心的波纹图标 (SVG) -->
+            <svg class="dial-icon" viewBox="0 0 24 24" fill="none" stroke="#ffb38a" stroke-width="2">
+                <path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16z" stroke-opacity="0.3"></path>
+                <circle cx="12" cy="12" r="3" fill="#ffb38a"></circle>
+                <path d="M4.93 4.93l1.41 1.41"></path>
+                <path d="M17.66 17.66l1.41 1.41"></path>
+                <path d="M19.07 4.93l-1.41 1.41"></path>
+                <path d="M6.34 17.66l-1.41 1.41"></path>
+            </svg>
+        </div>
+
+        <div class="label-text">TUNE IN</div>
+
+    </div>
+
+</body>
+
+</html>

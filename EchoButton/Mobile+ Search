@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        :root {
+            --core-gold: #FFB38A;  /* 记忆的光芒 */
+            --active-teal: #64FFDA; /* 信号锁定的电光色 */
+            --bg-dark: #0f0f11;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'SF Pro Display', 'Inter', sans-serif;
+            overflow: hidden;
+        }
+
+        /* 容器 */
+        .compass-container {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* -----------------------
+           1. The Orbit (外围的圈)
+           代表周围漂浮的灵魂/记忆。
+           初始状态：缓慢公转，像星系。
+        ----------------------- */
+        .orbit-ring {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 2px dashed rgba(255, 179, 138, 0.3);
+            /* 这种虚线间距让它看起来像是一群人/点 */
+            stroke-dasharray: 4 6; 
+            
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); /* 弹性过渡 */
+            animation: drift 20s linear infinite;
+        }
+
+        /* -----------------------
+           2. The Core (核心圆点)
+           初始状态：呼吸。
+        ----------------------- */
+        .core-node {
+            width: 24px;
+            height: 24px;
+            background-color: var(--core-gold);
+            border-radius: 50%;
+            box-shadow: 0 0 20px var(--core-gold);
+            z-index: 2;
+            
+            transition: all 0.5s ease;
+            animation: breathe 4s ease-in-out infinite;
+        }
+
+        /* -----------------------
+           3. The Text Label (指引文字)
+           初始状态：显示 Scan，或者空白
+        ----------------------- */
+        .status-label {
+            position: absolute;
+            bottom: -40px; /* 放在按钮下方 */
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            letter-spacing: 0.15em;
+            font-weight: 500;
+            text-transform: uppercase;
+            text-align: center;
+            width: 200px;
+            transition: all 0.4s ease;
+            opacity: 0.7;
+        }
+        
+        /* 动态增加的情绪高亮词 */
+        .emotion-highlight {
+            color: var(--active-teal);
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(100, 255, 218, 0.4);
+        }
+
+        /* ============================
+           STATE: SCANNING (第一次点击后)
+           类名 .scanning 被添加到 container
+        ============================ */
+        
+        /* 外圈变化：变成雷达，扩大，加速，变色 */
+        .compass-container.scanning .orbit-ring {
+            width: 110px;
+            height: 110px;
+            border-color: var(--active-teal);
+            border-style: solid; /* 变成实线或更密集的扫描线 */
+            border-width: 1px;
+            
+            /* 雷达扫描特效：利用 mask 或者 gradient 模拟 */
+            background: conic-gradient(from 0deg, transparent 0%, rgba(100, 255, 218, 0.1) 80%, rgba(100, 255, 218, 0.5) 100%);
+            border-radius: 50%;
+            
+            animation: scan-spin 1.5s linear infinite; /* 极速旋转 */
+            box-shadow: 0 0 30px rgba(100, 255, 218, 0.2);
+        }
+
+        /* 核心变化：收缩，变亮，准备发射 */
+        .compass-container.scanning .core-node {
+            transform: scale(0.6); /* 缩小聚焦 */
+            background-color: #fff; /* 变成高能白光 */
+            box-shadow: 0 0 40px var(--active-teal);
+            animation: rapid-pulse 0.8s ease-in-out infinite; /* 急促跳动 */
+        }
+
+        /* 文字变化：上移一点，更清晰 */
+        .compass-container.scanning .status-label {
+            transform: translateY(-5px);
+            opacity: 1;
+        }
+
+        /* ============================
+           Animations
+        ============================ */
+        @keyframes drift {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes scan-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.3); opacity: 1; }
+        }
+
+        @keyframes rapid-pulse {
+            0%, 100% { transform: scale(0.6); opacity: 0.8; }
+            50% { transform: scale(0.75); opacity: 1; }
+        }
+
+        /* 点击时的反馈效果 */
+        .compass-container:active .core-node {
+            transform: scale(0.9);
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 整个组件是一个可点击区域 -->
+    <div class="compass-container" id="compass" onclick="toggleState()">
+        
+        <!-- 外圈：人群/雷达 -->
+        <div class="orbit-ring"></div>
+        
+        <!-- 核心：能量点 -->
+        <div class="core-node"></div>
+        
+        <!-- 文字情报 -->
+        <div class="status-label" id="label">
+            Tap to Search
+        </div>
+        
+    </div>
+
+    <script>
+        const compass = document.getElementById('compass');
+        const label = document.getElementById('label');
+        
+        // 状态机：0 = Idle, 1 = Scanned (Found Signal)
+        let state = 0; 
+
+        function toggleState() {
+            if (state === 0) {
+                // --- 动作 1: 第一次点击 (进入扫描模式) ---
+                compass.classList.add('scanning');
+                
+                // 模拟正在寻找信号的延迟
+                label.innerText = "Scanning Frequencies...";
+                
+                setTimeout(() => {
+                    // 0.6秒后找到信号
+                    // 这里的 HTML 可以动态生成，显示距离和情绪
+                    label.innerHTML = "Signal Found: <br><span class='emotion-highlight'>Melancholy • 0.3mi</span>";
+                }, 600);
+                
+                state = 1;
+                
+                // 触发手机震动 (Haptics)
+                if (navigator.vibrate) navigator.vibrate(20);
+
+            } else {
+                // --- 动作 2: 第二次点击 (确认进入) ---
+                
+                // 这里执行跳转逻辑
+                console.log("Navigating to memory...");
+                
+                // 视觉反馈：瞬间爆发
+                label.innerHTML = "TUNING IN...";
+                if (navigator.vibrate) navigator.vibrate([50, 30, 50]); // 更强的震动
+                
+                // 演示用：1秒后重置
+                setTimeout(() => {
+                    reset();
+                }, 1000);
+            }
+        }
+
+        function reset() {
+            compass.classList.remove('scanning');
+            label.innerText = "Tap to Search";
+            state = 0;
+        }
+    </script>
+
+</body>
+</html>
