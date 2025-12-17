@@ -1,0 +1,11 @@
+{
+    "name": "echomap",
+    "version": "1.0.0",
+    "description": "EchoMap - A map of memories",
+    "scripts": {
+        "start": "serve ."
+    },
+    "devDependencies": {
+        "serve": "^14.2.1"
+    }
+}

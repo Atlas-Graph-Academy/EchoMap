@@ -1,0 +1,4 @@
+.agent
+.git
+node_modules
+*.md
