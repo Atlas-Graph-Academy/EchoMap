@@ -9,13 +9,19 @@
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
     <style>
         :root {
-            --neon-green: #ccff00;
-            /* The specific "Signal" green */
+            --gold-primary: #ffb38a;
+            --gold-glow: #e66a45;
+            --text-main: #e0dcd9;
             --glass-bg: rgba(20, 20, 20, 0.6);
-            --text-white: #ffffff;
-            --font-main: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+            --glass-warm: rgba(20, 20, 20, 0.6);
+
+            --font-display: 'Cormorant Garamond', serif;
+            --font-ui: 'Inter', sans-serif;
         }
 
         body {
@@ -26,7 +32,8 @@
             align-items: center;
             min-height: 100vh;
             background-color: #111;
-            font-family: var(--font-main);
+            font-family: var(--font-ui);
+            color: var(--text-main);
         }
 
         /* --- PHONE MOCKUP --- */
@@ -66,7 +73,6 @@
             height: 100%;
             z-index: 1;
             background: #000;
-            /* Fallback */
         }
 
         /* Customizing Leaflet controls to look cleaner */
@@ -80,7 +86,8 @@
             color: #aaa !important;
         }
 
-        /* Overlay gradient to make text readable at bottom */
+        /* --- ATMOSPHERE LAYERS REMOVED --- */
+
         .vignette {
             position: absolute;
             bottom: 0;
@@ -88,7 +95,7 @@
             width: 100%;
             height: 40%;
             background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
-            z-index: 2;
+            z-index: 4;
             pointer-events: none;
         }
 
@@ -112,11 +119,12 @@
             left: 40px;
             width: 160px;
             height: 200px;
-            border: 1px solid var(--neon-green);
-            /* The Stroke */
-            background: #000;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: var(--glass-warm);
+            backdrop-filter: blur(12px) brightness(1.1);
+            -webkit-backdrop-filter: blur(12px) brightness(1.1);
             z-index: 20;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
             pointer-events: auto;
         }
 
@@ -142,7 +150,7 @@
             width: 80px;
             height: 80px;
             object-fit: contain;
-            filter: drop-shadow(0 0 8px var(--neon-green));
+            filter: drop-shadow(0 0 15px var(--gold-primary));
             animation: pulse 3s infinite ease-in-out;
         }
 
@@ -172,9 +180,9 @@
         .lighthouse-pin .glow-point {
             width: 12px;
             height: 12px;
-            background: var(--neon-green);
+            background: var(--gold-primary);
             border-radius: 50%;
-            box-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green);
+            box-shadow: 0 0 10px var(--gold-primary), 0 0 20px var(--gold-glow);
             opacity: 0;
             /* Hidden by default, toggled by .active */
             transition: opacity 0.3s;
@@ -196,7 +204,7 @@
             to {
                 transform: scale(1.5);
                 opacity: 1;
-                box-shadow: 0 0 25px var(--neon-green), 0 0 40px var(--neon-green);
+                box-shadow: 0 0 25px var(--gold-primary), 0 0 40px var(--gold-glow);
             }
         }
 
@@ -244,17 +252,21 @@
         }
 
         .sticker-name {
-            background: #fff;
-            color: #000;
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text-main);
             padding: 4px 10px;
             border-radius: 12px;
             font-size: 12px;
-            font-weight: 700;
+            font-weight: 500;
             margin-left: -12px;
             /* Pull behind avatar */
             padding-left: 16px;
             /* Space for avatar */
             z-index: 1;
+            letter-spacing: 0.5px;
         }
 
         .sticker-reactions {
@@ -299,11 +311,11 @@
         /* Pin starts at: left 220px, top 350px */
 
         .tether-line {
-            stroke: var(--neon-green);
+            stroke: var(--gold-primary);
             stroke-width: 1;
             fill: none;
             /* Glowing effect */
-            filter: drop-shadow(0 0 2px var(--neon-green));
+            filter: drop-shadow(0 0 4px var(--gold-glow));
         }
 
         /* 4. THE DATA (BOTTOM RIGHT) */
@@ -312,7 +324,7 @@
             bottom: 120px;
             right: 24px;
             text-align: right;
-            color: var(--text-white);
+            color: var(--text-main);
             pointer-events: none;
         }
 
@@ -324,7 +336,10 @@
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
             display: block;
             margin-top: 8px;
-            color: var(--neon-green);
+            color: var(--gold-primary);
+            font-family: var(--font-display);
+            font-size: 18px;
+            letter-spacing: 1px;
         }
 
         .stat-label {
@@ -340,7 +355,10 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 2px;
-            opacity: 0.6;
+            opacity: 0.8;
+            color: var(--gold-primary);
+            font-family: var(--font-ui);
+            font-size: 10px;
             margin-bottom: 2px;
             display: block;
         }
@@ -356,18 +374,20 @@
         .title-pin-icon {
             width: 18px;
             height: 18px;
-            color: var(--neon-green);
-            filter: drop-shadow(0 0 4px rgba(204, 255, 0, 0.4));
+            color: var(--gold-primary);
+            filter: drop-shadow(0 0 4px var(--gold-glow));
         }
 
         .beacon-name {
-            font-size: 26px;
-            font-weight: 800;
+            font-family: var(--font-display);
+            font-size: 32px;
+            font-weight: 400;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            line-height: 1;
+            letter-spacing: 0.05em;
+            line-height: 0.9;
             margin: 0;
-            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+            text-shadow: 0 0 20px rgba(230, 106, 69, 0.4);
+            color: #fff;
         }
 
         /* Animation */
@@ -388,51 +408,107 @@
             }
         }
 
-        /* Seek Button - Now a Centered Floating Pill */
-        .signal-seeker {
+        /* --- RESONANCE ORB (Drift Control) --- */
+        .resonance-control {
             position: absolute;
             bottom: 40px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 24px;
-            background: rgba(10, 10, 10, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(204, 255, 0, 0.3);
-            border-radius: 100px;
+            gap: 12px;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
             z-index: 100;
             pointer-events: auto;
         }
 
-        .signal-seeker:hover {
-            background: rgba(204, 255, 0, 0.1);
-            border-color: var(--neon-green);
-            box-shadow: 0 0 15px rgba(204, 255, 0, 0.2);
-            transform: translateX(-50%) translateY(-2px);
+        .orb-core {
+            width: 68px;
+            height: 68px;
+            border-radius: 50%;
+            background: rgba(255, 179, 138, 0.05);
+            /* Very subtle glass */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 179, 138, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold-primary);
+            box-shadow:
+                0 0 20px rgba(0, 0, 0, 0.2),
+                inset 0 0 20px rgba(255, 179, 138, 0.1);
+            transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
         }
 
-        .signal-seeker span {
+        /* Inner light bloom */
+        .orb-core::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, var(--gold-primary) 0%, transparent 60%);
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.5);
+            transition: all 0.4s ease;
+        }
+
+        .resonance-control:hover .orb-core {
+            transform: scale(1.1);
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 30px rgba(230, 106, 69, 0.4);
+            background: rgba(255, 179, 138, 0.1);
+        }
+
+        .resonance-control:hover .orb-core::after {
+            opacity: 0.2;
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+
+        .resonance-control:active .orb-core {
+            transform: scale(0.95);
+        }
+
+        .orb-label {
+            font-family: var(--font-ui);
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 500;
             letter-spacing: 2px;
-            color: var(--neon-green);
             text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.6);
+            transition: color 0.3s;
         }
 
-        .signal-seeker svg {
-            color: var(--neon-green);
+        .orb-label {
+            font-family: var(--font-ui);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 0 10px rgba(255, 200, 100, 0.6);
+            transition: color 0.3s;
         }
 
-        /* Active state for button click */
-        .signal-seeker:active {
-            transform: translateX(-50%) scale(0.96);
+        .resonance-control:hover .orb-label {
+            color: #fff;
+            text-shadow: 0 0 15px rgba(255, 220, 150, 1);
+        }
+
+        /* Icon Animation */
+        .orb-core svg {
+            z-index: 2;
+            transition: transform 0.4s ease;
+            filter: drop-shadow(0 0 5px var(--gold-glow));
+        }
+
+        .resonance-control:hover svg {
+            transform: translateX(2px);
         }
 
         /* --- RESONANCE PROMPT (Radar) --- */
@@ -498,7 +574,7 @@
         .nav-toggle:hover {
             background: rgba(255, 255, 255, 0.1);
             color: #fff;
-            border-color: var(--neon-green);
+            border-color: var(--gold-primary);
         }
 
         .nav-menu {
@@ -533,7 +609,7 @@
 
         .nav-link:hover {
             background: rgba(255, 255, 255, 0.1);
-            color: var(--neon-green);
+            color: var(--gold-primary);
         }
     </style>
 </head>
@@ -557,7 +633,7 @@
             <line x1="200" y1="300" x2="220" y2="340" class="tether-line" />
 
             <!-- Optional: A small dot at the anchor point on the image -->
-            <circle cx="200" cy="300" r="2" fill="#ccff00" />
+            <circle cx="200" cy="300" r="2" fill="#ffb38a" />
         </svg>
 
         <!-- UI Elements -->
@@ -584,13 +660,17 @@
             <!-- The Navigator (Center Bottom) -->
             <div class="resonance-prompt">✨ High resonance detected nearby...</div>
 
-            <div class="signal-seeker" onclick="seekNextSignal()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-                <span>Find Next Signal</span>
+            <!-- The Resonance Orb (Drift Control) -->
+            <div class="resonance-control" onclick="seekNextSignal()">
+                <div class="orb-core">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M13 5L20 12L13 19" />
+                        <path d="M5 12H19" />
+                        <path d="M5 5C5 5 2 8 2 12C2 16 5 19 5 19" opacity="0.5" />
+                    </svg>
+                </div>
+                <span class="orb-label">Next Echo</span>
             </div>
 
             <!-- The Stats (Bottom Right - The "Dock") -->
@@ -658,10 +738,10 @@
             canvas.height = size;
             const ctx = canvas.getContext('2d');
             const gradient = ctx.createRadialGradient(radius, radius, 0, radius, radius, radius);
-            gradient.addColorStop(0, 'rgba(255, 255, 240, 0.9)');
-            gradient.addColorStop(0.15, 'rgba(204, 255, 0, 0.6)');
-            gradient.addColorStop(0.4, 'rgba(204, 255, 0, 0.15)');
-            gradient.addColorStop(1, 'rgba(204, 255, 0, 0)');
+            gradient.addColorStop(0, 'rgba(255, 240, 230, 0.9)');
+            gradient.addColorStop(0.15, 'rgba(255, 179, 138, 0.6)');
+            gradient.addColorStop(0.4, 'rgba(230, 106, 69, 0.15)');
+            gradient.addColorStop(1, 'rgba(230, 106, 69, 0)');
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, size, size);
             return canvas;
@@ -730,7 +810,7 @@
                 // Add to overlay pane
                 this.getPane().appendChild(this._canvas);
 
-                this._glowSprite = bakeGlowTexture(48, '#ccff00');
+                this._glowSprite = bakeGlowTexture(48, '#ffb38a');
 
                 this._points = allMemories;
 

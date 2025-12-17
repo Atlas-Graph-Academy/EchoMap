@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Holographic Invitation</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&family=Dancing+Script:wght@500&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --void-bg: #050505;
+
+            /* The Energy Palette */
+            --glass-surface: rgba(20, 20, 20, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-highlight: rgba(255, 255, 255, 0.05);
+
+            --gold-primary: #ffb38a;
+            --gold-glow: #e66a45;
+            --text-main: #e0dcd9;
+            --text-dim: #8a8583;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--void-bg);
+            /* Deep blurred background simulating the "Map" underneath */
+            background-image: radial-gradient(circle at 50% 50%, #1a0f0a 0%, #000 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            perspective: 1200px;
+            /* 关键：开启 3D 透视 */
+        }
+
+        /* Ambient environment noise */
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+
+        /* --- The Invitation Monolith --- */
+        .invitation-card {
+            width: 360px;
+            height: 720px;
+            /* Taller aspect ratio */
+            position: relative;
+
+            /* 3D Transform: Tilted back slightly to show it's an object */
+            transform: rotateX(10deg) rotateY(-5deg);
+            transform-style: preserve-3d;
+            transition: transform 0.4s ease-out;
+
+            /* The Material: Dark Glass */
+            background: linear-gradient(160deg, rgba(30, 30, 30, 0.8), rgba(10, 10, 10, 0.95));
+            backdrop-filter: blur(24px) saturate(120%);
+            -webkit-backdrop-filter: blur(24px) saturate(120%);
+
+            border-radius: 20px;
+            /* Fresnel Border: Brighter at top/left */
+            border: 1px solid var(--glass-border);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                /* Top rim light */
+                0 20px 50px rgba(0, 0, 0, 0.8),
+                /* Deep shadow */
+                0 0 30px rgba(230, 106, 69, 0.1);
+            /* Ambient bloom */
+        }
+
+        /* Interactive Hover: Card rights itself */
+        .invitation-card:hover {
+            transform: rotateX(0deg) rotateY(0deg) translateZ(20px);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                0 40px 80px rgba(0, 0, 0, 0.9),
+                0 0 60px rgba(230, 106, 69, 0.15);
+        }
+
+        /* --- The Geometric Flap (Top Triangle) --- */
+        .card-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.03), transparent);
+            /* Create the V shape */
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            z-index: 2;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            /* Subtle grid texture on the flap to look techy */
+            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* --- The "Seal" (Energy Core) --- */
+        .energy-seal {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            position: absolute;
+            top: 172px;
+            left: 50%;
+            transform: translateX(-50%) translateZ(20px);
+            /* Popped out in 3D */
+            z-index: 10;
+
+            /* The Glowing Core Material */
+            background: radial-gradient(circle at 30% 30%, var(--gold-primary), var(--gold-glow));
+            box-shadow:
+                0 0 20px var(--gold-glow),
+                inset 0 0 10px rgba(255, 255, 255, 0.5);
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px;
+            color: #3e1a10;
+            font-weight: bold;
+
+            /* The "Pulse" animation */
+            animation: pulse 4s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px var(--gold-glow), inset 0 0 10px rgba(255, 255, 255, 0.5);
+            }
+
+            50% {
+                box-shadow: 0 0 40px var(--gold-glow), inset 0 0 5px rgba(255, 255, 255, 0.8);
+            }
+        }
+
+        /* --- Content Body --- */
+        .content-area {
+            padding: 220px 30px 100px 30px;
+            /* Space for flap */
+            text-align: center;
+            color: var(--text-main);
+        }
+
+        .cursive-intro {
+            font-family: 'Dancing Script', cursive;
+            /* Handwritten feel but digital */
+            font-size: 22px;
+            color: var(--gold-primary);
+            margin-bottom: 20px;
+            opacity: 0.8;
+            text-shadow: 0 0 10px rgba(255, 179, 138, 0.3);
+            transform: rotate(-3deg);
+        }
+
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 42px;
+            font-weight: 400;
+            margin-bottom: 24px;
+            letter-spacing: -0.02em;
+            line-height: 1;
+
+            /* Emissive Text Effect */
+            color: #fff;
+            text-shadow:
+                0 0 10px rgba(255, 255, 255, 0.5),
+                0 0 30px var(--gold-glow);
+        }
+
+        .body-text {
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--text-dim);
+            font-weight: 300;
+            margin-bottom: 40px;
+        }
+
+        /* --- Holographic Pill (Attendees) --- */
+        .holo-pill {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 6px 16px 6px 6px;
+            border-radius: 50px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .avatars {
+            display: flex;
+            margin-right: 12px;
+        }
+
+        .av {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background-size: cover;
+            margin-left: -8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .av:first-child {
+            margin-left: 0;
+        }
+
+        .pill-text {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* --- Grid Logistics --- */
+        .grid-info {
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+            gap: 30px;
+            position: relative;
+        }
+
+        /* Vertical light beam divider */
+        .grid-info::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 10px;
+            height: 30px;
+            width: 1px;
+            background: linear-gradient(to bottom, transparent, var(--gold-primary), transparent);
+            opacity: 0.5;
+        }
+
+        .info-block h3 {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--gold-primary);
+            margin-bottom: 5px;
+        }
+
+        .info-block p {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 22px;
+            color: var(--text-main);
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        }
+
+        .info-block span {
+            display: block;
+            font-size: 10px;
+            color: var(--text-dim);
+            font-family: 'Inter', sans-serif;
+            margin-top: 2px;
+        }
+
+        /* --- Footer Action (Solid Metal) --- */
+        .card-footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 70px;
+            background: rgba(0, 0, 0, 0.4);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 0 0 20px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            /* Subtle moving sheen */
+            overflow: hidden;
+        }
+
+        .footer-btn {
+            color: #fff;
+            font-size: 12px;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            font-weight: 600;
+            opacity: 0.9;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+        }
+
+        /* Cinematic Edge Highlight (Fresnel) */
+        .edge-highlight {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+            pointer-events: none;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+            z-index: 5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="noise"></div>
+
+    <!-- 3D Card Container -->
+    <div class="invitation-card">
+
+        <!-- Edge Highlight -->
+        <div class="edge-highlight"></div>
+
+        <!-- The Geometric Flap (Tech-Envelope) -->
+        <div class="card-flap"></div>
+
+        <!-- The Photon Seal -->
+        <div class="energy-seal">E</div>
+
+        <!-- Content -->
+        <div class="content-area">
+            <div class="cursive-intro">Dear fellow wanderer,</div>
+
+            <h1>Indie<br>Film Night</h1>
+
+            <p class="body-text">
+                For those who watch movies alone<br>
+                and think about them for days.<br>
+                For those who stay for the credits.
+            </p>
+
+            <!-- Attendees -->
+            <div class="holo-pill">
+                <div class="avatars">
+                    <div class="av" style="background-color: #555;"></div>
+                    <div class="av" style="background-color: #777;"></div>
+                    <div class="av" style="background-color: #999;"></div>
+                </div>
+                <span class="pill-text">23 Souls</span>
+            </div>
+
+            <!-- Logistics -->
+            <div class="grid-info">
+                <div class="info-block">
+                    <h3>When</h3>
+                    <p>Oct 24</p>
+                    <span>08:00 PM</span>
+                </div>
+                <div class="info-block">
+                    <h3>Where</h3>
+                    <p>The Roxie</p>
+                    <span>San Francisco</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="card-footer">
+            <span class="footer-btn">RSVP • Join Us</span>
+        </div>
+
+    </div>
+
+    <script>
+        // Parallax Effect for Mouse Movement to enhance 3D feel
+        const card = document.querySelector('.invitation-card');
+
+        document.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth / 2 - e.pageX) / 25;
+            const y = (window.innerHeight / 2 - e.pageY) / 25;
+
+            // Limit the rotation
+            card.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
+        });
+    </script>
+
+</body>
+
+</html>
