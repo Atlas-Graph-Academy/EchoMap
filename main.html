@@ -189,7 +189,7 @@
         /* 4. THE DATA (BOTTOM RIGHT) */
         .stats-container {
             position: absolute;
-            bottom: 50px;
+            bottom: 120px;
             right: 24px;
             text-align: right;
             color: var(--text-white);
@@ -267,6 +267,53 @@
                 filter: brightness(1);
             }
         }
+
+        /* Seek Button - Now a Centered Floating Pill */
+        .signal-seeker {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(204, 255, 0, 0.3);
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            z-index: 100;
+            pointer-events: auto;
+        }
+
+        .signal-seeker:hover {
+            background: rgba(204, 255, 0, 0.1);
+            border-color: var(--neon-green);
+            box-shadow: 0 0 15px rgba(204, 255, 0, 0.2);
+            transform: translateX(-50%) translateY(-2px);
+        }
+
+        .signal-seeker span {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--neon-green);
+            text-transform: uppercase;
+        }
+
+        .signal-seeker svg {
+            color: var(--neon-green);
+        }
+
+        /* Active state for button click */
+        .signal-seeker:active {
+            transform: translateX(-50%) scale(0.96);
+        }
     </style>
 </head>
 
@@ -301,9 +348,17 @@
                 <img src="image/manga.png" class="memory-image" alt="Memory">
             </div>
 
+            <!-- The Navigator (Center Bottom) -->
+            <div class="signal-seeker" onclick="seekNextSignal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <span>Find Next Signal</span>
+            </div>
 
-
-            <!-- The Stats (Bottom Right) -->
+            <!-- The Stats (Bottom Right - The "Dock") -->
             <div class="stats-container">
                 <span class="city-context">SAN FRANCISCO</span>
 
@@ -361,6 +416,13 @@
         }
 
         // Generate "Memories" Data - Organic Tendrils
+        // --- GLOBAL MEMORY DATA ---
+        const clusters = [
+            { lat: missionCoords[0], lng: missionCoords[1], count: 180, spread: 0.008 },
+            { lat: 37.7609, lng: -122.4350, count: 60, spread: 0.006 },
+            { lat: 37.780, lng: -122.405, count: 60, spread: 0.006 }
+        ];
+
         function generateOrganicMemories(clusters) {
             const points = [];
             clusters.forEach(cluster => {
@@ -402,6 +464,8 @@
             return points;
         }
 
+        const allMemories = generateOrganicMemories(clusters);
+
         // Custom Leaflet Layer
         L.StarFieldLayer = L.Layer.extend({
             onAdd: function (map) {
@@ -416,13 +480,7 @@
 
                 this._glowSprite = bakeGlowTexture(48, '#ccff00');
 
-                // Clusters
-                const clusters = [
-                    { lat: missionCoords[0], lng: missionCoords[1], count: 180, spread: 0.008 },
-                    { lat: 37.7609, lng: -122.4350, count: 60, spread: 0.006 },
-                    { lat: 37.780, lng: -122.405, count: 60, spread: 0.006 }
-                ];
-                this._points = generateOrganicMemories(clusters);
+                this._points = allMemories;
 
                 map.on('move', this._update, this);
                 map.on('zoom', this._update, this);
@@ -549,6 +607,26 @@
             map.flyTo(missionCoords, 16, { animate: true, duration: 3 });
         }, 1000);
 
+        // --- SEEK NEXT SIGNAL LOGIC ---
+        function seekNextSignal() {
+            if (!allMemories || allMemories.length === 0) return;
+
+            // Visual feedback on button (optional here as css handles hover)
+            const btn = document.querySelector('.signal-seeker');
+            btn.style.opacity = '0.5';
+            setTimeout(() => btn.style.opacity = '1', 200);
+
+            // Pick random target
+            const randomIndex = Math.floor(Math.random() * allMemories.length);
+            const target = allMemories[randomIndex];
+
+            // Fly
+            map.flyTo([target.lat, target.lng], 16, {
+                animate: true,
+                duration: 2.0,
+                easeLinearity: 0.1
+            });
+        }
     </script>
 </body>
 

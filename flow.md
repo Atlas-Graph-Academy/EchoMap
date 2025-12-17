@@ -2,33 +2,40 @@
 
 ---
 
-## Screen Mode: Map View (Default)
+## Screen Mode: Map View (The Gentle Drift)
+
+Quiet. Minimal. Just a gentle way to wander.
 
 ```
 ┌─────────────────────────────────────────┐
 │                                         │
-│   ┌─────────────────────────────────┐   │
-│   │     Browse the memories  ▼      │   │  ← Button (top)
-│   └─────────────────────────────────┘   │
+│   (Status Bar)                          │
+│                                         │
 │                                         │
 │                                         │
 │             ✦        ✦                  │
-│                  ✦                      │
-│        ✦              ✦    ✦            │  ← Map with glowing lights
-│                                         │     (each light = memory beacon)
-│              ✦                          │
-│     ✦                    ✦              │
-│                  ●                      │  ← User's current location
-│            ✦         ✦                  │
+│  [Active Memory Card Pop-up]            │
+│  ┌──────────────────────────┐           │
+│  │ ┌──────────────────────┐ │           │
+│  │ │      IMAGE           │ │           │
+│  │ └──────────────────────┘ │           │
+│  │ "Quiet rain..."          │           │
+│  └────────────┬─────────────┘           │
+│               │                         │
+│               ●                         │
 │                                         │
-│   ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓   │  ← Gradient fade
+│                                         │
+│                                         │
+│                                         │
+│                                         │
+│                   ◎                     │  ← The Soft Key
+│   ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓   │
 │                                         │
 │   ┌─────────────────────────────────┐   │
 │   │                                 │   │
-│   │   MISSION DISTRICT              │   │  ← Beacon name (large)
-│   │   847 memories · 156 people     │   │  ← Stats line
+│   │   Scanning...                   │   │
 │   │                                 │   │
-│   │            ▽                    │   │  ← Arrow: "scroll up to see more"
+│   │                                 │   │
 │   │                                 │   │
 │   └─────────────────────────────────┘   │
 │                                         │
@@ -39,25 +46,32 @@
 
 ## UI Elements Breakdown
 
-### 1. Top Button: "Browse the memories"
-- **Position:** Top of screen, centered
-- **Action:** Tap to switch memory. Display a new memory. 
-- **Style:** Subtle, doesn't distract from map
+### 1. The Soft Key (The "Wander" Button)
+A subtle, semi-transparent circle at the bottom.
+- **Visual:** It's barely there. Like a drop of water on glass.
+- **Feeling:** No intense glowing or pulsing. It just waits.
 
-### 2. The Map
-- **Full-screen** behind everything
-- **User location:** Blue dot (●) showing where they are
-- **Meaning beacons:** Glowing lights (✦) scattered across the map
-  - These are NOT clickable in this mode
-  - They just signal: "there's life here, memories exist"
+### 2. The Interaction: "Drift & Bloom"
+This is about "Little Serendipities" (小轻轻的偶遇) and "Little Avoidance" (小轻轻的偶避).
 
-### 3. Bottom Panel: Beacon Info Stage
-- **Position:** Fixed at bottom of screen
-- **Content:**
-  - **Beacon Name** — Large text (e.g., "MISSION DISTRICT")
-  - **Stats** — "847 memories · 156 people"
-  - **Down Arrow (▽)** — Visual cue: scroll up to reveal memory list
-- **Behavior:** This panel can be swiped up to expand
+*   **The Avoidance (Dismiss):**
+    *   You tap the button.
+    *   The current memory doesn't snap shut. It just **dissolves** like mist. It fades away softly.
+    *   *Feeling:* "Let this one go."
+
+*   **The Drift (Transition):**
+    *   The map **glides** to the next spot. No fast flying. It feels like floating on a slow river.
+    *   Camera movement is smooth and heavy, not jittery.
+
+*   **The Serendipity (Discovery):**
+    *   A new location centers.
+    *   The new card **blooms** (fades in) gently.
+    *   *Feeling:* "Oh, here is something else."
+
+### 3. The Logic: Pure Randomness
+- No complex tuning. Just pure, simple shuffling of nearby echoes.
+- It feels like walking down a street and letting your eyes catch whatever they catch.
+
 
 ---
 
