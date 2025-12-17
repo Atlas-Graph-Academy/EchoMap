@@ -4,22 +4,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura: God's Window</title>
+    <title>Aura: Deep Field</title>
+
+    <!-- Leaflet Map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- Fonts (Preserved) -->
     <link
         href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap"
         rel="stylesheet">
-    <style>
-        :root {
-            --gold-primary: #ffb38a;
-            --gold-glow: #e66a45;
-            --text-main: #e0dcd9;
-            --glass-bg: rgba(20, 20, 20, 0.6);
-            --glass-warm: rgba(20, 20, 20, 0.6);
 
+    <style>
+        /* --- THE DESIGN SYSTEM: LIGHT & SPACE --- */
+        :root {
+            /* Palette: The Void & The Bioluminescence */
+            --bg-deep: #050507;
+            --glass-surface: rgba(255, 255, 255, 0.03);
+            --glass-border-light: rgba(255, 255, 255, 0.15);
+            --glass-border-dark: rgba(255, 255, 255, 0.05);
+
+            /* State Colors */
+            --warm-orange: #FF9F68;
+            /* Idle / Human Memory */
+            --warm-glow: #ffb38a;
+            --cyber-teal: #64FFDA;
+            /* Active / Machine Search */
+
+            /* Typography */
             --font-display: 'Montserrat', sans-serif;
             --font-ui: 'Inter', sans-serif;
         }
@@ -31,26 +45,29 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-color: #111;
+            background-color: #000;
             font-family: var(--font-ui);
-            color: var(--text-main);
+            color: #fff;
+            overflow: hidden;
         }
 
-        /* --- PHONE MOCKUP --- */
+        /* --- THE DEVICE FRAME --- */
         .phone-frame {
             width: 390px;
-            /* iPhone 14/15 Pro width */
             height: 844px;
-            background: #000;
+            background: var(--bg-deep);
             border-radius: 50px;
-            box-shadow: 0 0 0 12px #2c2c2c, 0 0 0 14px #1a1a1a, 0 20px 50px rgba(0, 0, 0, 0.5);
+            /* Deep, expensive-looking shadow */
+            box-shadow:
+                0 0 0 12px #1a1a1a,
+                0 0 0 13px #333,
+                0 40px 100px rgba(0, 0, 0, 0.8);
             position: relative;
             overflow: hidden;
             display: flex;
             flex-direction: column;
         }
 
-        /* Dynamic Island / Notch */
         .dynamic-island {
             width: 120px;
             height: 35px;
@@ -64,7 +81,7 @@
             pointer-events: none;
         }
 
-        /* --- THE MAP (BACKGROUND) --- */
+        /* --- THE MAP (Canvas of the Void) --- */
         #map {
             position: absolute;
             top: 0;
@@ -72,34 +89,31 @@
             width: 100%;
             height: 100%;
             z-index: 1;
-            background: #000;
+            background: #09090b;
+            /* Slightly lighter than pure black for depth */
+            filter: contrast(1.1) saturate(0.8);
+            /* Cinematic grading */
         }
 
-        /* Customizing Leaflet controls to look cleaner */
+        /* Remove Leaflet clutter */
         .leaflet-control-attribution {
-            font-size: 8px !important;
-            background: rgba(0, 0, 0, 0.5) !important;
-            color: #aaa !important;
+            display: none !important;
         }
 
-        .leaflet-control-attribution a {
-            color: #aaa !important;
-        }
-
-        /* --- ATMOSPHERE LAYERS REMOVED --- */
-
+        /* --- ATMOSPHERE: THE VIGNETTE --- */
+        /* This creates the "infinite dark" feeling at the edges */
         .vignette {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 40%;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
-            z-index: 4;
+            inset: 0;
             pointer-events: none;
+            z-index: 4;
+            background: radial-gradient(circle at center,
+                    transparent 50%,
+                    rgba(5, 5, 7, 0.8) 90%,
+                    rgba(5, 5, 7, 1) 100%);
         }
 
-        /* --- THE UI LAYER --- */
+        /* --- UI LAYER --- */
         .ui-layer {
             position: absolute;
             top: 0;
@@ -108,243 +122,115 @@
             height: 100%;
             z-index: 10;
             pointer-events: none;
-            /* Let clicks pass through to map */
+            /* Clicks pass to map unless on elements */
         }
 
-        /* 1. THE MEMORY (IMAGE SECTION) */
+        /* --- 1. THE MEMORY GLASS (Card) --- */
         .memory-card {
             position: absolute;
             top: 140px;
-            /* Moved down */
-            left: 40px;
-            width: 160px;
-            height: 200px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            background: var(--glass-warm);
-            backdrop-filter: blur(12px) brightness(1.1);
-            -webkit-backdrop-filter: blur(12px) brightness(1.1);
+            left: 30px;
+            width: 170px;
+            height: 220px;
+
+            /* Glassmorphism 2.0 */
+            background: linear-gradient(160deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02));
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+
+            /* The "Light Catch" Border */
+            border-radius: 24px;
+            border: 1px solid transparent;
+            border-top-color: var(--glass-border-light);
+            border-left-color: var(--glass-border-dark);
+            border-bottom-color: var(--glass-border-dark);
+
+            /* Elevation */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+
             z-index: 20;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
             pointer-events: auto;
+            overflow: visible;
+            /* Allow sticker to pop out */
+
+            /* Entrance Animation */
+            transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .memory-image-container {
+            position: absolute;
+            inset: 6px;
+            /* Inner padding */
+            border-radius: 18px;
+            overflow: hidden;
+            background: #000;
         }
 
         .memory-image {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            opacity: 0.9;
-        }
-
-        /* 2. THE BEACON (PIN) */
-        .map-pin {
-            width: 80px;
-            height: 80px;
-            z-index: 20;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            pointer-events: auto;
-            position: relative;
-        }
-
-        .pin-icon {
-            width: 80px;
-            height: 80px;
-            object-fit: contain;
-            filter: drop-shadow(0 0 15px var(--gold-primary));
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            opacity: 0;
-            /* Hidden in Overview */
-            transform: scale(0.5);
-        }
-
-        .glow-point-main {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: var(--gold-primary);
-            border-radius: 50%;
-            box-shadow: 0 0 15px var(--gold-primary), 0 0 30px var(--gold-glow);
-            transition: all 0.5s ease;
-            opacity: 1;
-            /* Visible in Overview */
-            transform: scale(1);
-            animation: light-pulse 2s infinite alternate;
-            z-index: 1;
-        }
-
-        /* Detail Mode: Show Image, Hide Glow */
-        body.detail-mode .pin-icon {
-            opacity: 1;
-            transform: scale(1);
-            animation: pulse 3s infinite ease-in-out;
-        }
-
-        body.detail-mode .glow-point-main {
-            opacity: 0;
-            transform: scale(0.5);
-            animation: none;
-        }
-
-        /* --- LIGHTHOUSE MODE BEACONS --- */
-        .lighthouse-pin {
-            position: relative;
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* The Building Image (Visible ONLY in Detail Mode) */
-        .lighthouse-pin .building-img {
-            width: 60px;
-            height: 60px;
-            object-fit: contain;
-            filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
-            opacity: 0;
-            transform: scale(0.8);
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            pointer-events: none;
-        }
-
-        /* The Glow Point (Visible ONLY in Overview Mode) */
-        .lighthouse-pin .glow-point {
-            width: 12px;
-            height: 12px;
-            background: var(--gold-primary);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--gold-primary), 0 0 20px var(--gold-glow);
-            opacity: 0;
-            /* Hidden by default, toggled by .active */
+            opacity: 0.85;
             transition: opacity 0.3s;
         }
 
-        /* Overview Mode: Cycle the Glows */
-        .lighthouse-pin.active .glow-point {
-            opacity: 1;
-            animation: light-pulse 1s infinite alternate;
-        }
-
-        @keyframes light-pulse {
-            from {
-                transform: scale(1);
-                opacity: 0.6;
-                box-shadow: 0 0 10px var(--neon-green);
-            }
-
-            to {
-                transform: scale(1.5);
-                opacity: 1;
-                box-shadow: 0 0 25px var(--gold-primary), 0 0 40px var(--gold-glow);
-            }
-        }
-
-        /* Detail Mode: Show Buildings, Hide Glows */
-        .detail-mode .lighthouse-pin .building-img {
-            opacity: 1;
-            transform: scale(1);
-            pointer-events: auto;
-        }
-
-        .detail-mode .lighthouse-pin .glow-point {
-            display: none;
-        }
-
-        /* --- STICKER COMPONENT --- */
+        /* --- 2. THE STICKER (Floating Tag) --- */
         .memory-sticker {
             position: absolute;
-            top: -50px;
-            /* Positioned ABOVE the card */
+            top: -24px;
+            /* Half in, half out */
             left: 50%;
             transform: translateX(-50%);
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             z-index: 30;
+
+            /* Shape */
+            padding: 4px 12px 4px 4px;
+            border-radius: 30px;
+
+            /* Material */
+            background: rgba(15, 15, 17, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+
             white-space: nowrap;
-            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
         }
 
         .sticker-avatar {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            border: 2px solid #fff;
+            border: 1.5px solid #fff;
             background-color: #333;
             background-size: cover;
-            /* Overlap name tag slightly */
-            z-index: 2;
-            /* Soul Glow - Narrative: He is "alive" in this memory */
-            box-shadow: 0 0 10px rgba(255, 179, 138, 0.4);
-            animation: soul-breathe 4s ease-in-out infinite;
+            /* The Soul Glow */
+            box-shadow: 0 0 15px rgba(255, 159, 104, 0.4);
         }
 
-        @keyframes soul-breathe {
-
-            0%,
-            100% {
-                box-shadow: 0 0 8px rgba(255, 179, 138, 0.3);
-                border-color: rgba(255, 255, 255, 0.9);
-            }
-
-            50% {
-                box-shadow: 0 0 18px rgba(230, 106, 69, 0.6), 0 0 35px rgba(255, 179, 138, 0.2);
-                border-color: #fff;
-            }
-        }
-
-        .sticker-content {
+        .sticker-info {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            flex-direction: column;
+            line-height: 1;
         }
 
         .sticker-name {
-            background: rgba(20, 20, 20, 0.6);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: var(--text-main);
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-            margin-left: -12px;
-            /* Pull behind avatar */
-            padding-left: 16px;
-            /* Space for avatar */
-            z-index: 1;
+            font-size: 11px;
+            font-weight: 700;
+            color: #fff;
             letter-spacing: 0.5px;
         }
 
-        .sticker-reactions {
-            display: flex;
-            align-items: center;
-            gap: 2px;
+        .sticker-meta {
+            font-size: 9px;
+            color: var(--warm-orange);
+            font-weight: 600;
+            margin-top: 2px;
         }
 
-        .reaction-emoji {
-            font-size: 20px;
-            line-height: 1;
-            filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
-        }
-
-        .reaction-emoji:nth-child(2) {
-            margin-left: -6px;
-            /* Slight Overlap */
-        }
-
-        .reaction-count {
-            color: #fff;
-            font-size: 14px;
-            font-weight: 700;
-            font-style: italic;
-            margin-left: 4px;
-            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
-        }
-
-        /* 3. THE CONNECTION (SVG LINE) */
+        /* --- 3. THE CONNECTION (Glowing Line) --- */
         .connection-layer {
             position: absolute;
             top: 0;
@@ -355,208 +241,144 @@
             pointer-events: none;
         }
 
-        /* The specific geometry to connect bottom-right of card to top-left of pin */
-        /* Card ends at: left 200px (40+160), top 300px (100+200) */
-        /* Pin starts at: left 220px, top 350px */
-
         .tether-line {
-            stroke: var(--gold-primary);
-            stroke-width: 1;
+            stroke: var(--warm-orange);
+            stroke-width: 1.5;
+            stroke-dasharray: 4 4;
+            /* Data packet look */
             fill: none;
-            /* Glowing effect */
-            filter: drop-shadow(0 0 4px var(--gold-glow));
+            opacity: 0.6;
+            filter: drop-shadow(0 0 6px var(--warm-orange));
+            animation: dash-flow 1s linear infinite;
         }
 
-        /* 4. THE DATA (BOTTOM RIGHT) */
+        @keyframes dash-flow {
+            to {
+                stroke-dashoffset: -8;
+            }
+        }
+
+        /* --- 4. THE DATA DOCK (Bottom Right) --- */
         .stats-container {
             position: absolute;
             bottom: 120px;
             right: 24px;
             text-align: right;
-            color: var(--text-main);
             pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
         }
 
-        .stat-count {
-            font-family: var(--font-display);
-            font-size: 20px;
-            font-weight: 700;
-            line-height: 1.2;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-            display: block;
-            margin-top: 6px;
-            color: var(--gold-primary);
-        }
-
-        .stat-label {
-            font-size: 12px;
-            font-weight: 500;
-            opacity: 0.7;
-            margin-bottom: 0;
-            display: block;
-        }
-
+        /* Cinematic Subtitle Style */
         .city-context {
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            opacity: 0.8;
-            color: var(--gold-primary);
             font-family: var(--font-ui);
             font-size: 10px;
-            margin-bottom: 2px;
-            display: block;
-        }
-
-        .beacon-title-row {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 10px;
-            /* Slightly more gap for the pin */
-            margin-bottom: 4px;
-            max-width: 340px;
-            /* Constrain to screen */
-        }
-
-        .title-pin-icon {
-            width: 18px;
-            height: 18px;
-            color: var(--gold-primary);
-            filter: drop-shadow(0 0 4px var(--gold-glow));
+            font-weight: 600;
+            letter-spacing: 3px;
+            color: var(--warm-orange);
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(255, 159, 104, 0.5);
+            margin-bottom: 6px;
         }
 
         .beacon-name {
             font-family: var(--font-display);
-            font-size: 28px;
-            /* Calibrated to fit on one line */
+            font-size: 26px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            line-height: 1;
-            margin: 0;
-            text-shadow: 0 0 25px rgba(230, 106, 69, 0.3);
+            letter-spacing: 1px;
             color: #fff;
-            white-space: nowrap;
-            /* Force one line */
+            margin: 0;
+            /* The Text Bloom */
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
         }
 
-        /* Animation */
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-                filter: brightness(1);
-            }
-
-            50% {
-                transform: scale(1.1);
-                filter: brightness(1.3);
-            }
-
-            100% {
-                transform: scale(1);
-                filter: brightness(1);
-            }
+        .stat-count {
+            font-family: var(--font-ui);
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 4px;
+            letter-spacing: 0.5px;
         }
 
-        /* --- ORB BUTTON (Optimized Tune In Control) --- */
-
-        /* Define state colors matching the new design system */
-        :root {
-            --warm-orange: #FF9F68;
-            /* Idle / Human */
-            --cyber-teal: #64FFDA;
-            /* Locating / Machine */
+        .stat-highlight {
+            color: #fff;
+            font-weight: 600;
         }
 
-        /* Container */
+        /* --- 5. THE ORB (Resonance Control) --- */
+        /* This is the optimized 'Singular Eye' code */
         .resonance-control {
             position: absolute;
             bottom: 30px;
-            /* Moved lower for more space */
             left: 50%;
             transform: translateX(-50%);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
+            gap: 16px;
             cursor: pointer;
             z-index: 100;
             pointer-events: auto;
         }
 
-        /* The Orb (Main Trigger) */
         .orb-button {
             position: relative;
-            width: 64px;
-            height: 64px;
+            width: 68px;
+            height: 68px;
             border-radius: 50%;
-
-            /* Glassmorphism Base */
-            background: var(--glass-surface);
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
             display: flex;
             justify-content: center;
             align-items: center;
-            -webkit-tap-highlight-color: transparent;
-            transition: transform 0.3s ease, border-color 0.5s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* The Inner Soul (Glowing Dot) */
         .orb-soul {
-            width: 12px;
-            height: 12px;
+            width: 14px;
+            height: 14px;
             background-color: var(--warm-orange);
             border-radius: 50%;
-            box-shadow: 0 0 15px var(--warm-orange);
+            box-shadow: 0 0 20px var(--warm-orange);
             transition: all 0.5s ease;
             z-index: 2;
         }
 
-        /* The Rotating Ring (The Radar) */
         .orb-ring {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 4px;
             border-radius: 50%;
             border: 1px dashed rgba(255, 179, 138, 0.3);
-            box-sizing: border-box;
+            animation: slow-drift 12s linear infinite;
             transition: all 0.5s ease;
-            animation: slow-drift 10s linear infinite;
         }
 
-        /* The "NEXT" Label (Micro-copy) */
         .orb-label {
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(255, 255, 255, 0.3);
             font-size: 10px;
-            letter-spacing: 2px;
-            font-weight: 600;
+            letter-spacing: 3px;
+            font-weight: 700;
             text-transform: uppercase;
             transition: all 0.3s ease;
-            pointer-events: none;
-            font-family: var(--font-ui);
         }
 
-        /* --- INTERACTION: Active / Locating (via .is-hunting class) --- */
-
+        /* --- ORB STATES --- */
+        /* Hunting / Loading State */
         .resonance-control.is-hunting .orb-button {
-            transform: scale(0.95);
+            transform: scale(0.9);
             border-color: rgba(100, 255, 218, 0.3);
+            box-shadow: 0 0 30px rgba(100, 255, 218, 0.2);
         }
 
         .resonance-control.is-hunting .orb-soul {
             background-color: var(--cyber-teal);
-            box-shadow: 0 0 25px var(--cyber-teal), 0 0 50px var(--cyber-teal);
-            transform: scale(0.8);
-            animation: pulse-fast 0.8s ease-in-out infinite;
+            box-shadow: 0 0 30px var(--cyber-teal), 0 0 60px var(--cyber-teal);
+            transform: scale(0.7);
+            animation: pulse-fast 0.6s ease-in-out infinite;
         }
 
         .resonance-control.is-hunting .orb-ring {
@@ -564,16 +386,15 @@
             border-style: solid;
             border-top-color: transparent;
             border-left-color: transparent;
-            animation: spin-fast 0.6s linear infinite;
+            animation: spin-fast 0.5s linear infinite;
         }
 
         .resonance-control.is-hunting .orb-label {
             color: var(--cyber-teal);
-            text-shadow: 0 0 8px rgba(100, 255, 218, 0.5);
-            letter-spacing: 3px;
+            text-shadow: 0 0 10px var(--cyber-teal);
         }
 
-        /* --- Animations --- */
+        /* --- ANIMATIONS --- */
         @keyframes slow-drift {
             from {
                 transform: rotate(0deg);
@@ -598,203 +419,139 @@
 
             0%,
             100% {
-                opacity: 0.5;
-                transform: scale(0.8);
+                opacity: 0.6;
             }
 
             50% {
                 opacity: 1;
-                transform: scale(1);
             }
         }
 
-        /* Icon Animation - Removed as we use dots/ticks now */
-
-        /* --- RESONANCE PROMPT (Radar) --- */
-        .resonance-prompt {
-            position: absolute;
-            bottom: 230px;
-            /* Positioned above the stats container */
-            right: 24px;
-            /* Anchored to the right */
-            text-align: right;
-            font-size: 13px;
-            font-weight: 500;
-            color: rgba(255, 255, 255, 0.7);
-            background: rgba(0, 0, 0, 0.4);
-            padding: 6px 12px;
-            border-radius: 20px;
-            pointer-events: none;
-            opacity: 0;
-            /* Hidden by default */
-            transition: opacity 0.5s ease;
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .resonance-prompt.visible {
-            opacity: 1;
-        }
-
-        /* --- UI FADE UTILITY --- */
-        .ui-element {
-            transition: opacity 0.4s ease, transform 0.4s ease;
-            opacity: 1;
-        }
-
-        .ui-hidden {
-            opacity: 0;
-            pointer-events: none;
-            transform: translateY(10px);
-            /* Subtle drop effect */
-        }
-
-        /* --- DEV NAVIGATION --- */
-        .nav-overlay {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            pointer-events: auto;
-            font-family: var(--font-main);
-        }
-
-        .nav-toggle {
-            background: rgba(0, 0, 0, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: rgba(255, 255, 255, 0.8);
-            padding: 6px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 12px;
-            backdrop-filter: blur(8px);
-            transition: all 0.2s;
-        }
-
-        .nav-toggle:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border-color: var(--gold-primary);
-        }
-
-        .nav-menu {
-            position: absolute;
-            top: 40px;
-            right: 0;
-            background: rgba(10, 10, 10, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 8px;
-            display: none;
-            flex-direction: column;
-            gap: 4px;
-            min-width: 160px;
-            backdrop-filter: blur(16px);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-        }
-
-        .nav-menu.visible {
-            color: var(--gold-primary);
-        }
-
-        /* --- TOP HEADER & STATUS BAR --- */
+        /* --- HEADER --- */
         .header-layer {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            padding: 0 24px;
+            padding: 12px 24px;
             box-sizing: border-box;
             z-index: 90;
             pointer-events: none;
-            display: flex;
-            flex-direction: column;
         }
 
-        .status-row {
-            height: 54px;
-            /* Align with Dynamic Island */
+        .status-bar {
+            height: 44px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
-            color: #fff;
-            padding-top: 12px;
+            opacity: 0.8;
         }
 
-        .status-right {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-        }
-
-        .app-header-row {
+        .app-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: -10px;
+            margin-top: 8px;
             pointer-events: auto;
         }
 
         .user-id {
-            font-family: var(--font-ui);
+            font-family: var(--font-display);
             font-weight: 800;
-            font-size: 20px;
-            letter-spacing: 0.5px;
-            color: rgba(255, 255, 255, 0.95);
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            font-size: 18px;
+            letter-spacing: 1px;
+            color: #fff;
             text-transform: uppercase;
         }
 
-        .header-actions {
-            display: flex;
-            gap: 12px;
-        }
-
         .icon-btn {
-            width: 44px;
-            height: 44px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background: rgba(20, 20, 20, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background: var(--glass-surface);
+            border: 1px solid var(--glass-border-dark);
+            backdrop-filter: blur(10px);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #fff;
+            color: rgba(255, 255, 255, 0.8);
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: 0.2s;
         }
 
         .icon-btn:hover {
             background: rgba(255, 255, 255, 0.1);
-            border-color: var(--gold-primary);
-            color: var(--gold-primary);
-            transform: translateY(-2px);
+            color: var(--warm-orange);
+            border-color: var(--warm-orange);
         }
 
-        .icon-btn svg {
-            width: 22px;
-            height: 22px;
-            stroke-width: 1.5px;
+        /* --- MAP PINS (Beacons) --- */
+        .map-pin {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .nav-link {
-            color: rgba(255, 255, 255, 0.7);
-            text-decoration: none;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            transition: all 0.2s;
-            display: block;
+        .pin-glow-core {
+            width: 16px;
+            height: 16px;
+            background: var(--warm-orange);
+            border-radius: 50%;
+            box-shadow: 0 0 20px var(--warm-orange), 0 0 40px var(--warm-glow);
+            animation: breathe 3s ease-in-out infinite;
         }
 
-        .nav-link:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--gold-primary);
+        .pin-building {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+            transform: scale(0.8);
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
+        /* State when zoomed in */
+        body.detail-mode .pin-glow-core {
+            opacity: 0;
+        }
+
+        body.detail-mode .pin-building {
+            opacity: 1;
+            transform: scale(1);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
         }
     </style>
 </head>
@@ -804,338 +561,109 @@
     <div class="phone-frame">
         <div class="dynamic-island"></div>
 
-        <!-- Top Header & Status Bar -->
+        <!-- Header -->
         <div class="header-layer">
-            <!-- Status Bar (Aligned with Notch) -->
-            <div class="status-row">
-                <span class="time">10:04</span>
-                <div class="status-right">
-                    <!-- Signal -->
+            <div class="status-bar">
+                <span>10:04</span>
+                <div style="display:flex; gap:6px">
                     <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor">
-                        <path d="M1 10H3V12H1V10ZM6 7H8V12H6V7ZM11 4H13V12H11V4ZM16 1H18V12H16V1Z" />
+                        <path d="M16 1H18V12H16V1Z M11 4H13V12H11V4Z M6 7H8V12H6V7Z M1 10H3V12H1V10Z" />
                     </svg>
-                    <!-- Wifi -->
-                    <svg width="20" height="14" viewBox="0 0 20 14" fill="currentColor">
-                        <path
-                            d="M10.0003 12.6366L0.90918 3.54546C1.49883 2.95507 2.19904 2.48679 2.96954 2.16752C3.74004 1.84825 4.56573 1.68426 5.39956 1.68494C6.23338 1.68561 7.05898 1.85093 7.82914 2.17145C8.59931 2.49197 9.29895 2.96141 9.88796 3.55299L10.0003 3.66531L10.1126 3.55299C11.3023 2.3644 12.9152 1.6968 14.597 1.6968C16.2789 1.6968 17.8918 2.3644 19.0814 3.55299L10.0003 12.6366ZM10.0003 10.0911L16.536 3.55544C16.0216 3.0409 15.3238 2.75185 14.5963 2.75185C13.8687 2.75185 13.1709 3.0409 12.6565 3.55544L10.0003 6.21166L7.34406 3.55544C6.82963 3.0409 6.13182 2.75185 5.40429 2.75185C4.67677 2.75185 3.97896 3.0409 3.46453 3.55544L10.0003 10.0911Z"
-                            stroke="none" />
-                        <path d="M10 12.6366L3.46448 6.10113L16.5355 6.10113L10 12.6366Z" fill="currentColor" />
-                    </svg>
-                    <!-- Battery -->
-                    <svg width="24" height="12" viewBox="0 0 24 12" fill="none" class="battery-icon">
-                        <rect x="1" y="1" width="20" height="10" rx="2.5" stroke="currentColor" stroke-width="1.5" />
-                        <path d="M23 4V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                        <rect x="3" y="3" width="16" height="6" rx="1.5" fill="currentColor" />
+                    <svg width="24" height="12" viewBox="0 0 24 12" fill="none">
+                        <rect x="1" y="2" width="20" height="8" rx="2" stroke="currentColor" />
+                        <rect x="3" y="4" width="16" height="4" rx="1" fill="currentColor" />
                     </svg>
                 </div>
             </div>
 
-            <!-- App Header (User & Actions) -->
-            <div class="app-header-row">
+            <div class="app-header">
                 <div class="user-id">Kobe2025</div>
-                <div class="header-actions">
-                    <!-- Friends List -->
-                    <div class="icon-btn">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
-                            stroke-linejoin="round">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="9" cy="7" r="4"></circle>
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                        </svg>
-                    </div>
-                    <!-- Messages -->
-                    <div class="icon-btn">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
-                            stroke-linejoin="round">
-                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                        </svg>
-                    </div>
+                <div style="display:flex; gap:10px">
+                    <div class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3" />
+                            <path
+                                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                        </svg></div>
                 </div>
             </div>
         </div>
 
-        <!-- Background Map -->
+        <!-- The Void Map -->
         <div id="map"></div>
         <div class="vignette"></div>
 
-        <!-- SVG Layer for the connecting line -->
-        <svg class="connection-layer ui-element">
-            <!-- 
-               Drawing a line from Memory Card Bottom-Right to Pin Top-Left 
-               Card Bottom Right: x=200, y=300
-               Pin Top Left (approx): x=210, y=340
-            -->
-            <line x1="200" y1="300" x2="220" y2="340" class="tether-line" />
-
-            <!-- Optional: A small dot at the anchor point on the image -->
-            <circle cx="200" cy="300" r="2" fill="#ffb38a" />
+        <!-- SVG Tether Line -->
+        <svg class="connection-layer">
+            <line x1="0" y1="0" x2="0" y2="0" class="tether-line" id="tetherLine" />
         </svg>
 
-        <!-- UI Elements -->
+        <!-- UI Layer -->
         <div class="ui-layer">
 
-            <!-- The Memory (Image Section) -->
-            <div class="memory-card ui-element">
-                <!-- Using a moody atmospheric image -->
-                <img src="image/manga.png" class="memory-image" alt="Memory">
+            <!-- 1. The Glass Memory Card -->
+            <div class="memory-card" id="memoryCard">
+                <div class="memory-image-container">
+                    <img src="image/manga.png" class="memory-image" id="memoryImg" alt="Memory">
+                </div>
 
-                <!-- The Sticker (Now Above) -->
+                <!-- The Sticker (Floating Tag) -->
                 <div class="memory-sticker">
-                    <div class="sticker-avatar"
+                    <div class="sticker-avatar" id="avatarBg"
                         style="background-image: url('https://api.dicebear.com/7.x/notionists/svg?seed=Felix')"></div>
-                    <div class="sticker-name">Felix</div>
-                    <div class="sticker-reactions">
-                        <div class="reaction-emoji">🎩</div>
-                        <div class="reaction-emoji">🥶</div>
-                        <span class="reaction-count">x4</span>
+                    <div class="sticker-info">
+                        <span class="sticker-name" id="stickerName">Felix</span>
+                        <div class="sticker-meta">
+                            <span id="reactionEmoji">🎩</span> <span id="reactionCount"
+                                style="color:#fff; opacity:0.7">x4</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- The Navigator (Center Bottom) -->
-            <div class="resonance-prompt">✨ High resonance detected nearby...</div>
+            <!-- 2. The Stats Dock -->
+            <div class="stats-container">
+                <span class="city-context">San Francisco, CA</span>
+                <h1 class="beacon-name" id="beaconTitle">Mission District</h1>
+                <span class="stat-count"><span class="stat-highlight">30,621</span> Memories</span>
+            </div>
 
-            <!-- The Optimized Orb Button (Tune In Control) -->
+            <!-- 3. The Orb (Main Control) -->
             <div class="resonance-control" id="orbControl" onclick="seekNextSignal()">
                 <div class="orb-button">
                     <div class="orb-ring"></div>
                     <div class="orb-soul"></div>
                 </div>
-                <div class="orb-label" id="orbLabel">NEXT</div>
-            </div>
-
-            <!-- The Stats (Bottom Right - The "Dock") -->
-            <div class="stats-container">
-                <span class="city-context">SAN FRANCISCO</span>
-
-                <div class="beacon-title-row">
-                    <svg class="title-pin-icon" viewBox="0 0 24 24" fill="currentColor">
-                        <path
-                            d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-                    </svg>
-                    <h1 class="beacon-name">MISSION DISTRICT</h1>
-                </div>
-
-                <span class="stat-count">30,621 Memories</span>
-                <span class="stat-label">from 421 people</span>
+                <div class="orb-label">NEXT</div>
             </div>
 
         </div>
     </div>
 
-    <!-- Dev Navigation -->
-    <div class="nav-overlay">
-        <button class="nav-toggle" onclick="toggleNav()">☰ Pages</button>
-        <div class="nav-menu" id="navMenu">
-            <a href="main.html" class="nav-link">Main</a>
-            <a href="main_time_variant.html" class="nav-link">Main (Time Variant)</a>
-            <a href="main_bignumber_withHeads.html" class="nav-link">Main (Big Number)</a>
-            <a href="map_view.html" class="nav-link">Map View (Clean)</a>
-        </div>
-    </div>
-
+    <!-- Logic -->
     <script>
-        function toggleNav() {
-            document.getElementById('navMenu').classList.toggle('visible');
-        }
-    </script>
-
-    <script>
-        // --- CONFIGURATION ---
+        // --- 1. Map Setup ---
         const sfCoords = [37.7749, -122.4194];
-        const missionCoords = [37.7599, -122.4148]; // Mission District approx center
+        const missionCoords = [37.7599, -122.4148];
 
-        // Initialize the map
         const map = L.map('map', {
             zoomControl: false,
             attributionControl: false,
             zoomAnimation: true,
-            fadeAnimation: true,
-            markerZoomAnimation: true
-        }).setView(sfCoords, 12);
+            fadeAnimation: true
+        }).setView(sfCoords, 13);
 
-        // Add the dark mode tile layer
+        // Dark Matter Map Tiles
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap &copy; CARTO',
             subdomains: 'abcd',
             maxZoom: 20
         }).addTo(map);
 
-        // --- 1. THE STARS ENGINE (Luminous Breath) ---
-        function bakeGlowTexture(radius, color) {
-            const size = radius * 2;
-            const canvas = document.createElement('canvas');
-            canvas.width = size;
-            canvas.height = size;
-            const ctx = canvas.getContext('2d');
-            const gradient = ctx.createRadialGradient(radius, radius, 0, radius, radius, radius);
-            gradient.addColorStop(0, 'rgba(255, 240, 230, 0.9)');
-            gradient.addColorStop(0.15, 'rgba(255, 179, 138, 0.6)');
-            gradient.addColorStop(0.4, 'rgba(230, 106, 69, 0.15)');
-            gradient.addColorStop(1, 'rgba(230, 106, 69, 0)');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, size, size);
-            return canvas;
-        }
-
-        // Generate "Memories" Data - Organic Tendrils
-        // --- GLOBAL MEMORY DATA ---
-        const clusters = [
-            { lat: missionCoords[0], lng: missionCoords[1], count: 180, spread: 0.008 },
-            { lat: 37.7609, lng: -122.4350, count: 60, spread: 0.006 },
-            { lat: 37.780, lng: -122.405, count: 60, spread: 0.006 }
-        ];
-
-        function generateOrganicMemories(clusters) {
-            const points = [];
-            clusters.forEach(cluster => {
-                const coreCount = Math.floor(cluster.count * 0.4);
-                for (let i = 0; i < coreCount; i++) {
-                    const angle = Math.random() * Math.PI * 2;
-                    const dist = Math.random() * cluster.spread * 0.3;
-                    points.push({
-                        lat: cluster.lat + Math.sin(angle) * dist * 0.6,
-                        lng: cluster.lng + Math.cos(angle) * dist,
-                        phase: Math.random() * Math.PI * 2,
-                        speed: 0.2 + Math.random() * 0.5,
-                        sizeVar: 0.8 + Math.random() * 0.5
-                    });
-                }
-                const tendrilCount = 4 + Math.floor(Math.random() * 3);
-                const pointsPerTendril = Math.floor((cluster.count - coreCount) / tendrilCount);
-                for (let t = 0; t < tendrilCount; t++) {
-                    let tLat = cluster.lat;
-                    let tLng = cluster.lng;
-                    const streetAngle = Math.random() * Math.PI * 2;
-                    const stepSize = cluster.spread * 0.15;
-                    for (let p = 0; p < pointsPerTendril; p++) {
-                        tLat += Math.sin(streetAngle) * stepSize * (0.9 + Math.random() * 0.2);
-                        tLng += Math.cos(streetAngle) * stepSize * (0.9 + Math.random() * 0.2);
-                        const drift = stepSize * 0.4;
-                        const pLat = tLat + (Math.random() - 0.5) * drift;
-                        const pLng = tLng + (Math.random() - 0.5) * drift;
-                        points.push({
-                            lat: pLat,
-                            lng: pLng,
-                            phase: Math.random() * Math.PI * 2,
-                            speed: 0.2 + Math.random() * 0.5,
-                            sizeVar: 0.6 + Math.random() * 0.8
-                        });
-                    }
-                }
-            });
-            return points;
-        }
-
-        const allMemories = generateOrganicMemories(clusters);
-
-        // Custom Leaflet Layer
-        L.StarFieldLayer = L.Layer.extend({
-            onAdd: function (map) {
-                this._map = map;
-                this._canvas = L.DomUtil.create('canvas', 'star-field-layer');
-                const size = map.getSize();
-                this._canvas.width = size.x;
-                this._canvas.height = size.y;
-
-                // Add to overlay pane
-                this.getPane().appendChild(this._canvas);
-
-                this._glowSprite = bakeGlowTexture(48, '#ffb38a');
-
-                this._points = allMemories;
-
-                map.on('move', this._update, this);
-                map.on('zoom', this._update, this);
-                map.on('resize', this._resize, this);
-
-                this._animating = true;
-                this._animate();
-            },
-
-            onRemove: function (map) {
-                map.getPane().appendChild(this._canvas).remove();
-                map.off('move', this._update, this);
-                map.off('zoom', this._update, this);
-                map.off('resize', this._resize, this);
-                this._animating = false;
-            },
-
-            _resize: function () {
-                const size = this._map.getSize();
-                this._canvas.width = size.x;
-                this._canvas.height = size.y;
-            },
-
-            _update: function () {
-                // We handle updates in the render loop for sync
-            },
-
-            _animate: function () {
-                if (!this._animating) return;
-                this._render();
-                requestAnimationFrame(() => this._animate());
-            },
-
-            _render: function () {
-                const map = this._map;
-                const canvas = this._canvas;
-                const ctx = canvas.getContext('2d');
-                const zoom = map.getZoom();
-                const now = Date.now() / 1000;
-
-                // --- CRITICAL FIX FOR SYNC ---
-                // Reset canvas position to match viewport top-left
-                // map.containerPointToLayerPoint([0,0]) gives the Layer Coordinate of the screen's top-left.
-                // We move the canvas there.
-                const topLeft = map.containerPointToLayerPoint([0, 0]);
-                L.DomUtil.setPosition(canvas, topLeft);
-
-                // Clear using canvas width (viewport size)
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.globalCompositeOperation = 'screen';
-
-                let baseRadius, globalAlphaMod;
-                if (zoom < 13) {
-                    baseRadius = 14; globalAlphaMod = 0.3;
-                } else if (zoom < 15) {
-                    const t = (zoom - 13) / 2;
-                    baseRadius = 14 - (t * 8);
-                    globalAlphaMod = 0.3 + (t * 0.3);
-                } else {
-                    baseRadius = 8; globalAlphaMod = 0.8;
-                }
-
-                this._points.forEach(p => {
-                    // latLngToContainerPoint gives coordinates relative to Viewport Top-Left [0,0]
-                    // Since we moved our canvas to Viewport Top-Left, these coords map 1:1 to Canvas coords!
-                    const point = map.latLngToContainerPoint([p.lat, p.lng]);
-
-                    // Render Culling
-                    if (point.x < -100 || point.x > canvas.width + 100 || point.y < -100 || point.y > canvas.height + 100) return;
-
-                    const breath = Math.sin(now * p.speed + p.phase);
-                    const sizeMod = (1 + (breath * 0.2)) * p.sizeVar;
-                    const opacityMod = 0.5 + (breath * 0.3);
-
-                    const currentRadius = baseRadius * sizeMod;
-                    const finalAlpha = globalAlphaMod * opacityMod;
-
-                    ctx.globalAlpha = finalAlpha;
-                    const size = currentRadius * 4;
-                    ctx.drawImage(this._glowSprite, point.x - size / 2, point.y - size / 2, size, size);
-                });
-            }
-        });
-
-        new L.StarFieldLayer().addTo(map);
-
-        // --- PIN & TETHER LOGIC ---
+        // --- 2. Custom Marker System ---
         const pinHtml = `
             <div class="map-pin">
-                <div class="glow-point-main"></div>
-                <img src="image/B1.png" class="pin-icon" alt="Beacon">
+                <div class="pin-glow-core"></div>
+                <img src="image/B1.png" class="pin-building" id="pinImg" alt="Beacon">
             </div>
         `;
         const customIcon = L.divIcon({
@@ -1144,275 +672,140 @@
             iconSize: [80, 80],
             iconAnchor: [40, 40]
         });
-        const marker = L.marker(missionCoords, { icon: customIcon }).addTo(map);
 
-        // --- LIGHTHOUSE BEACONS SETUP ---
-        // Mock data reordered for Counter-Clockwise flow around Mission (Center)
-        // Order: SoMa (NE) -> Nob Hill (N) -> Castro (W) -> Bernal (S)
-        const otherBeacons = [
-            { lat: 37.780, lng: -122.405, id: 'soma' },      // Top Right
-            { lat: 37.790, lng: -122.420, id: 'nobhill' },   // Top Left
-            { lat: 37.7609, lng: -122.4350, id: 'castro' },  // Left
-            { lat: 37.750, lng: -122.410, id: 'bernal' }     // Bottom
-        ];
+        const mainMarker = L.marker(missionCoords, { icon: customIcon }).addTo(map);
 
-        const lighthouseMarkers = [];
-        const buildingImages = ['image/B1.png', 'image/B2.png', 'image/B3.png'];
-
-        otherBeacons.forEach(b => {
-            // Random building
-            const randomImg = buildingImages[Math.floor(Math.random() * buildingImages.length)];
-
-            const html = `
-                <div class="lighthouse-pin">
-                    <div class="glow-point"></div>
-                    <img src="${randomImg}" class="building-img" alt="Beacon">
-                </div>
-             `;
-
-            const icon = L.divIcon({
-                className: 'lighthouse-container',
-                html: html,
-                iconSize: [60, 60],
-                iconAnchor: [30, 30]
-            });
-            const m = L.marker([b.lat, b.lng], { icon: icon }).addTo(map);
-            lighthouseMarkers.push(m);
-        });
-
-        const lineElement = document.querySelector('.tether-line');
-        const memoryCard = document.querySelector('.memory-card');
-
+        // --- 3. Tether Line Logic (Connecting Card to Pin) ---
         function updateTether() {
-            const cardAnchorX = 40 + 160;
-            const cardAnchorY = 140 + 200; // Bottom-Right of Card
+            const card = document.getElementById('memoryCard');
+            const line = document.getElementById('tetherLine');
 
-            // Get Pin Center
-            const pinPoint = map.latLngToContainerPoint(marker.getLatLng());
+            // Get Card Bottom Right
+            const cardRect = card.getBoundingClientRect();
+            // Note: We need coordinates relative to the .phone-frame, not viewport
+            // Since .phone-frame is centered, we can just use the explicit CSS positions 
+            // defined in .memory-card (top: 140px, left: 30px, width: 170px, height: 220px)
+            const cardX = 30 + 170; // 200
+            const cardY = 140 + 220 - 20; // Bottom-ish
 
-            // Calculate Top-Left of Pin (assuming 80x80 pin, center anchored)
-            // Center is (0,0) relative to anchor. Top-Left is -40,-40.
-            // We'll target slightly inside the corner for visuals (-30)
-            const pinTargetX = pinPoint.x - 30;
-            const pinTargetY = pinPoint.y - 30;
+            // Get Pin Position
+            const pinPoint = map.latLngToContainerPoint(mainMarker.getLatLng());
 
-            lineElement.setAttribute('x1', cardAnchorX);
-            lineElement.setAttribute('y1', cardAnchorY);
-            lineElement.setAttribute('x2', pinTargetX);
-            lineElement.setAttribute('y2', pinTargetY);
+            // Set Line
+            line.setAttribute('x1', cardX);
+            line.setAttribute('y1', cardY);
+            line.setAttribute('x2', pinPoint.x);
+            line.setAttribute('y2', pinPoint.y);
         }
 
-        // --- VISIBILITY & LIGHTHOUSE LOGIC ---
-        const uiElements = document.querySelectorAll('.ui-element');
-        const resonancePrompt = document.querySelector('.resonance-prompt');
-        let lighthouseInterval = null;
-        let lighthouseIndex = 0;
-
-        function startLighthouse() {
-            if (lighthouseInterval) return; // Already running
-
-            // Immediately start
-            cycleLighthouse();
-
-            // Cycle every 2 seconds for a faster "scanning" feel
-            lighthouseInterval = setInterval(cycleLighthouse, 2000);
-        }
-
-        function stopLighthouse() {
-            if (!lighthouseInterval) return;
-            clearInterval(lighthouseInterval);
-            lighthouseInterval = null;
-
-            // Clear all active states immediately
-            lighthouseMarkers.forEach(m => {
-                const el = m.getElement().querySelector('.lighthouse-pin');
-                if (el) el.classList.remove('active');
-            });
-        }
-
-        function cycleLighthouse() {
-            // 1. HARD RESET: Turn off EVERYONE first
-            lighthouseMarkers.forEach(m => {
-                const el = m.getElement().querySelector('.lighthouse-pin');
-                if (el) el.classList.remove('active');
-            });
-
-            // 2. Turn on ONLY the current target
-            const target = lighthouseMarkers[lighthouseIndex];
-            if (target) {
-                const el = target.getElement().querySelector('.lighthouse-pin');
-                if (el) el.classList.add('active');
-            }
-
-            // 3. Increment for next time (Loop)
-            lighthouseIndex = (lighthouseIndex + 1) % lighthouseMarkers.length;
-        }
-
-        function updateVisibility() {
-            const zoom = map.getZoom();
-
-            // THRESHOLD: 15
-            if (zoom < 15) {
-                // --- OVERVIEW MODE ---
-                document.body.classList.remove('detail-mode');
-                uiElements.forEach(el => el.classList.add('ui-hidden'));
-                startLighthouse();
-            } else {
-                // --- DETAIL MODE ---
-                document.body.classList.add('detail-mode');
-                uiElements.forEach(el => el.classList.remove('ui-hidden'));
-                stopLighthouse();
-            }
-
-            updateTether();
-        }
-
-        // Simple resonance simulator
-        function checkResonance() {
-            // In a real app, this would check distance to nearest cluster
-            // Here we just randomly pulse it when moving for "feeling"
-            if (Math.random() > 0.95) {
-                resonancePrompt.innerText = "✨ Someone felt similar here...";
-                resonancePrompt.classList.add('visible');
-                setTimeout(() => resonancePrompt.classList.remove('visible'), 3000);
-            }
-        }
-
-        map.on('move', () => {
-            updateTether();
-            checkResonance();
-        });
-        map.on('zoom', updateVisibility);
+        // Update line on map move
+        map.on('move', updateTether);
         map.on('viewreset', updateTether);
-        updateVisibility(); // Ensure initial state is correct regarding zoom level
 
+        // --- 4. Zoom Logic (Overview vs Detail) ---
+        function handleZoom() {
+            const zoom = map.getZoom();
+            const body = document.body;
+            const card = document.getElementById('memoryCard');
+
+            if (zoom >= 15) {
+                body.classList.add('detail-mode');
+                // Make card visible
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            } else {
+                body.classList.remove('detail-mode');
+                // Hide card in overview
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+            }
+            updateTether();
+        }
+
+        map.on('zoom', handleZoom);
+
+        // Initial Fly-in
         setTimeout(() => {
-            map.flyTo(missionCoords, 16, { animate: true, duration: 3 });
-        }, 1000);
+            map.flyTo(missionCoords, 16, { animate: true, duration: 2.5 });
+        }, 800);
 
-        // --- MEMORY STREAMS (CHANNELS) ---
-        const memoryStreams = [
+        // --- 5. Data & Interaction Engine ---
+        const memoryData = [
             {
-                id: 0,
-                image: 'image/manga.png',
-                building: 'image/B1.png',
-                coords: missionCoords, // Mission District
-                user: {
-                    name: 'Felix',
-                    avatar: 'https://api.dicebear.com/7.x/notionists/svg?seed=Felix',
-                    reactions: ['🎩', '🥶'],
-                    count: 'x4',
-                    beaconName: 'MISSION DISTRICT'
-                }
+                coords: missionCoords,
+                title: "Mission District",
+                img: "image/manga.png",
+                building: "image/B1.png",
+                user: "Felix",
+                avatar: "https://api.dicebear.com/7.x/notionists/svg?seed=Felix",
+                emoji: "🎩"
             },
             {
-                id: 1,
-                image: 'image/manga2.gif',
-                building: 'image/B2.png',
-                coords: [37.7609, -122.4350], // Castro Style Location
-                user: {
-                    name: 'Aria',
-                    avatar: 'https://api.dicebear.com/7.x/notionists/svg?seed=Aria',
-                    reactions: ['⚡', '✨'],
-                    count: 'x12',
-                    beaconName: 'CASTRO TOWER'
-                }
+                coords: [37.7609, -122.4350], // Castro
+                title: "Castro Tower",
+                img: "image/manga2.gif", // Assuming you have this
+                building: "image/B2.png",
+                user: "Aria",
+                avatar: "https://api.dicebear.com/7.x/notionists/svg?seed=Aria",
+                emoji: "⚡"
             },
             {
-                id: 2,
-                image: 'image/manga3.png',
-                building: 'image/B3.png',
-                coords: [37.780, -122.405], // SoMa Style Location
-                user: {
-                    name: 'Zen',
-                    avatar: 'https://api.dicebear.com/7.x/notionists/svg?seed=Zen',
-                    reactions: ['🌊', '🎹'],
-                    count: 'x8',
-                    beaconName: 'SOMA HUB'
-                }
+                coords: [37.780, -122.405], // SoMa
+                title: "SoMa Hub",
+                img: "image/manga3.png",
+                building: "image/B3.png",
+                user: "Zen",
+                avatar: "https://api.dicebear.com/7.x/notionists/svg?seed=Zen",
+                emoji: "🌊"
             }
         ];
 
-        let currentMemoryIndex = 0; // Starts at 0 (Felix/B1)
+        let currentIndex = 0;
 
-        // --- SEEK NEXT SIGNAL LOGIC ---
         function seekNextSignal() {
-            const orbControl = document.getElementById('orbControl');
-            const orbLabel = document.getElementById('orbLabel');
+            const btn = document.getElementById('orbControl');
+            if (btn.classList.contains('is-hunting')) return;
 
-            // Prevent double clicking
-            if (orbControl && orbControl.classList.contains('is-hunting')) return;
+            // 1. Activate Visuals
+            btn.classList.add('is-hunting');
+            if (navigator.vibrate) navigator.vibrate(20);
 
-            // 1. Enter Hunting State
-            if (orbControl) orbControl.classList.add('is-hunting');
+            // 2. Prepare Data
+            currentIndex = (currentIndex + 1) % memoryData.length;
+            const data = memoryData[currentIndex];
 
-            // Haptic feedback (Mobile)
-            if (navigator.vibrate) navigator.vibrate(15);
+            // 3. UI Exit Transition
+            const card = document.getElementById('memoryCard');
+            const title = document.getElementById('beaconTitle');
 
-            // 2. Calculate next index
-            currentMemoryIndex = (currentMemoryIndex + 1) % memoryStreams.length;
-            const data = memoryStreams[currentMemoryIndex];
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(10px) scale(0.95)';
+            title.style.opacity = '0';
+            title.style.transform = 'translateY(10px)';
 
-            // 3. Start Transition (Fade Out)
-            const memoryCard = document.querySelector('.memory-card');
-            const pinIcon = document.querySelector('.map-pin .pin-icon');
-            const beaconName = document.querySelector('.beacon-name');
-            const stickerName = document.querySelector('.sticker-name');
-            const stickerAvatar = document.querySelector('.sticker-avatar');
-            const stickerReactions = document.querySelector('.sticker-reactions');
+            // 4. Map Fly
+            mainMarker.setLatLng(data.coords);
+            map.flyTo(data.coords, 16, { animate: true, duration: 1.5 });
 
-            // Add a transition class to blur/fade
-            memoryCard.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
-            memoryCard.style.opacity = '0';
-            memoryCard.style.transform = 'translateY(10px) scale(0.95)';
-
-            // 4. Update Marker Position & Fly
-            marker.setLatLng(data.coords); // <--- IMPORTANT: Move pin to new location
-            map.flyTo(data.coords, 16, {
-                animate: true,
-                duration: 1.5,
-                easeLinearity: 0.2
-            });
-
-            // 5. Update Content & Fade In after delay (simulating the search)
+            // 5. Update & Enter
             setTimeout(() => {
-                // Update Memory Image
-                document.querySelector('.memory-image').src = data.image;
+                // Swap Content
+                document.getElementById('memoryImg').src = data.img;
+                document.getElementById('pinImg').src = data.building;
+                document.getElementById('stickerName').innerText = data.user;
+                document.getElementById('avatarBg').style.backgroundImage = `url('${data.avatar}')`;
+                document.getElementById('reactionEmoji').innerText = data.emoji;
+                document.getElementById('beaconTitle').innerText = data.title;
 
-                // Update User Info
-                if (stickerAvatar) stickerAvatar.style.backgroundImage = `url('${data.user.avatar}')`;
-                if (stickerName) stickerName.innerText = data.user.name;
+                // Animate In
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0) scale(1)';
+                title.style.opacity = '1';
+                title.style.transform = 'translateY(0)';
 
-                // Update Reactions
-                if (stickerReactions) {
-                    stickerReactions.innerHTML = `
-                        <div class="reaction-emoji">${data.user.reactions[0]}</div>
-                        <div class="reaction-emoji">${data.user.reactions[1]}</div>
-                        <span class="reaction-count">${data.user.count}</span>
-                    `;
-                }
-
-                // Update Building Pin in the map
-                if (pinIcon) {
-                    pinIcon.src = data.building;
-                    // Reset animation to make it pop
-                    pinIcon.style.animation = 'none';
-                    pinIcon.offsetHeight; /* trigger reflow */
-                    pinIcon.style.animation = 'pulse 3s infinite ease-in-out';
-                }
-
-                // Update Beacon Title
-                if (beaconName) beaconName.innerText = data.user.beaconName;
-
-                // Fade In
-                memoryCard.style.opacity = '1';
-                memoryCard.style.transform = 'translateY(0px) scale(1)';
-
-                // Success Haptic
-                if (navigator.vibrate) navigator.vibrate([40, 20, 40]);
-
-                // 6. Exit Hunting State
-                if (orbControl) orbControl.classList.remove('is-hunting');
+                // Reset Button
+                btn.classList.remove('is-hunting');
+                if (navigator.vibrate) navigator.vibrate([30, 10, 30]);
 
             }, 1500);
         }
