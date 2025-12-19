@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura | Manga Memory Header</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-void: #050505;
+            --text-white: #FFFFFF;
+            --text-grey: #9CA3AF;
+
+            /* Signals */
+            --human-orange: #F97316;
+            --ai-purple: #8B5CF6;
+            --tech-ocean: #06B6D4;
+
+            /* Surfaces */
+            --glass-deep: rgba(10, 10, 10, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: #111;
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .device-frame {
+            width: 430px;
+            height: 932px;
+            background: var(--bg-void);
+            border-radius: 50px;
+            border: 1px solid #333;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 0 12px #000;
+        }
+
+        /* --- CONTENT AREA (No scroll needed) --- */
+        .content-scroll {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* --- 1. CINEMATIC MANGA HEADER --- */
+        .manga-hero {
+            width: 100%;
+            position: relative;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .manga-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            /* Subtle desaturation to make UI pop, purely aesthetic choice */
+            filter: contrast(1.1) grayscale(10%);
+        }
+
+        /* The "Ink Bleed" Gradient - Smooth boundary transition */
+        .hero-fade-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60%;
+            background: linear-gradient(to bottom,
+                    transparent 0%,
+                    rgba(5, 5, 5, 0.6) 30%,
+                    rgba(5, 5, 5, 0.95) 70%,
+                    var(--bg-void) 100%);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* --- HEADER CONTROLS (Fixed at top) --- */
+        .header-controls {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 40px 20px 20px;
+            /* Extra top padding for 'status bar' space */
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            z-index: 150;
+            background: linear-gradient(to bottom, rgba(5, 5, 5, 0.7) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+        .header-controls>* {
+            pointer-events: auto;
+        }
+
+        /* Common Glass Button Style */
+        .btn-glass {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--glass-deep);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-glass svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Center Pill */
+        .source-pill {
+            height: 32px;
+            padding: 0 12px;
+            background: var(--glass-deep);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .glow-icon {
+            width: 10px;
+            height: 14px;
+            background: white;
+            border-radius: 2px;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+        }
+
+        .source-text {
+            font-size: 10px;
+            color: #aaa;
+            white-space: nowrap;
+        }
+
+        .glow-icon {
+            width: 14px;
+            height: 18px;
+            background: white;
+            border-radius: 2px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+        }
+
+        .source-text {
+            font-size: 12px;
+            color: #ccc;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .source-text b {
+            color: white;
+            font-weight: 600;
+        }
+
+        /* User Badge (Bottom Left of Header) */
+        .user-badge-float {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 12px 4px 4px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #333;
+            border-radius: 100px;
+            z-index: 5;
+            backdrop-filter: blur(8px);
+        }
+
+        .badge-avi {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .badge-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+
+        /* --- 2. BODY CONTENT (Overlaid on manga) --- */
+        .body-container {
+            position: absolute;
+            bottom: 140px;
+            /* Above the dock */
+            left: 0;
+            right: 0;
+            padding: 0 20px;
+            z-index: 10;
+        }
+
+        /* Log */
+        .timeline-log {
+            margin-bottom: 8px;
+            padding-left: 14px;
+        }
+
+        .log-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 9px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            letter-spacing: 0.3px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+        }
+
+        .ai-row {
+            color: #555;
+        }
+
+        .ai-row .dot {
+            background: var(--ai-purple);
+        }
+
+        .human-row {
+            color: var(--human-orange);
+        }
+
+        .human-row .dot {
+            background: var(--human-orange);
+            box-shadow: 0 0 6px rgba(249, 115, 22, 0.4);
+        }
+
+        /* Content */
+        .text-group {
+            position: relative;
+            padding-left: 12px;
+        }
+
+        .spine-line {
+            position: absolute;
+            left: 0;
+            top: 4px;
+            bottom: 4px;
+            width: 2px;
+            background: var(--human-orange);
+            border-radius: 2px;
+        }
+
+        .mem-title {
+            font-size: 20px;
+            font-weight: 800;
+            line-height: 1.15;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .mem-desc {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #B0B0B0;
+            font-weight: 400;
+        }
+
+        /* Social Stack */
+        .social-proof {
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .avatar-stack {
+            display: flex;
+        }
+
+        .stack-avi {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid var(--bg-void);
+            background: #333;
+            margin-left: -8px;
+            color: #fff;
+            font-size: 8px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stack-avi:first-child {
+            margin-left: 0;
+        }
+
+        .proof-text {
+            font-size: 11px;
+            color: #777;
+        }
+
+        .proof-text b {
+            color: white;
+            font-weight: 600;
+        }
+
+        .chevron {
+            opacity: 0.5;
+            font-size: 11px;
+            margin-left: auto;
+            color: #555;
+        }
+
+        /* Reaction Rail (Moved to fixed dock) */
+        .reaction-rail {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .reaction-rail::-webkit-scrollbar {
+            display: none;
+        }
+
+        .rxn-btn {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #111;
+            border: 1px solid #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: transform 0.2s;
+        }
+
+        .rxn-btn:hover {
+            transform: scale(1.1);
+            background: #1a1a1a;
+        }
+
+        .btn-report {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px dashed #444;
+            color: #555;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .btn-report svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* --- FOOTER DOCK --- */
+        .dock-layer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px 20px 30px;
+            background: rgba(5, 5, 5, 0.9);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .input-bar {
+            width: 100%;
+            height: 44px;
+            background: #151515;
+            border: 1px solid #2a2a2a;
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            padding: 0 5px 0 16px;
+        }
+
+        .input-bar input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .input-bar input::placeholder {
+            color: #555;
+        }
+
+        .btn-send {
+            width: 34px;
+            height: 34px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: black;
+        }
+
+        .btn-send svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .agent-stats {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            padding-right: 12px;
+        }
+
+        .stat-line {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .stat-sub {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* --- NAVIGATION OVERLAY --- */
+        .nav-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(5, 5, 7, 0.9);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            padding: 80px 40px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .nav-header {
+            margin-bottom: 40px;
+        }
+
+        .nav-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #fff;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .nav-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .nav-item {
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-overlay.active .nav-item {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--human-orange);
+            color: #fff;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        .nav-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .nav-path {
+            font-size: 10px;
+            opacity: 0.5;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .close-nav {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="device-frame">
+
+        <!-- Fixed Header -->
+        <div class="header-controls">
+            <!-- Close -->
+            <div class="btn-glass" onclick="window.history.back()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </div>
+
+            <!-- Source Pill -->
+            <div class="source-pill">
+                <div class="glow-icon"></div>
+                <span class="source-text">Extracted from <b>Third-Party Sources</b></span>
+            </div>
+
+            <!-- Menu / Prototype Explorer -->
+            <div class="btn-glass" onclick="toggleNav()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7" />
+                    <rect x="14" y="3" width="7" height="7" />
+                    <rect x="14" y="14" width="7" height="7" />
+                    <rect x="3" y="14" width="7" height="7" />
+                </svg>
+            </div>
+        </div>
+
+        <div class="content-scroll">
+            <!-- MANGA fills the entire background -->
+            <div class="manga-hero">
+                <img src="../image/manga.png" class="manga-img" alt="Manga Panel">
+                <div class="hero-fade-overlay"></div>
+                <!-- User Badge -->
+                <div class="user-badge-float">
+                    <img src="https://i.pravatar.cc/150?u=will" class="badge-avi" alt="User">
+                    <span class="badge-name">Will McKelvey</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- BODY CONTENT (Overlaid as floating card) -->
+        <div class="body-container">
+            <div class="timeline-log">
+                <div class="log-item human-row">
+                    <div class="dot"></div><span>Updated by Will • 2h ago</span>
+                </div>
+            </div>
+
+            <div class="text-group">
+                <div class="spine-line"></div>
+                <h1 class="mem-title">The Constraints of Creativity</h1>
+                <p class="mem-desc">
+                    The panel illustrates a profound disconnection. It feels like cognition isn't one's own—much
+                    like the neutrinos passing through us.
+                </p>
+            </div>
+
+            <!-- SOCIAL PROOF -->
+            <div class="social-proof">
+                <div class="avatar-stack">
+                    <div class="stack-avi" style="background:#FFD700; color:#000">A</div>
+                    <div class="stack-avi" style="background:#FCA5A5; color:#991B1B">M</div>
+                    <div class="stack-avi" style="background:#93C5FD; color:#1E40AF">K</div>
+                </div>
+                <div class="proof-text">Liked by <b>Alex</b>, <b>Maria</b> +24</div>
+            </div>
+        </div>
+
+        <!-- FIXED FOOTER DOCK (Contains Reaction Rail & Input) -->
+        <div class="dock-layer">
+
+            <!-- REACTION RAIL -->
+            <div class="reaction-rail">
+                <div class="rxn-btn"><span style="filter: drop-shadow(0 0 6px rgba(255,140,105,0.5))">🔥</span></div>
+                <div class="rxn-btn"><span style="filter: drop-shadow(0 0 6px rgba(244,114,182,0.5))">😭</span></div>
+                <div class="rxn-btn"><span style="filter: drop-shadow(0 0 6px rgba(96,165,250,0.5))">😂</span></div>
+                <div class="rxn-btn"><span style="filter: drop-shadow(0 0 6px rgba(250,204,21,0.5))">🎉</span></div>
+                <div class="btn-report">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                        <line x1="4" y1="22" x2="4" y2="15"></line>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="input-bar">
+                <input type="text" placeholder="Ask about this memory...">
+                <div class="btn-send">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Overlay -->
+        <div class="nav-overlay" id="navOverlay">
+            <div class="close-nav" onclick="toggleNav()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </div>
+            <div class="nav-header">
+                <h2 class="nav-title">Aura Hub</h2>
+                <p style="color: rgba(255,255,255,0.4); font-size: 12px; margin-top: 8px;">Prototype Explorer</p>
+            </div>
+            <div class="nav-list" id="navList">
+                <!-- Links populated by JS -->
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const pageRoutes = [
+            { name: "Main: Deep Field", path: "main.html", icon: "🌐" },
+            { name: "Memory Detail", path: "MemoryDetail.html", icon: "💎" },
+            { name: "Map View", path: "../map_view.html", icon: "🗺️" },
+            { name: "Big Number Variant", path: "../main_bignumber_withHeads.html", icon: "📊" },
+            { name: "Time Variant", path: "../main_time_variant.html", icon: "⏳" },
+            { name: "Event Popup", path: "../event_popup.html", icon: "🔔" },
+            { name: "Echo Button", path: "../EchoButton/EchoButton.html", icon: "🔘" }
+        ];
+
+        function populateNav() {
+            const list = document.getElementById('navList');
+            list.innerHTML = '';
+            pageRoutes.forEach((route, index) => {
+                const item = document.createElement('div');
+                item.className = 'nav-item';
+                item.style.transitionDelay = `${index * 0.05}s`;
+
+                item.innerHTML = `
+                    <a href="${route.path}" class="nav-link">
+                        <div class="nav-icon">${route.icon}</div>
+                        <div class="nav-info">
+                            <span class="nav-name">${route.name}</span>
+                            <span class="nav-path">${route.path}</span>
+                        </div>
+                    </a>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function toggleNav() {
+            const overlay = document.getElementById('navOverlay');
+            overlay.classList.toggle('active');
+            if (overlay.classList.contains('active')) {
+                populateNav();
+            }
+        }
+    </script>
+
+</body>
+
+</html>

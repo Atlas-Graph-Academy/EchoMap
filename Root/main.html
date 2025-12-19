@@ -557,6 +557,148 @@
                 transform: translateY(-5px);
             }
         }
+
+        /* --- NAVIGATION OVERLAY --- */
+        .nav-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(5, 5, 7, 0.85);
+            backdrop-filter: blur(30px) saturate(200%);
+            -webkit-backdrop-filter: blur(30px) saturate(200%);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            padding: 80px 40px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .nav-header {
+            margin-bottom: 40px;
+        }
+
+        .nav-title {
+            font-family: var(--font-display);
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #fff;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .nav-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-item {
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-overlay.active .nav-item {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--warm-orange);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(255, 159, 104, 0.15);
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--warm-orange);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link:hover::before {
+            transform: scaleY(1);
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--warm-orange);
+            filter: drop-shadow(0 0 8px var(--warm-orange));
+        }
+
+        .nav-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-name {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-path {
+            font-size: 10px;
+            opacity: 0.5;
+            font-family: monospace;
+            margin-top: 2px;
+        }
+
+        .close-nav {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: 0.3s;
+        }
+
+        .close-nav:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: rotate(90deg);
+        }
     </style>
 </head>
 
@@ -583,6 +725,13 @@
             <div class="app-header">
                 <div class="user-id">Kobe2025</div>
                 <div style="display:flex; gap:10px">
+                    <div class="icon-btn" onclick="toggleNav()"><svg width="18" height="18" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7" />
+                            <rect x="14" y="3" width="7" height="7" />
+                            <rect x="14" y="14" width="7" height="7" />
+                            <rect x="3" y="14" width="7" height="7" />
+                        </svg></div>
                     <div class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="3" />
@@ -608,7 +757,7 @@
             <!-- 1. The Glass Memory Card -->
             <div class="memory-card" id="memoryCard">
                 <div class="memory-image-container">
-                    <img src="image/manga.png" class="memory-image" id="memoryImg" alt="Memory">
+                    <img src="../image/manga.png" class="memory-image" id="memoryImg" alt="Memory">
                 </div>
 
                 <!-- The Sticker (Floating Tag) -->
@@ -642,6 +791,23 @@
             </div>
 
         </div>
+
+        <!-- Navigation Overlay (Dynamic Manifest) -->
+        <div class="nav-overlay" id="navOverlay">
+            <div class="close-nav" onclick="toggleNav()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </div>
+            <div class="nav-header">
+                <h2 class="nav-title">Aura Hub</h2>
+                <p style="color: rgba(255,255,255,0.4); font-size: 12px; margin-top: 8px;">Prototype Explorer</p>
+            </div>
+            <div class="nav-list" id="navList">
+                <!-- Links will be populated here -->
+            </div>
+        </div>
     </div>
 
     <!-- Logic -->
@@ -667,7 +833,7 @@
         const pinHtml = `
             <div class="map-pin">
                 <div class="pin-glow-core"></div>
-                <img src="image/B1.png" class="pin-building" id="pinImg" alt="Beacon">
+                <img src="../image/B1.png" class="pin-building" id="pinImg" alt="Beacon">
             </div>
         `;
         const customIcon = L.divIcon({
@@ -732,6 +898,46 @@
         setTimeout(() => {
             map.flyTo(missionCoords, 16, { animate: true, duration: 2.5 });
         }, 800);
+
+        // --- 6. Dynamic Navigation Explorer ---
+        const pageRoutes = [
+            { name: "Main: Deep Field", path: "main.html", icon: "🌐" },
+            { name: "Memory Detail", path: "MemoryDetail.html", icon: "💎" },
+            { name: "Map View", path: "../map_view.html", icon: "🗺️" },
+            { name: "Big Number Variant", path: "../main_bignumber_withHeads.html", icon: "📊" },
+            { name: "Time Variant", path: "../main_time_variant.html", icon: "⏳" },
+            { name: "Event Popup", path: "../event_popup.html", icon: "🔔" },
+            { name: "Echo Button", path: "../EchoButton/EchoButton.html", icon: "🔘" }
+        ];
+
+        function populateNav() {
+            const list = document.getElementById('navList');
+            list.innerHTML = '';
+            pageRoutes.forEach((route, index) => {
+                const item = document.createElement('div');
+                item.className = 'nav-item';
+                item.style.transitionDelay = `${index * 0.05}s`;
+
+                item.innerHTML = `
+                    <a href="${route.path}" class="nav-link">
+                        <div class="nav-icon">${route.icon}</div>
+                        <div class="nav-info">
+                            <span class="nav-name">${route.name}</span>
+                            <span class="nav-path">${route.path}</span>
+                        </div>
+                    </a>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function toggleNav() {
+            const overlay = document.getElementById('navOverlay');
+            overlay.classList.toggle('active');
+            if (overlay.classList.contains('active')) {
+                populateNav();
+            }
+        }
 
         // --- 5. Data & Interaction Engine ---
         const memoryData = [
