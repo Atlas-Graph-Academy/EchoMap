@@ -176,6 +176,69 @@
                 transform: translate(-50%, -50%) rotate(360deg);
             }
         }
+
+        /* --- NAVIGATION OVERLAY --- */
+        .nav-overlay {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            pointer-events: auto;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .nav-toggle {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            backdrop-filter: blur(8px);
+            transition: all 0.2s;
+        }
+
+        .nav-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-color: var(--primary-glow);
+        }
+
+        .nav-menu {
+            position: absolute;
+            top: 40px;
+            right: 0;
+            background: rgba(10, 10, 10, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 8px;
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 180px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-menu.visible {
+            display: flex;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            transition: all 0.2s;
+            display: block;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--primary-glow);
+        }
     </style>
 </head>
 
@@ -209,6 +272,47 @@
         <div class="label-text">TUNE IN</div>
 
     </div>
+
+    <!-- Navigation -->
+    <div class="nav-overlay">
+        <button class="nav-toggle" onclick="toggleNav()">☰ Pages</button>
+        <div class="nav-menu" id="navMenu">
+            <!-- Links will be populated by JS -->
+        </div>
+    </div>
+
+    <script>
+        // Define all pages with correct relative paths from EchoButton directory
+        const pageRoutes = [
+            { name: "Main: Deep Field", path: "../Root/main.html", icon: "🌐" },
+            { name: "Memory Detail", path: "../Root/MemoryDetail.html", icon: "💎" },
+            { name: "Map View", path: "../map_view.html", icon: "🗺️" },
+            { name: "Big Number Variant", path: "../main_bignumber_withHeads.html", icon: "📊" },
+            { name: "Time Variant", path: "../main_time_variant.html", icon: "⏳" },
+            { name: "Event Popup", path: "../event_popup.html", icon: "🔔" },
+            { name: "Echo Button", path: "EchoButton.html", icon: "🔘" }
+        ];
+
+        function populateNav() {
+            const menu = document.getElementById('navMenu');
+            menu.innerHTML = '';
+            pageRoutes.forEach((route) => {
+                const link = document.createElement('a');
+                link.href = route.path;
+                link.className = 'nav-link';
+                link.textContent = route.name;
+                menu.appendChild(link);
+            });
+        }
+
+        function toggleNav() {
+            const menu = document.getElementById('navMenu');
+            menu.classList.toggle('visible');
+            if (menu.classList.contains('visible') && menu.children.length === 0) {
+                populateNav();
+            }
+        }
+    </script>
 
 </body>
 

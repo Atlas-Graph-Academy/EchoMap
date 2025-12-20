@@ -660,16 +660,40 @@
     <div class="nav-overlay">
         <button class="nav-toggle" onclick="toggleNav()">☰ Pages</button>
         <div class="nav-menu" id="navMenu">
-            <a href="main.html" class="nav-link">Main</a>
-            <a href="main_time_variant.html" class="nav-link">Main (Time Variant)</a>
-            <a href="main_bignumber_withHeads.html" class="nav-link">Main (Big Number)</a>
-            <a href="map_view.html" class="nav-link">Map View (Clean)</a>
+            <!-- Links will be populated by JS -->
         </div>
     </div>
 
     <script>
+        // Define all pages with correct relative paths from root
+        const pageRoutes = [
+            { name: "Main: Deep Field", path: "Root/main.html", icon: "🌐" },
+            { name: "Memory Detail", path: "Root/MemoryDetail.html", icon: "💎" },
+            { name: "Map View", path: "map_view.html", icon: "🗺️" },
+            { name: "Big Number Variant", path: "main_bignumber_withHeads.html", icon: "📊" },
+            { name: "Time Variant", path: "main_time_variant.html", icon: "⏳" },
+            { name: "Event Popup", path: "event_popup.html", icon: "🔔" },
+            { name: "Echo Button", path: "EchoButton/EchoButton.html", icon: "🔘" }
+        ];
+
+        function populateNav() {
+            const menu = document.getElementById('navMenu');
+            menu.innerHTML = '';
+            pageRoutes.forEach((route) => {
+                const link = document.createElement('a');
+                link.href = route.path;
+                link.className = 'nav-link';
+                link.textContent = route.name;
+                menu.appendChild(link);
+            });
+        }
+
         function toggleNav() {
-            document.getElementById('navMenu').classList.toggle('visible');
+            const menu = document.getElementById('navMenu');
+            menu.classList.toggle('visible');
+            if (menu.classList.contains('visible') && menu.children.length === 0) {
+                populateNav();
+            }
         }
     </script>
     <script>
