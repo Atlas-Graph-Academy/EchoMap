@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura | Memory Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-void: #000000;
+            --text-primary: #FFFFFF;
+            --text-secondary: #9CA3AF;
+            --accent-orange: #F97316;
+            --accent-blue: #06B6D4;
+
+            --glass-panel: rgba(20, 20, 20, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --surface-hover: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: #111;
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* --- THE MONOLITH (Device Frame) --- */
+        .device-frame {
+            width: 430px;
+            height: 932px;
+            background: var(--bg-void);
+            border-radius: 54px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 0 14px #080808, 0 0 100px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- 1. HERO LAYER (Manga) --- */
+        .hero-layer {
+            position: absolute;
+            top: 30%;
+            /* Set center line to 30% height */
+            left: 0;
+            width: 100%;
+            height: auto;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            transform: translateY(-50%);
+            /* Center the container on the 30% line */
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+            background: transparent;
+        }
+
+        .hero-layer img {
+            width: 100%;
+            height: auto;
+            flex-shrink: 0;
+            filter: contrast(1.05) brightness(0.9);
+            object-fit: contain;
+            /* Soft fade on top and bottom to remove hard edges */
+            -webkit-mask-image: linear-gradient(to bottom,
+                    transparent 0%,
+                    rgba(0, 0, 0, 0.5) 8%,
+                    black 15%,
+                    black 85%,
+                    rgba(0, 0, 0, 0.5) 92%,
+                    transparent 100%);
+            mask-image: linear-gradient(to bottom,
+                    transparent 0%,
+                    rgba(0, 0, 0, 0.5) 8%,
+                    black 15%,
+                    black 85%,
+                    rgba(0, 0, 0, 0.5) 92%,
+                    transparent 100%);
+        }
+
+        /* Nav Arrows */
+        .nav-arrow {
+            position: absolute;
+            top: 30%;
+            /* Align with image center */
+            transform: translateY(-50%);
+            width: 48px;
+            height: 48px;
+            background: rgba(20, 20, 20, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            z-index: 40;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-arrow:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .nav-arrow:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .nav-arrow.left {
+            left: 16px;
+        }
+
+        .nav-arrow.right {
+            right: 16px;
+        }
+
+        .image-counter {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 4px 10px;
+            border-radius: 20px;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            z-index: 40;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* The Deep Fade (Scrim) - Masks from title area down */
+        .gradient-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 75%;
+            /* Higher gradient to cover the area below the new 30% center */
+            background: linear-gradient(to bottom,
+                    transparent 0%,
+                    rgba(0, 0, 0, 0.5) 40%,
+                    rgba(0, 0, 0, 0.9) 80%,
+                    #000000 100%);
+            pointer-events: none;
+            z-index: 5;
+            /* Sit between image and text */
+        }
+
+        /* --- 2. HEADER UI --- */
+        .header-ui {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 24px 24px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            z-index: 20;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.4) 60%, transparent 100%);
+        }
+
+        .header-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+            flex: 1;
+        }
+
+        .memory-label {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.8;
+        }
+
+        .btn-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(30, 30, 30, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+        }
+
+        .source-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: rgba(20, 20, 20, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 100px;
+            backdrop-filter: blur(12px);
+        }
+
+        .source-icon {
+            width: 10px;
+            height: 14px;
+            background: white;
+            border-radius: 2px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .source-text {
+            font-size: 11px;
+            color: #ccc;
+        }
+
+        .source-text b {
+            color: white;
+            font-weight: 600;
+        }
+
+        /* --- 3. CONTENT CORE --- */
+        .content-core {
+            position: absolute;
+            bottom: 180px;
+            /* Space for the dock */
+            left: 0;
+            right: 0;
+            padding: 0 24px;
+            z-index: 10;
+            transform: translateY(0);
+            transition: transform 0.4s ease;
+        }
+
+        /* The User Chip (Floating above text) */
+        .user-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 4px 14px 4px 4px;
+            border-radius: 100px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .user-avi {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            color: white;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        /* Metadata */
+        .meta-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent-orange);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-orange);
+        }
+
+        .meta-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--accent-orange);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .time-ago {
+            color: #666;
+            font-weight: 400;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 32px;
+            font-weight: 800;
+            line-height: 1.1;
+            color: white;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            /* Pop against image */
+        }
+
+        p {
+            font-size: 15px;
+            line-height: 1.5;
+            color: #B0B0B0;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        /* Social Pile */
+        .social-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatars {
+            display: flex;
+        }
+
+        .av-sm {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #000;
+            margin-left: -8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: 700;
+            color: #000;
+        }
+
+        .av-sm:first-child {
+            margin-left: 0;
+        }
+
+        .social-text {
+            font-size: 12px;
+            color: #777;
+        }
+
+        .social-text b {
+            color: #ddd;
+        }
+
+        /* --- 4. INTERACTIVE DOCK (The Slider) --- */
+        .dock-area {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 24px 40px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0));
+            z-index: 50;
+        }
+
+        /* The Slider Component */
+        .slider-container {
+            position: relative;
+            width: 100%;
+            height: 56px;
+            background: #1A1A1A;
+            border-radius: 100px;
+            margin-bottom: 24px;
+            border: 1px solid #333;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .slider-container.active {
+            background: #000;
+            border-color: #555;
+        }
+
+        /* Text underneath the slider handle */
+        .slider-label {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            letter-spacing: 0.5px;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        /* The Draggable Handle */
+        .slider-handle {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 48px;
+            height: 48px;
+            background: #FFFFFF;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            transition: transform 0.1s linear, width 0.3s ease, border-radius 0.3s ease;
+            z-index: 2;
+        }
+
+        .slider-handle svg {
+            width: 20px;
+            height: 20px;
+            color: #000;
+        }
+
+        /* The Input Field (Hidden initially) */
+        .msg-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: none;
+            padding: 0 60px 0 24px;
+            color: white;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .msg-input:focus {
+            outline: none;
+        }
+
+        /* Stats & Reactions Row */
+        .engagement-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .reactions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .emoji-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 1px dashed #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: transform 0.2s;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .emoji-btn:hover {
+            transform: scale(1.15);
+            background: rgba(255, 255, 255, 0.05);
+            border-style: solid;
+        }
+
+        .emoji-btn.active {
+            border: 1px solid var(--accent-orange);
+            background: rgba(249, 115, 22, 0.1);
+            box-shadow: 0 0 15px rgba(249, 115, 22, 0.2);
+        }
+
+        .stats-block {
+            text-align: right;
+        }
+
+        .stat-main {
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .stat-sub {
+            font-size: 10px;
+            color: #555;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Echo context hint */
+        .echo-hint {
+            position: absolute;
+            bottom: 130px;
+            /* Above slider */
+            left: 24px;
+            font-size: 12px;
+            color: var(--accent-blue);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            opacity: 0;
+            /* Hidden until interacted or scroll */
+            animation: fadeIn 1s 1s forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="device-frame">
+
+        <!-- HEADER -->
+        <div class="header-ui">
+            <div class="btn-icon" onclick="window.history.back()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </div>
+
+            <div class="header-center">
+                <div class="memory-label">Memory</div>
+
+                <div class="user-chip">
+                    <img src="https://i.pravatar.cc/150?u=will" class="user-avi" alt="Will">
+                    <span class="user-name">Will McKelvey</span>
+                </div>
+
+                <div class="source-pill">
+                    <span class="source-text">Extracted from</span>
+                    <div class="source-icon"></div>
+                    <span class="source-text"><b>a Public Conversation</b></span>
+                </div>
+            </div>
+
+            <div class="btn-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+            </div>
+        </div>
+
+        <!-- BACKGROUND -->
+        <div class="hero-layer" id="heroCarousel">
+            <!-- Images populated via JS -->
+        </div>
+        <div class="gradient-overlay"></div>
+
+        <!-- Navigation Arrows -->
+        <div class="nav-arrow left" onclick="moveSlide(-1)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+        </div>
+        <div class="nav-arrow right" onclick="moveSlide(1)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+        </div>
+        <div class="image-counter" id="imgCounter">1 / 21</div>
+
+        <!-- MAIN CONTENT -->
+        <div class="content-core" id="contentCore">
+
+
+
+            <div class="meta-row">
+                <div class="dot"></div>
+                <span class="meta-text">Updated by Will</span>
+                <span class="meta-text time-ago">• 2h ago</span>
+            </div>
+
+            <h1>The Constraints of Creativity</h1>
+            <p>The panel illustrates a profound disconnection. It feels like cognition isn't one's own—much like the
+                neutrinos passing through us.The panel illustrates a profound disconnection. It feels like cognition
+                isn't one's own—much like the neutrinos passing through us. This connects to our discussion on agency in
+                digital spaces.
+
+                This connects to our discussion on agency in digital spaces.</p>
+
+            <div class="social-row">
+                <div class="avatars">
+                    <div class="av-sm" style="background:#FCD34D;">A</div>
+                    <div class="av-sm" style="background:#FCA5A5;">M</div>
+                    <div class="av-sm" style="background:#93C5FD;">K</div>
+                </div>
+                <span class="social-text">Liked by <b>Alex</b>, <b>Maria</b> and 24 others</span>
+            </div>
+        </div>
+
+        <!-- ECHO HINT -->
+        <div class="echo-hint">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2a10 10 0 1 0 10 10H12V2z"></path>
+            </svg>
+            Talk to Will's Echo to unlock context...
+        </div>
+
+        <!-- INTERACTIVE DOCK -->
+        <div class="dock-area">
+
+            <!-- THE SLIDER COMPONENT -->
+            <div class="slider-container" id="slider">
+                <div class="slider-label" id="sliderLabel">Slide to Message</div>
+
+                <!-- When active, this becomes the send button -->
+                <div class="slider-handle" id="handle">
+                    <svg id="arrowIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </div>
+
+                <input type="text" class="msg-input" id="msgInput" placeholder="Reply to Will...">
+            </div>
+
+            <!-- STATS & REACTIONS -->
+            <div class="engagement-row">
+                <div class="reactions">
+                    <div class="emoji-btn" onclick="toggleReact(this)">🔥</div>
+                    <div class="emoji-btn" onclick="toggleReact(this)">😭</div>
+                    <div class="emoji-btn" onclick="toggleReact(this)">😂</div>
+                    <div class="emoji-btn" onclick="toggleReact(this)">🎉</div>
+                </div>
+
+                <div class="stats-block">
+                    <div class="stat-main">Response rate 90%</div>
+                    <div class="stat-sub">Last drop: 15h ago</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const images = [
+            "manga.png", "manga3.png", "map.png"
+        ];
+
+        let currentSlide = 0; // Start at first image
+        const heroCarousel = document.getElementById('heroCarousel');
+        const imgCounter = document.getElementById('imgCounter');
+
+        // Populate Carousel
+        function initCarousel() {
+            images.forEach((img, index) => {
+                const el = document.createElement('img');
+                el.src = `image2/${img}`;
+                el.alt = `Slide ${index + 1}`;
+                heroCarousel.appendChild(el);
+            });
+            updateCarousel();
+        }
+
+        function moveSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide >= images.length) currentSlide = 0;
+            if (currentSlide < 0) currentSlide = images.length - 1;
+            updateCarousel();
+        }
+
+        function updateCarousel() {
+            // Updated translation to work with horizontal carousel + 28% top position
+            heroCarousel.style.transform = `translateY(-50%) translateX(-${currentSlide * 100}%)`;
+            imgCounter.innerText = `${currentSlide + 1} / ${images.length}`;
+        }
+
+        initCarousel();
+
+        const slider = document.getElementById('slider');
+        const handle = document.getElementById('handle');
+        const label = document.getElementById('sliderLabel');
+        const input = document.getElementById('msgInput');
+        const arrow = document.getElementById('arrowIcon');
+
+        let isDragging = false;
+        let startX, currentX;
+        let isUnlocked = false;
+
+        // Simulation of the Drag
+        handle.addEventListener('mousedown', startDrag);
+
+        function startDrag(e) {
+            if (isUnlocked) return; // If already unlocked, handle acts as send button
+            isDragging = true;
+            startX = e.clientX;
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+
+            const sliderWidth = slider.offsetWidth;
+            let moveX = e.clientX - startX;
+
+            // Bounds
+            if (moveX < 0) moveX = 0;
+            if (moveX > sliderWidth - 56) moveX = sliderWidth - 56;
+
+            handle.style.left = moveX + 4 + 'px';
+
+            // Opacity of text fades as you drag
+            label.style.opacity = 1 - (moveX / (sliderWidth / 2));
+
+            // Unlock Threshold
+            if (moveX > sliderWidth - 80) {
+                unlockSlider();
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (!isDragging) return;
+            isDragging = false;
+
+            if (!isUnlocked) {
+                // Snap back
+                handle.style.left = '4px';
+                label.style.opacity = '1';
+            }
+        });
+
+        // Also allow simple click to unlock for prototype ease
+        slider.addEventListener('click', () => {
+            if (!isUnlocked) unlockSlider();
+        });
+
+        function unlockSlider() {
+            isUnlocked = true;
+            isDragging = false;
+
+            slider.classList.add('active');
+
+            // Morph Handle to Send Button position
+            handle.style.left = 'auto';
+            handle.style.right = '4px';
+            handle.style.width = '40px';
+            handle.style.height = '40px';
+            handle.style.top = '7px';
+
+            // Change Arrow to Send Icon
+            arrow.innerHTML = '<line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>';
+
+            // Hide Label, Show Input
+            label.style.opacity = '0';
+            input.style.opacity = '1';
+            input.style.pointerEvents = 'auto';
+            input.focus();
+        }
+
+        function toggleReact(btn) {
+            btn.classList.toggle('active');
+        }
+
+    </script>
+
+</body>
+
+</html>
