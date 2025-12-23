@@ -94,26 +94,32 @@
                     transparent 100%);
         }
 
-        /* Nav Arrows */
+        /* Nav Arrows - Smaller and more subtle */
         .nav-arrow {
             position: absolute;
-            top: 30%;
-            /* Align with image center */
+            top: 25%;
+            /* Slightly higher to stay clear of text area */
             transform: translateY(-50%);
-            width: 48px;
-            height: 48px;
-            background: rgba(20, 20, 20, 0.4);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 36px;
+            height: 36px;
+            background: rgba(20, 20, 20, 0.2);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: rgba(255, 255, 255, 0.6);
             cursor: pointer;
             z-index: 40;
             transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-arrow:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-50%) scale(1.05);
         }
 
         .nav-arrow:hover {
@@ -134,20 +140,6 @@
             right: 16px;
         }
 
-        .image-counter {
-            position: absolute;
-            top: 24px;
-            right: 24px;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 4px 10px;
-            border-radius: 20px;
-            color: white;
-            font-size: 10px;
-            font-weight: 700;
-            font-family: 'JetBrains Mono', monospace;
-            z-index: 40;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
 
         /* The Deep Fade (Scrim) - Masks from title area down */
         .gradient-overlay {
@@ -249,10 +241,30 @@
             /* Space for the dock */
             left: 0;
             right: 0;
-            padding: 0 24px;
+            padding: 60px 24px 20px;
             z-index: 10;
             transform: translateY(0);
             transition: transform 0.4s ease;
+        }
+
+        /* The Legibility Scrim */
+        .content-core::before {
+            content: '';
+            position: absolute;
+            top: -120px;
+            /* Bleed up much further to protect title */
+            left: 0;
+            right: 0;
+            bottom: -180px;
+            /* Cover bottom area too */
+            background: linear-gradient(to top,
+                    rgba(0, 0, 0, 1) 0%,
+                    rgba(0, 0, 0, 0.95) 20%,
+                    rgba(0, 0, 0, 0.8) 50%,
+                    rgba(0, 0, 0, 0.4) 80%,
+                    transparent 100%);
+            z-index: -1;
+            pointer-events: none;
         }
 
         /* The User Chip (Floating above text) */
@@ -318,19 +330,64 @@
             color: white;
             margin-bottom: 16px;
             letter-spacing: -0.02em;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            text-shadow: 0 4px 16px rgba(0, 0, 0, 0.9), 0 0 40px rgba(0, 0, 0, 0.5);
             /* Pop against image */
         }
 
         p {
             font-size: 15px;
-            line-height: 1.5;
-            color: #B0B0B0;
+            line-height: 1.6;
+            color: #E5E7EB;
             display: -webkit-box;
-            -webkit-line-clamp: 4;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            margin-bottom: 20px;
+            margin-bottom: 8px;
+            transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+            position: relative;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        p.expanded {
+            -webkit-line-clamp: unset;
+            color: #FFFFFF;
+        }
+
+        /* Fade effect for truncated text */
+        .text-container {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .text-container:not(.is-expanded)::after {
+            content: '';
+            position: absolute;
+            bottom: 24px;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.8));
+            pointer-events: none;
+        }
+
+        .read-more-btn {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: opacity 0.2s;
+            margin-top: 4px;
+        }
+
+        .read-more-btn:hover {
+            opacity: 0.8;
+            text-decoration: underline;
         }
 
         /* Social Pile */
@@ -371,29 +428,115 @@
             color: #ddd;
         }
 
-        /* --- 4. INTERACTIVE DOCK (The Slider) --- */
+        /* --- 4. INTERACTIVE DOCK (Resonance Hub) --- */
         .dock-area {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 20px 24px 40px;
-            background: linear-gradient(to top, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0));
+            padding: 32px 24px 70px;
+            background: linear-gradient(to top,
+                    rgba(0, 0, 0, 1) 0%,
+                    rgba(0, 0, 0, 0.98) 50%,
+                    rgba(0, 0, 0, 0.9) 75%,
+                    transparent 100%);
             z-index: 50;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            /* More breathing room between sections */
+        }
+
+        /* Quick Reaction Bar (Directly below content) */
+        .reactions-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .reaction-hint {
+            font-size: 11px;
+            color: #666;
+            margin-right: auto;
+            font-weight: 500;
+        }
+
+        /* Trust & Connection Layer */
+        .connection-info {
+            display: flex;
+            align-items: center;
+            padding: 0 4px;
+        }
+
+        /* Stats Footer (Below slider) */
+        .dock-footer {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 0 12px;
+            gap: 16px;
+        }
+
+        .stat-group {
+            text-align: right;
+        }
+
+        .stat-main {
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 2px;
+            display: block;
+        }
+
+        .stat-sub {
+            font-size: 10px;
+            color: #555;
+            font-family: 'JetBrains Mono', monospace;
+            display: block;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 100px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: #10B981;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #10B981;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: #10B981;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         /* The Slider Component */
         .slider-container {
             position: relative;
             width: 100%;
-            height: 56px;
-            background: #1A1A1A;
+            height: 68px;
+            /* Prominent primary action */
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 100px;
-            margin-bottom: 24px;
-            border: 1px solid #333;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             overflow: hidden;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
         }
 
         .slider-container.active {
@@ -462,59 +605,24 @@
             outline: none;
         }
 
-        /* Stats & Reactions Row */
-        .engagement-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
-
-        .reactions {
-            display: flex;
-            gap: 12px;
-        }
-
+        /* Emoji Overrides */
         .emoji-btn {
-            width: 42px;
-            height: 42px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
-            border: 1px dashed #333;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
-            transition: transform 0.2s;
+            font-size: 18px;
+            transition: all 0.2s;
             cursor: pointer;
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .emoji-btn:hover {
             transform: scale(1.15);
-            background: rgba(255, 255, 255, 0.05);
-            border-style: solid;
-        }
-
-        .emoji-btn.active {
-            border: 1px solid var(--accent-orange);
-            background: rgba(249, 115, 22, 0.1);
-            box-shadow: 0 0 15px rgba(249, 115, 22, 0.2);
-        }
-
-        .stats-block {
-            text-align: right;
-        }
-
-        .stat-main {
-            font-size: 12px;
-            font-weight: 700;
-            color: white;
-            margin-bottom: 4px;
-        }
-
-        .stat-sub {
-            font-size: 10px;
-            color: #555;
-            font-family: 'JetBrains Mono', monospace;
+            background: rgba(255, 255, 255, 0.15);
         }
 
         /* Echo context hint */
@@ -532,6 +640,94 @@
             opacity: 0;
             /* Hidden until interacted or scroll */
             animation: fadeIn 1s 1s forwards;
+        }
+
+        /* --- MENU DROPDOWN --- */
+        .menu-container {
+            position: relative;
+        }
+
+        .menu-dropdown {
+            position: absolute;
+            top: 54px;
+            right: 0;
+            width: 200px;
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 18px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            z-index: 100;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+            transform: translateY(-10px);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .menu-dropdown.show {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .menu-item {
+            padding: 12px 14px;
+            border-radius: 12px;
+            color: #E5E7EB;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+        }
+
+        .menu-item:active {
+            transform: scale(0.98);
+        }
+
+        .menu-item svg {
+            opacity: 0.5;
+            flex-shrink: 0;
+        }
+
+        /* Multi-image indicator hint */
+        .image-hint {
+            position: absolute;
+            top: 48%;
+            /* Bottom of the image area at 30% height */
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            opacity: 0.4;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .hint-dot {
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .hint-dot.active {
+            height: 12px;
+            border-radius: 100px;
+            opacity: 1;
         }
 
         @keyframes fadeIn {
@@ -570,19 +766,52 @@
                 </div>
             </div>
 
-            <div class="btn-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="3" width="7" height="7"></rect>
-                    <rect x="14" y="3" width="7" height="7"></rect>
-                    <rect x="14" y="14" width="7" height="7"></rect>
-                    <rect x="3" y="14" width="7" height="7"></rect>
-                </svg>
+            <div class="menu-container">
+                <div class="btn-icon" id="menuBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <circle cx="12" cy="5" r="1.5"></circle>
+                        <circle cx="12" cy="12" r="1.5"></circle>
+                        <circle cx="12" cy="19" r="1.5"></circle>
+                    </svg>
+                </div>
+                <div class="menu-dropdown" id="menuDropdown">
+                    <div class="menu-item" onclick="reportMemory()">
+                        <span>Report this memory</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                            <line x1="4" y1="22" x2="4" y2="15"></line>
+                        </svg>
+                    </div>
+                    <div class="menu-item" onclick="seeSource()">
+                        <span>See memory source</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                    </div>
+                    <div class="menu-item" onclick="uploadMedia()">
+                        <span>Add related media</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- BACKGROUND -->
         <div class="hero-layer" id="heroCarousel">
             <!-- Images populated via JS -->
+        </div>
+        <div class="image-hint" id="imageHint">
+            <!-- Dots populated via JS -->
         </div>
         <div class="gradient-overlay"></div>
 
@@ -597,7 +826,7 @@
                 <polyline points="9 18 15 12 9 6"></polyline>
             </svg>
         </div>
-        <div class="image-counter" id="imgCounter">1 / 21</div>
+
 
         <!-- MAIN CONTENT -->
         <div class="content-core" id="contentCore">
@@ -611,20 +840,30 @@
             </div>
 
             <h1>The Constraints of Creativity</h1>
-            <p>The panel illustrates a profound disconnection. It feels like cognition isn't one's own—much like the
-                neutrinos passing through us.The panel illustrates a profound disconnection. It feels like cognition
-                isn't one's own—much like the neutrinos passing through us. This connects to our discussion on agency in
-                digital spaces.
+            <div class="text-container" id="textContainer">
+                <p id="memoryDescription">The panel illustrates a profound disconnection. It feels like cognition isn't
+                    one's own—much like the neutrinos passing through us. This connects to our discussion on agency in
+                    digital spaces.
 
-                This connects to our discussion on agency in digital spaces.</p>
-
-            <div class="social-row">
-                <div class="avatars">
-                    <div class="av-sm" style="background:#FCD34D;">A</div>
-                    <div class="av-sm" style="background:#FCA5A5;">M</div>
-                    <div class="av-sm" style="background:#93C5FD;">K</div>
+                    When we look at the way signals propagate through this map, we see the same patterns of emergence.
+                    The "Echo" isn't just a recording; it's a resonant frequency of a human moment, caught between the
+                    physical and the digital. By diving deeper into these constraints, we actually find more freedom—the
+                    freedom to interpret the static between the signals.</p>
+                <div class="read-more-btn" id="readMoreBtn" onclick="toggleReadMore()">
+                    <span>Read more</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                        style="transition: transform 0.3s ease;">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
                 </div>
-                <span class="social-text">Liked by <b>Alex</b>, <b>Maria</b> and 24 others</span>
+            </div>
+
+            <div class="reactions-bar">
+                <span class="reaction-hint">Quick reaction</span>
+                <div class="emoji-btn" onclick="toggleReact(this)">🔥</div>
+                <div class="emoji-btn" onclick="toggleReact(this)">😭</div>
+                <div class="emoji-btn" onclick="toggleReact(this)">😂</div>
+                <div class="emoji-btn" onclick="toggleReact(this)">🎉</div>
             </div>
         </div>
 
@@ -636,36 +875,41 @@
             Talk to Will's Echo to unlock context...
         </div>
 
-        <!-- INTERACTIVE DOCK -->
+        <!-- INTERACTIVE DOCK (Resonance Hub) -->
         <div class="dock-area">
+            <!-- STEP 2: CONTEXT & TRUST -->
+            <div class="connection-info">
+                <div class="social-row" style="margin: 0;">
+                    <div class="avatars">
+                        <div class="av-sm" style="background:#FCD34D;">A</div>
+                        <div class="av-sm" style="background:#FCA5A5;">M</div>
+                        <div class="av-sm" style="background:#93C5FD;">K</div>
+                    </div>
+                    <span class="social-text">Liked by <b>Alex</b> and 24 others</span>
+                </div>
+            </div>
 
-            <!-- THE SLIDER COMPONENT -->
+            <!-- STEP 3: DEEP RESONANCE (Primary Action) -->
             <div class="slider-container" id="slider">
-                <div class="slider-label" id="sliderLabel">Slide to Message</div>
-
-                <!-- When active, this becomes the send button -->
+                <div class="slider-label" id="sliderLabel">Slide to Resonate</div>
                 <div class="slider-handle" id="handle">
                     <svg id="arrowIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                         <polyline points="12 5 19 12 12 19"></polyline>
                     </svg>
                 </div>
-
-                <input type="text" class="msg-input" id="msgInput" placeholder="Reply to Will...">
+                <input type="text" class="msg-input" id="msgInput" placeholder="Send this reflection to Will...">
             </div>
 
-            <!-- STATS & REACTIONS -->
-            <div class="engagement-row">
-                <div class="reactions">
-                    <div class="emoji-btn" onclick="toggleReact(this)">🔥</div>
-                    <div class="emoji-btn" onclick="toggleReact(this)">😭</div>
-                    <div class="emoji-btn" onclick="toggleReact(this)">😂</div>
-                    <div class="emoji-btn" onclick="toggleReact(this)">🎉</div>
+            <!-- SUCCESS PROBABILITY (Post-action context) -->
+            <div class="dock-footer">
+                <div class="stat-group">
+                    <span class="stat-main">Response rate 90%</span>
+                    <span class="stat-sub">Last drop: 15h ago</span>
                 </div>
-
-                <div class="stats-block">
-                    <div class="stat-main">Response rate 90%</div>
-                    <div class="stat-sub">Last drop: 15h ago</div>
+                <div class="status-pill">
+                    <div class="status-dot"></div>
+                    <span class="stat-label">Active</span>
                 </div>
             </div>
         </div>
@@ -679,7 +923,7 @@
 
         let currentSlide = 0; // Start at first image
         const heroCarousel = document.getElementById('heroCarousel');
-        const imgCounter = document.getElementById('imgCounter');
+
 
         // Populate Carousel
         function initCarousel() {
@@ -702,7 +946,17 @@
         function updateCarousel() {
             // Updated translation to work with horizontal carousel + 28% top position
             heroCarousel.style.transform = `translateY(-50%) translateX(-${currentSlide * 100}%)`;
-            imgCounter.innerText = `${currentSlide + 1} / ${images.length}`;
+            updateDots();
+        }
+
+        function updateDots() {
+            const hint = document.getElementById('imageHint');
+            hint.innerHTML = '';
+            images.forEach((_, i) => {
+                const dot = document.createElement('div');
+                dot.className = `hint-dot ${i === currentSlide ? 'active' : ''}`;
+                hint.appendChild(dot);
+            });
         }
 
         initCarousel();
@@ -790,6 +1044,54 @@
             btn.classList.toggle('active');
         }
 
+        // --- MENU DROPDOWN LOGIC ---
+        const menuBtn = document.getElementById('menuBtn');
+        const menuDropdown = document.getElementById('menuDropdown');
+
+        menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menuDropdown.classList.toggle('show');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!menuDropdown.contains(e.target)) {
+                menuDropdown.classList.remove('show');
+            }
+        });
+
+        function reportMemory() {
+            console.log('Report memory triggered');
+            // Add your reporting logic here
+            alert('Thank you. This memory has been flagged for review.');
+        }
+
+        function seeSource() {
+            console.log('See source triggered');
+            // Add your source viewing logic here
+            alert('Redirecting to the original conversation source...');
+        }
+
+        function uploadMedia() {
+            console.log('Upload media triggered');
+            alert('Opening media gallery to add related captures...');
+        }
+
+        function toggleReadMore() {
+            const container = document.getElementById('textContainer');
+            const p = document.getElementById('memoryDescription');
+            const btn = document.getElementById('readMoreBtn');
+            const isExpanded = p.classList.toggle('expanded');
+
+            container.classList.toggle('is-expanded', isExpanded);
+
+            if (isExpanded) {
+                btn.querySelector('span').innerText = 'Show less';
+                btn.querySelector('svg').style.transform = 'rotate(180deg)';
+            } else {
+                btn.querySelector('span').innerText = 'Read more';
+                btn.querySelector('svg').style.transform = 'rotate(0deg)';
+            }
+        }
     </script>
 
 </body>
