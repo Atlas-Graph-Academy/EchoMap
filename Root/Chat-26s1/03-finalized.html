@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aura - The Accumulated Light</title>
+    <style>
+        :root {
+            /* Turrellian Palette */
+            --bg-space: #050505;
+            --void-purple: #0b0812;
+            --nebula-blue: #141b2e;
+            --sunset-orange: #331a0f;
+
+            --echo-glow: rgba(180, 220, 255, 0.6);
+            --memory-gold: rgba(255, 215, 100, 0.9);
+
+            --user-glass: rgba(255, 255, 255, 0.08);
+            --user-border: rgba(255, 255, 255, 0.12);
+
+            /* Font from your provided file */
+            --font-main: "SF Pro Text", "Inter", -apple-system, sans-serif;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-space);
+            color: white;
+            font-family: var(--font-main);
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- 1. ATMOSPHERE --- */
+        #ganzfeld {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Deep atmospheric gradient */
+            background: radial-gradient(circle at 50% 30%, var(--nebula-blue), var(--void-purple) 60%, var(--bg-space) 90%);
+            z-index: -2;
+            transition: filter 1s ease;
+        }
+
+        /* --- 2. THE ACCUMULATOR (光之积累层) --- */
+        #singularity-stage {
+            position: absolute;
+            /* Adjusted to sit perfectly at the vanishing point */
+            top: 15%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* High Z-Index ensures crystals sit ON TOP of fading text */
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        #core-aura {
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(140, 180, 255, 0.4) 60%, transparent 100%);
+            filter: blur(35px);
+            opacity: 0.7;
+            transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        #cluster-root {
+            position: relative;
+            width: 40px;
+            height: 40px;
+        }
+
+        /* Crystals - Now designed to accumulate */
+        .luminous-stone {
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #fff, rgba(255, 255, 255, 0.1));
+            box-shadow: 0 0 20px var(--echo-glow);
+            filter: blur(4px);
+            /* Slightly softer to blend when stacked */
+            opacity: 0;
+            transform: scale(0);
+            /* Animation: Enter and Stay */
+            animation: materializeStone 0.8s forwards;
+        }
+
+        @keyframes materializeStone {
+            to {
+                opacity: 0.9;
+                transform: scale(1);
+            }
+        }
+
+        /* --- 3. THE FLUID STREAM (Refined Text) --- */
+        #stream-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 20px;
+            gap: 16px;
+            z-index: 5;
+            perspective: 1000px;
+
+            /* THE CLAMP: 物理遮罩，确保文字在进入光球区域时被完美“切断”/吸收 */
+            mask-image: linear-gradient(to bottom, transparent 15%, black 35%);
+            -webkit-mask-image: linear-gradient(to bottom, transparent 15%, black 35%);
+        }
+
+        .message-row {
+            width: 90%;
+            max-width: 400px;
+            display: flex;
+            flex-shrink: 0;
+            position: relative;
+            /* Physics Origin: Top Center for the "Stretch" */
+            transform-origin: top center;
+            will-change: transform, opacity, filter;
+        }
+
+        .msg-content {
+            position: relative;
+            /* PORTED STYLE from your file */
+            padding: 14px 20px;
+            font-size: 16px;
+            line-height: 1.5;
+            border-radius: 20px;
+            transition: background 0.5s ease, border 0.5s ease, color 0.5s ease;
+        }
+
+        /* PORTED STYLE: User Glass */
+        .is-user {
+            justify-content: flex-end;
+        }
+
+        .is-user .msg-content {
+            background: var(--user-glass);
+            border: 1px solid var(--user-border);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: rgba(255, 255, 255, 0.95);
+            border-bottom-right-radius: 4px;
+        }
+
+        /* PORTED STYLE: Echo Text */
+        .is-echo {
+            justify-content: flex-start;
+        }
+
+        .is-echo .msg-content {
+            background: transparent;
+            color: rgba(200, 230, 255, 0.9);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            padding-left: 4px;
+        }
+
+        /* --- 4. INPUT LAYER --- */
+        #input-layer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to top, #000 80%, transparent);
+            z-index: 50;
+            transition: height 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding-bottom: env(safe-area-inset-bottom, 20px);
+        }
+
+        #keyboard-spacer {
+            height: 0px;
+            width: 100%;
+            background: #0a0a0a;
+            transition: height 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        #input-controls {
+            width: 100%;
+            padding: 10px 20px 20px 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #flux-input {
+            width: 100%;
+            min-height: 40px;
+            max-height: 120px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            padding: 10px 15px;
+            outline: none;
+            resize: none;
+            font-family: inherit;
+        }
+
+        #flux-input:focus {
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .sim-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+        }
+
+        .btn-sim {
+            flex: 1;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-sim:active,
+        .btn-sim.active {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .btn-voice {
+            background: rgba(255, 215, 100, 0.1);
+            color: var(--memory-gold);
+        }
+
+        .btn-voice:active {
+            background: var(--memory-gold);
+            color: black;
+            box-shadow: 0 0 20px var(--memory-gold);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="ganzfeld"></div>
+
+    <div id="singularity-stage">
+        <div id="core-aura"></div>
+        <div id="cluster-root">
+            <div class="luminous-stone" style="width:25px; height:25px; top:-5px; left:5px;"></div>
+        </div>
+    </div>
+
+    <div id="stream-container">
+        <div class="message-row is-echo">
+            <div class="msg-content">此处是深空。</div>
+        </div>
+        <div class="message-row is-echo">
+            <div class="msg-content">保持安静，或者让光积累。</div>
+        </div>
+    </div>
+
+    <div id="input-layer">
+        <div id="input-controls">
+            <textarea id="flux-input" rows="1" placeholder="Type or hold to speak..."></textarea>
+
+            <div class="sim-controls">
+                <button class="btn-sim" id="btn-toggle-kb" onclick="toggleKeyboard()">▲ Keyboard</button>
+                <button class="btn-sim btn-voice" id="btn-voice" onmousedown="startVoice()" onmouseup="stopVoice()"
+                    ontouchstart="startVoice()" ontouchend="stopVoice()">● Hold to Speak</button>
+            </div>
+        </div>
+        <div id="keyboard-spacer"></div>
+    </div>
+
+    <script>
+        const stream = document.getElementById('stream-container');
+        const inputField = document.getElementById('flux-input');
+        const keyboardSpacer = document.getElementById('keyboard-spacer');
+        const coreAura = document.getElementById('core-aura');
+        let isKeyboardOpen = false;
+        let voiceInterval = null;
+
+        // --- PHYSICS ENGINE: MIXED (Format from File + Physics from V3.1) ---
+        function updateFieldDynamics() {
+            const messages = Array.from(stream.children);
+            const windowHeight = window.innerHeight;
+
+            // The Zone Definitions
+            const meltingPoint = windowHeight * 0.40; // Start melting here
+            const singularityPoint = windowHeight * 0.15; // Fully absorbed here
+            const meltingZoneHeight = meltingPoint - singularityPoint;
+
+            messages.forEach(row => {
+                const rect = row.getBoundingClientRect();
+                const elementMidpoint = rect.top + (rect.height / 2);
+
+                if (elementMidpoint > meltingPoint) {
+                    // SAFE ZONE: Clean text (Styles from your file)
+                    row.style.transform = 'translateY(0) scale(1)';
+                    row.style.opacity = '1';
+                    row.style.filter = 'none';
+                }
+                else if (elementMidpoint > singularityPoint) {
+                    // MELTING ZONE: The "Stretch" Physics
+                    let p = (meltingPoint - elementMidpoint) / meltingZoneHeight;
+                    p = Math.min(Math.max(p, 0), 1);
+                    const ease = Math.pow(p, 2);
+
+                    const stretchY = 1 + (ease * 3); // Vertical stretch
+                    const squeezeX = 1 - (ease * 0.4);
+                    const lift = ease * -50;
+
+                    row.style.transform = `translateY(${lift}px) scale(${squeezeX}, ${stretchY})`;
+
+                    // Blur logic
+                    const blurAmount = ease * 25;
+                    row.style.filter = `blur(${blurAmount}px)`;
+
+                    // Opacity fade logic (match visual cutoff)
+                    const opacity = Math.max(0, 1 - (p * 1.5));
+                    row.style.opacity = opacity.toString();
+                }
+                else {
+                    // SINGULARITY: Invisible
+                    row.style.opacity = '0';
+                }
+            });
+
+            requestAnimationFrame(updateFieldDynamics);
+        }
+
+        // --- CRYSTAL GROWTH ENGINE (Persistent) ---
+        function spawnCrystal(isAggressive = false) {
+            const root = document.getElementById('cluster-root');
+
+            // 1. Limit Logic: Keep scene healthy but dense
+            // Allow up to 60 stones to accumulate.
+            const maxStones = 60;
+            if (root.children.length > maxStones) {
+                // Remove the oldest one to make room for new growth
+                root.removeChild(root.firstElementChild);
+            }
+
+            const stone = document.createElement('div');
+            stone.className = 'luminous-stone';
+
+            // 2. Size Logic: Variation is key
+            const baseSize = isAggressive ? 25 : 15;
+            const size = baseSize + Math.random() * 20;
+            stone.style.width = size + 'px';
+            stone.style.height = size + 'px';
+
+            // 3. Position Logic: Cluster around the center
+            // Use a gaussian-like distribution for a dense center
+            const angle = Math.random() * Math.PI * 2;
+            // Random radius, but biased towards center (0-60px)
+            const radius = Math.random() * 60 * Math.random();
+
+            const x = Math.cos(angle) * radius;
+            const y = Math.sin(angle) * radius;
+
+            stone.style.left = x + 'px';
+            stone.style.top = y + 'px';
+
+            // 4. IMPORTANT: No removeChild timeout! 
+            // The stone stays and adds to the glow.
+
+            root.appendChild(stone);
+        }
+
+        // --- Interaction ---
+
+        function toggleKeyboard() {
+            isKeyboardOpen = !isKeyboardOpen;
+            const btn = document.getElementById('btn-toggle-kb');
+            if (isKeyboardOpen) {
+                keyboardSpacer.style.height = '300px';
+                btn.classList.add('active');
+                stream.style.height = 'calc(80% - 300px)';
+            } else {
+                keyboardSpacer.style.height = '0px';
+                btn.classList.remove('active');
+                stream.style.height = '80%';
+            }
+        }
+
+        function startVoice() {
+            const phrases = ["意识", "正在", "堆积", "光", "变得", "更强", "连接", "建立"];
+            inputField.placeholder = "Listening...";
+            coreAura.style.transform = "scale(1.5)";
+            coreAura.style.background = "var(--memory-gold)";
+
+            voiceInterval = setInterval(() => {
+                const word = phrases[Math.floor(Math.random() * phrases.length)];
+                inputField.value += word + " ";
+                inputField.scrollTop = inputField.scrollHeight;
+
+                // Spawn crystals rapidly while speaking
+                spawnCrystal(true);
+            }, 200);
+        }
+
+        function stopVoice() {
+            clearInterval(voiceInterval);
+            if (inputField.value.trim().length > 0) sendMsg();
+            inputField.placeholder = "Type or hold to speak...";
+            coreAura.style.transform = "scale(1)";
+            coreAura.style.background = "";
+        }
+
+        inputField.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); sendMsg(); }
+        });
+
+        function sendMsg() {
+            const text = inputField.value.trim();
+            if (!text) return;
+            addMessage(text, 'user');
+            inputField.value = '';
+            setTimeout(() => {
+                const replies = ["已确认。", "回响...", "记录在光中。"];
+                addMessage(replies[Math.floor(Math.random() * replies.length)], 'echo');
+            }, 800);
+        }
+
+        function addMessage(text, type) {
+            const div = document.createElement('div');
+            div.className = `message-row is-${type}`;
+            div.innerHTML = `<div class="msg-content">${text}</div>`;
+            stream.appendChild(div);
+            if (stream.children.length > 15) stream.removeChild(stream.firstElementChild);
+
+            // Each message adds to the pile
+            if (type === 'user') {
+                // Spawn a burst of 3 stones for every message
+                spawnCrystal();
+                setTimeout(() => spawnCrystal(), 100);
+                setTimeout(() => spawnCrystal(), 200);
+            }
+        }
+
+        requestAnimationFrame(updateFieldDynamics);
+
+    </script>
+</body>
+
+</html>

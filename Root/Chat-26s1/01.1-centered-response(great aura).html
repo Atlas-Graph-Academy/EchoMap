@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Echo - Evolving Memory Core</title>
+    <style>
+        :root {
+            --bg-space: #000000;
+            --echo-glow: rgba(180, 220, 255, 0.6);
+            --user-bubble: rgba(255, 255, 255, 0.05);
+            --memory-gold: rgba(255, 215, 100, 0.8);
+            --font-main: -apple-system, "SF Pro Display", "Inter", system-ui, sans-serif;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-space);
+            color: white;
+            font-family: var(--font-main);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #ganzfeld {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at 50% 40%, #121826 0%, #000 70%);
+            z-index: -1;
+        }
+
+        #viewport-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: linear-gradient(to bottom, black 0%, transparent 15%, transparent 85%, black 100%);
+            z-index: 5;
+        }
+
+        /* --- 1. The Evolving Core (核心进化) --- */
+        #echo-stage {
+            position: relative;
+            margin-top: 15vh;
+            width: 260px;
+            height: 260px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            cursor: pointer;
+        }
+
+        /* 基础背景光晕：其尺寸和亮度由 JS 动态控制 */
+        #core-aura {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: var(--echo-glow);
+            filter: blur(50px);
+            border-radius: 50%;
+            transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0.4;
+        }
+
+        /* 结晶容器 */
+        #cluster-root {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 单个光质结晶 */
+        .luminous-stone {
+            position: absolute;
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.05));
+            filter: blur(4px);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            mix-blend-mode: screen;
+            opacity: 0;
+            transform: scale(0);
+            animation: stonePop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes stonePop {
+            to {
+                opacity: 0.7;
+                transform: scale(1);
+            }
+        }
+
+        .highlight-stone {
+            background: radial-gradient(circle at 30% 30%, rgba(255, 230, 150, 0.9), rgba(255, 180, 50, 0.1));
+            box-shadow: 0 0 25px var(--memory-gold);
+        }
+
+        #drop-hint {
+            position: absolute;
+            bottom: -40px;
+            font-size: 12px;
+            color: var(--echo-glow);
+            letter-spacing: 2px;
+            opacity: 0;
+            transition: opacity 0.5s;
+            text-transform: uppercase;
+        }
+
+        /* --- 2. Chat Flow (文字层) --- */
+        #chat-flow {
+            width: 90%;
+            max-width: 500px;
+            flex: 1;
+            margin-top: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            padding: 40px 20px 150px 20px;
+            scrollbar-width: none;
+            z-index: 2;
+        }
+
+        #chat-flow::-webkit-scrollbar {
+            display: none;
+        }
+
+        .msg-echo {
+            align-self: center;
+            text-align: center;
+            max-width: 90%;
+            font-size: 17px;
+            font-weight: 300;
+            line-height: 1.6;
+            color: rgba(200, 230, 255, 0.95);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            animation: echoAppear 1.2s forwards;
+        }
+
+        .msg-user {
+            align-self: flex-end;
+            background: var(--user-bubble);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 12px 20px;
+            border-radius: 20px;
+            border-bottom-right-radius: 4px;
+            font-size: 15px;
+            max-width: 75%;
+            animation: userAppear 0.5s forwards;
+        }
+
+        @keyframes echoAppear {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+                filter: blur(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+                filter: blur(0);
+            }
+        }
+
+        @keyframes userAppear {
+            from {
+                opacity: 0;
+                transform: translateX(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* --- 3. Input --- */
+        #input-altar {
+            position: fixed;
+            bottom: 40px;
+            width: 80%;
+            max-width: 400px;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #input-field {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            color: white;
+            font-size: 16px;
+            text-align: center;
+            outline: none;
+        }
+
+        .particle {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 100;
+            box-shadow: 0 0 10px white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="ganzfeld"></div>
+    <div id="viewport-mask"></div>
+
+    <div id="echo-stage" onclick="triggerDrop()">
+        <div id="core-aura"></div>
+        <div id="cluster-root">
+            <div class="luminous-stone" style="width:30px; height:30px; opacity:0.6; transform:scale(1);"></div>
+        </div>
+        <div id="drop-hint">凝聚记忆</div>
+    </div>
+
+    <div id="chat-flow">
+        <div class="msg-echo">我是Echo。你的话语会在这里留下痕迹。</div>
+    </div>
+
+    <div id="input-altar">
+        <input type="text" id="input-field" placeholder="描述你的瞬间..." autocomplete="off">
+    </div>
+
+    <script>
+        const chatFlow = document.getElementById('chat-flow');
+        const inputField = document.getElementById('input-field');
+        const coreAura = document.getElementById('core-aura');
+        const clusterRoot = document.getElementById('cluster-root');
+        const dropHint = document.getElementById('drop-hint');
+
+        let messageCount = 0;
+
+        function addMessage(text, type) {
+            const div = document.createElement('div');
+            div.className = type === 'echo' ? 'msg-echo' : 'msg-user';
+            div.innerText = text;
+            chatFlow.appendChild(div);
+            chatFlow.scrollTo({ top: chatFlow.scrollHeight, behavior: 'smooth' });
+
+            // 获取消息位置并触发粒子
+            const rect = div.getBoundingClientRect();
+            createParticle(rect.left + rect.width / 2, rect.top, type);
+        }
+
+        function createParticle(x, y, type) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            if (type === 'user') p.style.background = 'var(--memory-gold)';
+            document.body.appendChild(p);
+
+            const coreRect = document.getElementById('echo-stage').getBoundingClientRect();
+            const targetX = coreRect.left + coreRect.width / 2;
+            const targetY = coreRect.top + coreRect.height / 2;
+
+            p.style.left = x + 'px';
+            p.style.top = y + 'px';
+
+            p.animate([
+                { transform: 'translate(0,0) scale(1)', opacity: 1 },
+                { transform: `translate(${targetX - x}px, ${targetY - y}px) scale(0)`, opacity: 0 }
+            ], { duration: 1000, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' }).onfinish = () => {
+                p.remove();
+                evolveCore();
+            };
+        }
+
+        function evolveCore() {
+            messageCount++;
+
+            // 1. 动态增强光晕
+            const scale = 1 + (messageCount * 0.2); // 每条消息增加 20% 尺寸
+            const opacity = Math.min(0.4 + (messageCount * 0.1), 0.9); // 每条消息增加亮度
+            coreAura.style.transform = `scale(${scale})`;
+            coreAura.style.opacity = opacity;
+
+            // 2. 添加物理结晶
+            const stone = document.createElement('div');
+            stone.className = 'luminous-stone';
+            if (messageCount % 3 === 0) stone.classList.add('highlight-stone');
+
+            const size = 20 + Math.random() * 30;
+            const offsetX = (Math.random() - 0.5) * 50;
+            const offsetY = (Math.random() - 0.5) * 50;
+            const rotate = Math.random() * 360;
+
+            stone.style.width = size + 'px';
+            stone.style.height = size + 'px';
+            stone.style.left = (15 + offsetX) + 'px';
+            stone.style.top = (15 + offsetY) + 'px';
+            stone.style.transform = `rotate(${rotate}deg)`;
+
+            clusterRoot.appendChild(stone);
+
+            // 3. 显示提示
+            if (messageCount >= 3) {
+                dropHint.style.opacity = 1;
+            }
+        }
+
+        function triggerDrop() {
+            if (messageCount < 3) return;
+
+            // 模拟凝聚动画
+            coreAura.style.transform = 'scale(0.5)';
+            coreAura.style.opacity = '1';
+            clusterRoot.style.filter = 'blur(20px)';
+            clusterRoot.style.transform = 'scale(0)';
+
+            setTimeout(() => {
+                // 重置核心
+                messageCount = 0;
+                clusterRoot.innerHTML = '<div class="luminous-stone" style="width:30px; height:30px; opacity:0.6; transform:scale(1);"></div>';
+                clusterRoot.style.filter = '';
+                clusterRoot.style.transform = '';
+                coreAura.style.transform = 'scale(1)';
+                coreAura.style.opacity = '0.4';
+                dropHint.style.opacity = 0;
+
+                // 这里可以添加逻辑：在界面上产生一个小的反馈，比如在背景里留下一颗星
+                console.log("Memory Captured.");
+            }, 800);
+        }
+
+        inputField.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && inputField.value.trim()) {
+                const val = inputField.value;
+                addMessage(val, 'user');
+                inputField.value = '';
+                setTimeout(() => {
+                    const resp = ["我感受到了这种波动。", "记忆正在凝聚成形。", "这是一个值得记录的时刻。"][Math.floor(Math.random() * 3)];
+                    addMessage(resp, 'echo');
+                }, 1500);
+            }
+        });
+    </script>
+</body>
+
+</html>

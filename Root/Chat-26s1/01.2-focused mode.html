@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aura - The Fusion Stream</title>
+    <style>
+        :root {
+            --space-black: #050505;
+            --void-purple: #0a0610;
+            --nebula-blue: #12182b;
+            --starlight: rgba(230, 240, 255, 0.95);
+            --echo-glow: rgba(140, 180, 255, 0.5);
+            --user-glass: rgba(255, 255, 255, 0.05);
+            --highlight: rgba(255, 255, 255, 0.8);
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: "SF Pro Text", "Inter", -apple-system, sans-serif;
+            background: var(--space-black);
+            color: var(--starlight);
+        }
+
+        /* --- 1. ATMOSPHERE --- */
+        #universe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 30%, var(--nebula-blue), var(--void-purple) 50%, var(--space-black) 90%);
+            z-index: -2;
+            transition: transform 4s ease-out;
+        }
+
+        /* --- 2. THE CORE (Light Source / Singularity) --- */
+        /* 这是消息最终汇入的地方 */
+        #light-singularity {
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* 呼吸的光晕 */
+        .halo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.6;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(100, 150, 255, 0.2) 60%, transparent 100%);
+            animation: breathe 6s infinite ease-in-out;
+        }
+
+        .halo.inner {
+            width: 100px;
+            height: 100px;
+            filter: blur(20px);
+            opacity: 0.8;
+            animation-duration: 4s;
+        }
+
+        .halo.outer {
+            width: 300px;
+            height: 300px;
+            filter: blur(60px);
+            opacity: 0.3;
+            animation-delay: 1s;
+        }
+
+        @keyframes breathe {
+
+            0%,
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0.7;
+            }
+        }
+
+        /* 当消息被吃掉时，光核会闪烁 */
+        .pulse-absorb {
+            animation: absorbFlash 0.6s ease-out forwards;
+        }
+
+        @keyframes absorbFlash {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                filter: blur(20px) brightness(1);
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.5);
+                filter: blur(15px) brightness(2);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                filter: blur(20px) brightness(1);
+            }
+        }
+
+        /* --- 3. THE STREAM (Fluid Messages) --- */
+        #stream-stage {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            /* 让点击穿透 */
+            overflow: hidden;
+        }
+
+        #stream-container {
+            position: absolute;
+            bottom: 120px;
+            /* 输入框上方 */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 85%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            /* 底部对齐 */
+            align-items: center;
+            gap: 20px;
+            /* 关键：这里不需要mask，因为我们通过transform让它消失在光里 */
+            perspective: 1000px;
+            /* 增加一点3D透视感 */
+        }
+
+        .message-row {
+            width: 100%;
+            display: flex;
+            pointer-events: auto;
+            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+            /* 平滑过渡 */
+            transform-origin: 50% -200%;
+            /* 关键核心：变形的原点设在屏幕上方光晕处！ */
+            position: relative;
+        }
+
+        .msg-content {
+            padding: 14px 22px;
+            font-size: 15px;
+            line-height: 1.5;
+            border-radius: 20px;
+            backdrop-filter: blur(8px);
+            transition: all 0.8s ease;
+            position: relative;
+        }
+
+        /* 用户样式：初始像玻璃 */
+        .is-user {
+            justify-content: flex-end;
+        }
+
+        .is-user .msg-content {
+            background: var(--user-glass);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.95);
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Echo样式：初始像光 */
+        .is-echo {
+            justify-content: flex-start;
+        }
+
+        .is-echo .msg-content {
+            background: transparent;
+            color: #b0c4de;
+            text-shadow: 0 0 10px rgba(176, 196, 222, 0.3);
+            padding-left: 0;
+        }
+
+        /* --- 4. THE INPUT --- */
+        #input-zone {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 240px;
+            z-index: 50;
+            transition: width 0.4s ease;
+        }
+
+        #input-zone:focus-within {
+            width: 340px;
+        }
+
+        input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+            padding: 12px 0;
+            color: white;
+            font-size: 16px;
+            text-align: center;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.2);
+            letter-spacing: 1px;
+        }
+
+        /* --- 5. VISUAL FX CLASSES (Applied via JS) --- */
+
+        /* 最新消息：清晰 */
+        .state-new {
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+            filter: blur(10px);
+        }
+
+        .state-active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+        }
+
+        /* 中间态：开始变形 */
+        .state-drifting {
+            /* 稍微被拉长，稍微变窄 */
+            /* scaleX变小(收窄), scaleY变大(拉伸) */
+        }
+
+        /* 融合态：被光吃掉 */
+        /* 这是你最想要的效果：线性拉伸 + 模糊 + 变亮 */
+        .state-fusing {
+            /* 文字变成纯光 */
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="universe"></div>
+
+    <div id="light-singularity">
+        <div class="halo inner" id="core-light"></div>
+        <div class="halo outer"></div>
+    </div>
+
+    <div id="stream-stage">
+        <div id="stream-container">
+            <div class="message-row is-echo state-active">
+                <div class="msg-content">我们在编织一个新的星座。</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="input-zone">
+        <input type="text" id="user-input" placeholder="Type to fuse..." autocomplete="off">
+    </div>
+
+    <script>
+        const stream = document.getElementById('stream-container');
+        const input = document.getElementById('user-input');
+        const coreLight = document.getElementById('core-light');
+
+        // Echo的预设回复
+        const echoResponses = [
+            "能量已被接收。",
+            "光晕正在扩张。",
+            "它是透明的，但我看见了情绪。",
+            "你这个想法很耀眼。",
+            "继续...",
+            "我们正在接近奇点。"
+        ];
+
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && input.value.trim() !== "") {
+                const text = input.value;
+                input.value = "";
+
+                // 1. Add User Message
+                addMessage(text, 'user');
+
+                // 2. Trigger Light Pulse (Feedback)
+                triggerCorePulse();
+
+                // 3. Echo Reply (Simulated delay)
+                setTimeout(() => {
+                    const reply = echoResponses[Math.floor(Math.random() * echoResponses.length)];
+                    addMessage(reply, 'echo');
+                    triggerCorePulse();
+                }, 800 + Math.random() * 600);
+            }
+        });
+
+        function addMessage(text, type) {
+            const row = document.createElement('div');
+            row.className = `message-row is-${type} state-new`;
+
+            const content = document.createElement('div');
+            content.className = 'msg-content';
+            content.textContent = text;
+
+            row.appendChild(content);
+            stream.appendChild(row);
+
+            // Force reflow
+            void row.offsetWidth;
+
+            // Enter animation
+            row.classList.remove('state-new');
+            row.classList.add('state-active');
+
+            // 核心逻辑：更新所有旧消息的状态
+            updateStreamPhysics();
+        }
+
+        function triggerCorePulse() {
+            // 移除再添加class来重置动画
+            coreLight.classList.remove('pulse-absorb');
+            void coreLight.offsetWidth; // force reflow
+            coreLight.classList.add('pulse-absorb');
+        }
+
+        /**
+         * THE FUSION PHYSICS ENGINE
+         * 这是实现“线性拉伸”和“光之融合”的核心算法
+         */
+        function updateStreamPhysics() {
+            const messages = Array.from(stream.children);
+            const total = messages.length;
+
+            // 我们从下往上遍历 (Index: Total-1 是最新的, 0 是最旧的)
+            // 但为了计算方便，我们定义 reverseIndex: 0 是最新的, 1 是上一个...
+
+            messages.forEach((msg, index) => {
+                // reverseIndex: 0 = 底部最新消息
+                const reverseIndex = total - 1 - index;
+                const content = msg.querySelector('.msg-content');
+
+                // Reset styles first
+                msg.style.transform = '';
+                msg.style.opacity = '';
+                msg.style.filter = '';
+                content.style.background = '';
+                content.style.border = '';
+                content.style.color = '';
+
+                if (reverseIndex === 0) {
+                    // --- 最新消息 (Newest) ---
+                    // 保持原样，清晰可见
+                    msg.style.opacity = '1';
+                    msg.style.transform = 'translateY(0) scale(1)';
+                }
+                else if (reverseIndex === 1) {
+                    // --- 上一条 (Previous) ---
+                    // 开始轻微上浮，轻微透明
+                    msg.style.opacity = '0.7';
+                    msg.style.transform = 'translateY(-20px) scale(0.95)';
+                    // 玻璃感开始减弱
+                    if (msg.classList.contains('is-user')) {
+                        content.style.background = 'rgba(255,255,255,0.02)';
+                    }
+                }
+                else if (reverseIndex === 2) {
+                    // --- 融合区边缘 (Fusion Edge) ---
+                    // 开始明显的拉伸和模糊
+                    msg.style.opacity = '0.4';
+                    // scaleX(0.8) = 收窄
+                    // scaleY(1.5) = 拉长 (线性感)
+                    // translateY(-60px) = 被吸上去
+                    msg.style.transform = 'translateY(-60px) scaleX(0.8) scaleY(1.5)';
+                    msg.style.filter = 'blur(4px)';
+
+                    // 容器彻底消失，只剩文字
+                    content.style.background = 'transparent';
+                    content.style.border = 'none';
+                    content.style.boxShadow = 'none';
+                }
+                else {
+                    // --- 光之融合 (Singularity Fusion) ---
+                    // 这是你最看重的部分：完全被光吃掉
+                    // 极度的拉伸，极度的收窄，极度的亮
+
+                    const extraDist = (reverseIndex - 2) * 50; // 越老的消息越靠上
+
+                    msg.style.opacity = '0'; // 最终不可见
+
+                    // 极端的拉伸：scaleY(3) -> 像面条一样被吸入
+                    // 极端的收窄：scaleX(0.2) -> 汇聚成一个点
+                    msg.style.transform = `translateY(-${120 + extraDist}px) scaleX(0.1) scaleY(4)`;
+
+                    // 极度的模糊，模拟光晕
+                    msg.style.filter = 'blur(20px) brightness(2)';
+                }
+            });
+
+            // 清理太老的消息，防止DOM过大
+            if (messages.length > 8) {
+                stream.removeChild(messages[0]);
+            }
+        }
+    </script>
+</body>
+
+</html>
