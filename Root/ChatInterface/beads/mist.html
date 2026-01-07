@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Echo - Nebula & Crystals</title>
+    <style>
+        :root {
+            --bg-deep: #02020a;
+            --bg-gradient: radial-gradient(circle at 50% 30%, #151530, #000000);
+            --glow-white: rgba(255, 255, 255, 0.8);
+            --glow-gold: rgba(255, 210, 100, 0.9);
+            --glass-border: rgba(255, 255, 255, 0.5);
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: var(--bg-deep);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+            color: white;
+        }
+
+        /* 1. Deep Space Background */
+        #ambient-bg {
+            position: absolute;
+            inset: 0;
+            background: var(--bg-gradient);
+            z-index: -1;
+            animation: slowPulse 10s infinite alternate;
+        }
+
+        @keyframes slowPulse {
+            0% {
+                opacity: 0.9;
+                transform: scale(1);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+        }
+
+        /* 2. The Archive Rail */
+        #memory-rail {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            pointer-events: none;
+        }
+
+        .star-archive {
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 8px white;
+            opacity: 0.5;
+        }
+
+        /* 3. The Echo Stage */
+        #echo-stage {
+            position: absolute;
+            top: 35%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            z-index: 10;
+            cursor: pointer;
+            /* Debug: border: 1px solid red; */
+        }
+
+        #cluster-core {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            /* 这种结构允许子元素自由散落 */
+        }
+
+        /* --- Node Type A: The Mist (Soft Light) --- */
+        /* 大多数消息：无边界，融合，提供体积感 */
+        .node-mist {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(100, 150, 255, 0) 70%);
+            filter: blur(8px);
+            /* 强模糊 */
+            mix-blend-mode: screen;
+            /* 叠加混合 */
+            opacity: 0.7;
+            transform: translate(-50%, -50%) scale(0);
+            animation: mistForm 2s ease-out forwards, drift 6s infinite alternate ease-in-out;
+        }
+
+        /* --- Node Type B: The Crystal (Hard Insight) --- */
+        /* 少数消息：有边界，玻璃质感，提供结构 */
+        .node-crystal {
+            position: absolute;
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+            /* 有机形状 */
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            /* 清晰边界 */
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3), inset 0 0 10px rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(3px);
+            /* 内部微磨砂 */
+            transform: translate(-50%, -50%) scale(0);
+            animation: crystalPop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, drift 5s infinite alternate-reverse ease-in-out;
+            z-index: 5;
+            /* 晶体总是在雾气之上 */
+        }
+
+        /* 金色晶体 (High Value) */
+        .crystal-gold {
+            border-color: rgba(255, 220, 100, 0.6);
+            box-shadow: 0 0 20px rgba(255, 200, 50, 0.4), inset 0 0 10px rgba(255, 200, 0, 0.1);
+        }
+
+        @keyframes mistForm {
+            to {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.6;
+            }
+        }
+
+        @keyframes crystalPop {
+            to {
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        @keyframes drift {
+            0% {
+                margin-top: 0px;
+            }
+
+            100% {
+                margin-top: -10px;
+            }
+        }
+
+        /* Hint */
+        #cluster-hint {
+            position: absolute;
+            bottom: 40px;
+            width: 100%;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            letter-spacing: 1px;
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+        }
+
+        /* Chat UI */
+        #chat-ui {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.95), transparent);
+            padding-bottom: 20px;
+        }
+
+        #messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            scrollbar-width: none;
+        }
+
+        .bubble {
+            max-width: 80%;
+            padding: 10px 16px;
+            border-radius: 16px;
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            width: fit-content;
+        }
+
+        .user-bubble {
+            align-self: flex-end;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .echo-bubble {
+            align-self: flex-start;
+        }
+
+        #input-area {
+            padding: 10px 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 30px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        /* Flying Particles */
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px white;
+            z-index: 100;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="ambient-bg"></div>
+    <div id="memory-rail"></div>
+
+    <!-- Central Stage -->
+    <div id="echo-stage" onclick="dropIt()">
+        <div id="cluster-core">
+            <!-- Start with one soft mist node -->
+            <div class="node-mist" style="width: 60px; height: 60px;"></div>
+        </div>
+        <div id="cluster-hint">记忆已成形。点击收集。</div>
+    </div>
+
+    <!-- Chat -->
+    <div id="chat-ui">
+        <div id="messages">
+            <div class="bubble echo-bubble">我是 Echo。我在听。</div>
+        </div>
+        <div id="input-area">
+            <input type="text" placeholder="输入对话..." onkeypress="handleKey(event)" autocomplete="off">
+        </div>
+    </div>
+
+    <script>
+        let count = 0;
+        const core = document.getElementById('cluster-core');
+        const hint = document.getElementById('cluster-hint');
+        const msgs = document.getElementById('messages');
+        const rail = document.getElementById('memory-rail');
+
+        const replies = ["感觉到了。", "这是一个关键点。", "继续说。", "很有趣。", "嗯..."];
+
+        function handleKey(e) {
+            if (e.key === "Enter" && e.target.value.trim()) {
+                let txt = e.target.value;
+                e.target.value = "";
+                addMsg(txt, 'user');
+                setTimeout(() => {
+                    addMsg(replies[Math.floor(Math.random() * replies.length)], 'echo');
+                }, 800);
+            }
+        }
+
+        function addMsg(txt, role) {
+            let d = document.createElement('div');
+            d.className = `bubble ${role}-bubble`;
+            d.innerText = txt;
+            msgs.appendChild(d);
+            msgs.scrollTop = msgs.scrollHeight;
+            flyParticle(d, role);
+        }
+
+        function flyParticle(el, role) {
+            // Particle Animation
+            let rect = el.getBoundingClientRect();
+            let p = document.createElement('div');
+            p.className = 'particle';
+            document.body.appendChild(p);
+
+            let startX = rect.left + rect.width / 2;
+            let startY = rect.top;
+
+            // Randomize particle appearance (sometimes simple light, sometimes spark)
+            if (Math.random() > 0.7) {
+                p.style.background = "var(--glow-gold)";
+                p.style.boxShadow = "0 0 10px var(--glow-gold)";
+            }
+
+            p.style.left = startX + 'px';
+            p.style.top = startY + 'px';
+
+            let stageRect = document.getElementById('echo-stage').getBoundingClientRect();
+            let targetX = stageRect.left + stageRect.width / 2;
+            let targetY = stageRect.top + stageRect.height / 2;
+
+            let anim = p.animate([
+                { transform: 'translate(0,0) scale(1)', opacity: 1 },
+                { transform: `translate(${targetX - startX}px, ${targetY - startY}px) scale(0)`, opacity: 0.5 }
+            ], { duration: 700, easing: 'cubic-bezier(0.5, 0, 0.5, 1)' });
+
+            anim.onfinish = () => {
+                p.remove();
+                spawnNode(role);
+            }
+        }
+
+        function spawnNode(role) {
+            count++;
+
+            // LOGIC: 80% Mist (Nebula), 20% Crystal (Star/Insight)
+            // Echo's messages have higher chance to be crystals
+            let isCrystal = (Math.random() > 0.75) || (role === 'echo' && Math.random() > 0.5);
+
+            let node = document.createElement('div');
+
+            if (isCrystal) {
+                // Crystal Node (Hard, Defined)
+                node.className = 'node-crystal';
+                if (Math.random() > 0.6) node.classList.add('crystal-gold');
+                let size = 15 + Math.random() * 20;
+                node.style.width = size + 'px';
+                node.style.height = size + 'px';
+            } else {
+                // Mist Node (Soft, Blurry)
+                node.className = 'node-mist';
+                let size = 30 + Math.random() * 40; // Mist is larger
+                node.style.width = size + 'px';
+                node.style.height = size + 'px';
+            }
+
+            // Placement: Organic Cluster around center
+            // Gaussian-ish distribution for a "pile" look
+            let angle = Math.random() * Math.PI * 2;
+            let dist = Math.random() * 50 * Math.sqrt(Math.random()); // Cluster towards center
+
+            let x = Math.cos(angle) * dist;
+            let y = Math.sin(angle) * dist;
+
+            node.style.left = x + 'px';
+            node.style.top = y + 'px';
+
+            core.appendChild(node);
+
+            if (count > 4) hint.style.opacity = 1;
+        }
+
+        function dropIt() {
+            if (count < 2) return;
+            let stage = document.getElementById('echo-stage');
+
+            // "Suck in" animation then drop
+            stage.style.transition = "transform 0.8s ease-in, opacity 0.8s";
+            stage.style.transform = "translate(-120px, 100px) scale(0.05)";
+            stage.style.opacity = 0;
+
+            setTimeout(() => {
+                stage.style.transition = "none";
+                stage.style.transform = "translate(-50%, -50%)";
+                stage.style.opacity = 1;
+                core.innerHTML = '<div class="node-mist" style="width: 50px; height: 50px;"></div>';
+                count = 0;
+                hint.style.opacity = 0;
+
+                let s = document.createElement('div');
+                s.className = 'star-archive';
+                rail.appendChild(s);
+            }, 800);
+        }
+    </script>
+</body>
+
+</html>

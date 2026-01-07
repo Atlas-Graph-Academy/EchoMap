@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Context Window Header</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@300;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #080f12;
+            --bg-teal-glow: #132a2e;
+            --glass-surface: rgba(20, 30, 35, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #e0e6e8;
+            --text-secondary: #8aa0a3;
+            --accent-purple: #7b61ff;
+            --accent-glow: rgba(123, 97, 255, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* iPhone Frame */
+        .iphone-frame {
+            width: 100%;
+            height: 100%;
+            max-width: 430px;
+            max-height: 932px;
+            position: relative;
+            background: radial-gradient(circle at 50% 40%, #1a3d42 0%, #05080a 70%);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Ambient Noise */
+        .noise {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Background Layer */
+        .bg-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .dna-helix {
+            position: absolute;
+            top: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 400px;
+            background: repeating-linear-gradient(45deg,
+                    transparent,
+                    transparent 10px,
+                    rgba(255, 255, 255, 0.03) 10px,
+                    rgba(255, 255, 255, 0.03) 12px);
+            mask-image: linear-gradient(to bottom, transparent, black 40%, black 60%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 40%, black 60%, transparent);
+            filter: blur(2px);
+            opacity: 0.6;
+        }
+
+        /* --- Horizontal Context Header --- */
+        .context-header {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 240px;
+            /* Slightly taller to accommodate the horizontal layout comfortably */
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(10, 20, 25, 0.8) 60%, transparent 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding-top: 50px;
+            /* Space for dynamic island */
+            display: flex;
+            flex-direction: row;
+            /* Horizontal Layout */
+            mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+        }
+
+        /* Simulated Dynamic Island */
+        .dynamic-island {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 35px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 20;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .di-icon {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #2f4;
+        }
+
+        .di-time {
+            color: #2f4;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Left Half: Title & Time */
+        .header-left {
+            flex: 1;
+            /* Left Half */
+            padding-left: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            position: relative;
+        }
+
+        .header-left .time-big {
+            font-size: 56px;
+            /* Really prominent */
+            font-weight: 200;
+            color: #ffffff;
+            line-height: 1;
+            letter-spacing: -2px;
+            background: linear-gradient(to right, #fff, #a0d8ef);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            margin-bottom: 4px;
+        }
+
+        .header-left .date-row {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--accent-purple);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .header-left .date-row::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--accent-purple);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        /* Right Half: Content (Carousel/Sphere) */
+        .header-right {
+            flex: 1;
+            /* Right Half */
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 800px;
+        }
+
+        /* Recycling the 3D Logic but centering it in the Right Half */
+        .wizard-sphere {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #4a5a6a, #0d1114);
+            position: absolute;
+            z-index: 15;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 2px 5px rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Move it slightly to look balanced in the half-space */
+        }
+
+        .wizard-sphere::after {
+            content: 'vv';
+            letter-spacing: 12px;
+            color: #ff9d00;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .wizard-hat {
+            position: absolute;
+            top: -12px;
+            right: 8px;
+            font-size: 20px;
+            transform: rotate(15deg);
+        }
+
+        /* Scale down cards slightly to fit the half-width comfortably */
+        .card-3d {
+            width: 50px;
+            height: 80px;
+            border-radius: 8px;
+            background-size: cover;
+            background-position: center;
+            position: absolute;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: transform 0.3s ease;
+        }
+
+        /* Adjusted Transforms for the condensed space */
+        .c-left {
+            background-image: url('https://images.unsplash.com/photo-1542206391-7f9492806184?auto=format&fit=crop&w=200&q=80');
+            transform: translateX(-60px) translateZ(-40px) rotateY(-20deg);
+            opacity: 0.6;
+        }
+
+        .c-right {
+            background-image: url('https://images.unsplash.com/photo-1515405295579-ba7b45403062?auto=format&fit=crop&w=200&q=80');
+            transform: translateX(60px) translateZ(-40px) rotateY(20deg);
+            opacity: 0.6;
+        }
+
+        .c-center {
+            background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=200&q=80');
+            transform: translateZ(20px) rotateY(-5deg);
+            z-index: 14;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* Placeholder for rest of chat to visually complete the "Part of the header" feeling */
+        .chat-body-placeholder {
+            flex: 1;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.1);
+            text-align: center;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="iphone-frame">
+        <div class="noise"></div>
+        <div class="bg-layer">
+            <div class="dna-helix"></div>
+        </div>
+
+        <!-- Horizontal Context Header -->
+        <div class="context-header">
+            <!-- Dynamic Island (Top Center) -->
+            <div class="dynamic-island">
+                <div class="di-icon" style="background:transparent;">🌱</div>
+                <div class="di-time" id="island-time">9:41</div>
+                <div class="di-icon" style="background:transparent; font-size:10px;">🔋85</div>
+            </div>
+
+            <!-- Left Half: Prominent Time & Date -->
+            <div class="header-left">
+                <div class="time-big" id="header-time">12:38</div>
+                <div class="date-row">
+                    <span id="header-day">Tuesday</span>
+                    <span style="opacity:0.5;">|</span>
+                    <span id="header-date">Dec 30</span>
+                </div>
+            </div>
+
+            <!-- Right Half: Visual Content -->
+            <div class="header-right">
+                <div class="wizard-sphere">
+                    <div class="wizard-hat">🧙‍♂️</div>
+                </div>
+                <div class="card-3d c-left"></div>
+                <div class="card-3d c-right"></div>
+                <div class="card-3d c-center"></div>
+            </div>
+        </div>
+
+        <div class="chat-body-placeholder"></div>
+    </div>
+
+    <script>
+        function updateTime() {
+            const now = new Date();
+
+            // Format Time for Big Display (e.g. 12:38)
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const displayHours = hours % 12 || 12; // 12-hour format
+            const timeStr = `${displayHours}:${minutes}`;
+
+            // Format Day and Date
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+            const dayName = days[now.getDay()];
+            const monthName = months[now.getMonth()];
+            const dateNum = now.getDate();
+            const dateStr = `${monthName} ${dateNum}`;
+
+            // Update DOM
+            const timeEl = document.getElementById('header-time');
+            const dayEl = document.getElementById('header-day');
+            const dateEl = document.getElementById('header-date');
+            const islandTimeEl = document.getElementById('island-time');
+
+            if (timeEl) timeEl.textContent = timeStr;
+            if (dayEl) dayEl.textContent = dayName;
+            if (dateEl) dateEl.textContent = dateStr;
+            if (islandTimeEl) islandTimeEl.textContent = `${displayHours}:${minutes}`;
+        }
+
+        // Initialize and tick
+        updateTime();
+        setInterval(updateTime, 1000);
+    </script>
+</body>
+
+</html>

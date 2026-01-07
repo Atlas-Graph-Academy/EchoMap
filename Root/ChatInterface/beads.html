@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Echo - Discrete Crystal Cluster</title>
+    <style>
+        /* --- Aris Aesthetic: Turrell & Glass --- */
+        :root {
+            --bg-core: #050510;
+            --bg-gradient: radial-gradient(circle at 50% 40%, #1a1b4b, #0a0a1a, #000000);
+            --glass-stone: rgba(255, 255, 255, 0.15);
+            --stone-border: rgba(255, 255, 255, 0.3);
+            --glow-blue: rgba(100, 200, 255, 0.5);
+            --glow-gold: rgba(255, 200, 100, 0.6);
+            --text-secondary: rgba(255, 255, 255, 0.5);
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: var(--bg-core);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+            color: white;
+        }
+
+        /* 1. Ganzfeld Background */
+        #ambient-bg {
+            position: absolute;
+            inset: 0;
+            background: var(--bg-gradient);
+            z-index: -1;
+            animation: deepBreathe 8s infinite alternate ease-in-out;
+        }
+
+        @keyframes deepBreathe {
+            0% {
+                opacity: 0.8;
+                transform: scale(1);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1.02);
+            }
+        }
+
+        /* 2. Left Rail: The Constellation Archive */
+        #memory-rail {
+            position: absolute;
+            left: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            pointer-events: none;
+        }
+
+        .archive-star {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 12px var(--glow-blue);
+            opacity: 0.6;
+            transition: all 0.3s;
+        }
+
+        /* 3. The Echo Stage (Center) */
+        #echo-stage {
+            position: absolute;
+            top: 35%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            z-index: 10;
+            /* Debug border to see area */
+            /* border: 1px dashed rgba(255,255,255,0.1); */
+        }
+
+        /* 4. The Cluster (The "Molecule") */
+        #cluster-core {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            /* Visible structure, no longer a blob */
+        }
+
+        /* 离散的“宝石” */
+        .crystal-node {
+            position: absolute;
+            border-radius: 50%;
+            /* 关键：使用 backdrop-filter 和 border 制造实体感 */
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.1));
+            border: 1px solid var(--stone-border);
+            box-shadow: 0 0 15px var(--glow-blue), inset 0 0 10px rgba(255, 255, 255, 0.2);
+            /* 轻微模糊，但保留边缘 */
+            backdrop-filter: blur(2px);
+            transform: translate(-50%, -50%) scale(0);
+            animation: nodePop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, nodeFloat 4s infinite ease-in-out alternate;
+            mix-blend-mode: normal;
+            /* 不再使用 screen，防止过曝 */
+        }
+
+        /* 重要的记忆点：金色 */
+        .node-gold {
+            box-shadow: 0 0 20px var(--glow-gold), inset 0 0 10px rgba(255, 200, 100, 0.3);
+            border-color: rgba(255, 220, 150, 0.5);
+        }
+
+        /* 每一个节点都有轻微的独立浮动，像在水里 */
+        @keyframes nodeFloat {
+            0% {
+                transform: translate(-50%, -50%) translateY(0px);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) translateY(-5px);
+            }
+        }
+
+        @keyframes nodePop {
+            to {
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        /* 5. Hint Text */
+        #cluster-hint {
+            position: absolute;
+            top: 60%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-secondary);
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+            letter-spacing: 1px;
+            margin-top: 60px;
+        }
+
+        /* 6. Chat Interface */
+        #chat-ui {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 45vh;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding-bottom: 30px;
+        }
+
+        #messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            /* Hide scrollbar */
+            scrollbar-width: none;
+        }
+
+        #messages::-webkit-scrollbar {
+            display: none;
+        }
+
+        .msg-row {
+            display: flex;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .msg-row.user {
+            justify-content: flex-end;
+        }
+
+        .msg-row.echo {
+            justify-content: flex-start;
+        }
+
+        .bubble {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 15px;
+            line-height: 1.4;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .bubble.user {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bubble.echo {
+            background: rgba(255, 255, 255, 0.05);
+            color: #ccc;
+            border-bottom-left-radius: 4px;
+        }
+
+        /* Input Area */
+        #input-zone {
+            padding: 0 20px;
+            margin-top: 10px;
+        }
+
+        input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            border-radius: 24px;
+            padding: 14px 20px;
+            color: white;
+            font-size: 16px;
+            outline: none;
+            box-sizing: border-box;
+            transition: background 0.2s;
+        }
+
+        input:focus {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        /* 7. Particle Animation */
+        .flying-light {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 8px white;
+            z-index: 100;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="ambient-bg"></div>
+
+    <div id="memory-rail">
+        <!-- Where drops land -->
+    </div>
+
+    <!-- The discrete cluster -->
+    <div id="echo-stage" onclick="dropMemory()">
+        <div id="cluster-core">
+            <!-- Initial seed -->
+            <div class="crystal-node" style="width: 30px; height: 30px; animation-delay: 0s;"></div>
+        </div>
+        <div id="cluster-hint">精华已凝聚。点击将此刻化为记忆。</div>
+    </div>
+
+    <div id="chat-ui">
+        <div id="messages">
+            <div class="msg-row echo">
+                <div class="bubble echo">我是Echo。如果你把对话看作一种能量交换，那我就在这里收集这些光。</div>
+            </div>
+        </div>
+        <div id="input-zone">
+            <input type="text" id="input-field" placeholder="发送消息..." onkeypress="onEnter(event)" autocomplete="off">
+        </div>
+    </div>
+
+    <script>
+        let msgCount = 0;
+        const core = document.getElementById('cluster-core');
+        const hint = document.getElementById('cluster-hint');
+        const rail = document.getElementById('memory-rail');
+        const msgs = document.getElementById('messages');
+
+        // 模拟 Echo 回复
+        const responses = [
+            "这个点很有趣。",
+            "我在听，继续。",
+            "这是我们之间的共鸣。",
+            "感觉记忆正在变得清晰。",
+            "这可能会成为一个重要的瞬间。"
+        ];
+
+        function onEnter(e) {
+            if (e.key === "Enter" && e.target.value.trim() !== "") {
+                const text = e.target.value;
+                e.target.value = "";
+
+                // User Msg
+                addBubble(text, 'user');
+
+                // Echo Reply Sim
+                setTimeout(() => {
+                    const reply = responses[Math.floor(Math.random() * responses.length)];
+                    addBubble(reply, 'echo');
+                }, 1200);
+            }
+        }
+
+        function addBubble(text, role) {
+            const row = document.createElement('div');
+            row.classList.add('msg-row', role);
+            const bub = document.createElement('div');
+            bub.classList.add('bubble', role);
+            bub.innerText = text;
+            row.appendChild(bub);
+            msgs.appendChild(row);
+            msgs.scrollTop = msgs.scrollHeight;
+
+            // Trigger Particle -> Cluster
+            flyParticle(bub, role);
+        }
+
+        function flyParticle(element, role) {
+            // 1. Start Position
+            const rect = element.getBoundingClientRect();
+            const startX = rect.left + rect.width / 2;
+            const startY = rect.top;
+
+            // 2. Create Particle
+            const p = document.createElement('div');
+            p.classList.add('flying-light');
+            document.body.appendChild(p);
+            p.style.left = startX + 'px';
+            p.style.top = startY + 'px';
+
+            // 3. Target (Center of Echo Stage)
+            const stageRect = document.getElementById('echo-stage').getBoundingClientRect();
+            const targetX = stageRect.left + stageRect.width / 2;
+            const targetY = stageRect.top + stageRect.height / 2;
+
+            // 4. Animate
+            const anim = p.animate([
+                { transform: 'translate(0,0) scale(1)', opacity: 1 },
+                { transform: `translate(${targetX - startX}px, ${targetY - startY}px) scale(0.2)`, opacity: 0 }
+            ], {
+                duration: 800,
+                easing: 'cubic-bezier(0.5, 0, 0.2, 1)'
+            });
+
+            anim.onfinish = () => {
+                p.remove();
+                addToCluster(role);
+            };
+        }
+
+        function addToCluster(role) {
+            msgCount++;
+
+            const node = document.createElement('div');
+            node.classList.add('crystal-node');
+
+            // Random Size (Discrete chunks)
+            const size = 15 + Math.random() * 25;
+            node.style.width = size + 'px';
+            node.style.height = size + 'px';
+
+            // Position Logic: Spiral / Galaxy Cluster
+            // Instead of pure random, we use a slight spiral offset to ensure they cluster but don't strictly overlap
+            const angle = msgCount * 137.5; // Golden angle
+            const radius = 10 * Math.sqrt(msgCount) + (Math.random() * 10); // Spread outwards
+
+            // Convert polar to cartesian
+            const x = radius * Math.cos(angle * Math.PI / 180);
+            const y = radius * Math.sin(angle * Math.PI / 180);
+
+            node.style.left = x + 'px'; // Relative to center due to translate(-50%, -50%) logic in CSS
+            node.style.top = y + 'px';
+            node.style.marginTop = '0'; // Reset styling
+
+            // Random delay for floating so they don't sync
+            node.style.animationDelay = `0s, -${Math.random() * 4}s`;
+
+            // Make some nodes "Gold" (Insights)
+            if (Math.random() > 0.7 || role === 'echo') {
+                node.classList.add('node-gold');
+            }
+
+            core.appendChild(node);
+
+            // Show hint after some messages
+            if (msgCount > 3) {
+                hint.style.opacity = 1;
+            }
+        }
+
+        function dropMemory() {
+            if (msgCount < 2) return;
+
+            const stage = document.getElementById('echo-stage');
+
+            // 1. Animate Cluster Collapsing/Moving
+            stage.style.transition = "transform 0.8s cubic-bezier(0.5, 0, 0, 1), opacity 0.5s ease-in 0.3s";
+            stage.style.transform = "translate(-120px, 150px) scale(0.1)"; // Move towards rail roughly
+            stage.style.opacity = 0;
+
+            setTimeout(() => {
+                // 2. Reset Stage
+                stage.style.transition = "none";
+                stage.style.transform = "translate(-50%, -50%)";
+                stage.style.opacity = 1;
+                core.innerHTML = '<div class="crystal-node" style="width: 30px; height: 30px;"></div>';
+                msgCount = 0;
+                hint.style.opacity = 0;
+
+                // 3. Add to Rail
+                const star = document.createElement('div');
+                star.classList.add('archive-star');
+                rail.appendChild(star);
+
+            }, 800);
+        }
+    </script>
+</body>
+
+</html>

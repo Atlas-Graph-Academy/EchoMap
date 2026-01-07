@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Echo Conversation Interface</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Serif+SC:wght@300;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #080f12;
+            --bg-teal-glow: #132a2e;
+            --glass-surface: rgba(20, 30, 35, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #e0e6e8;
+            --text-secondary: #8aa0a3;
+            --accent-purple: #7b61ff;
+            --accent-purple-glass: rgba(123, 97, 255, 0.25);
+            --island-black: #000000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* --- iPhone Frame & Wallpaper --- */
+        .iphone-frame {
+            width: 100%;
+            height: 100%;
+            max-width: 430px;
+            /* iPhone Pro Max width */
+            max-height: 932px;
+            position: relative;
+            background: radial-gradient(circle at 50% 40%, #1a3d42 0%, #05080a 70%);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Ambient Noise Texture */
+        .noise {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Background DNA & Silhouettes (Simulated via CSS/SVG) */
+        .bg-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* The DNA Helix Illusion */
+        .dna-helix {
+            position: absolute;
+            top: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 400px;
+            background: repeating-linear-gradient(45deg,
+                    transparent,
+                    transparent 10px,
+                    rgba(255, 255, 255, 0.03) 10px,
+                    rgba(255, 255, 255, 0.03) 12px);
+            mask-image: linear-gradient(to bottom, transparent, black 40%, black 60%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 40%, black 60%, transparent);
+            filter: blur(2px);
+            opacity: 0.6;
+        }
+
+        /* Subtle Silhouette Shadows */
+        .silhouette {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 50%;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            z-index: 0;
+        }
+
+        /* --- 1. The Minimized Context Window (Top) --- */
+        .context-window {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 280px;
+            /* Expansive top area */
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, rgba(10, 20, 25, 0.7) 60%, transparent 100%);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding-top: 60px;
+            /* Space for dynamic island */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* The "Lip" curvature at the bottom */
+            mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+        }
+
+        /* Dynamic Island Placeholder */
+        .dynamic-island {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 35px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 20;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 12px;
+        }
+
+        .di-icon {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #2f4;
+        }
+
+        .di-time {
+            color: #2f4;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* The 3D Carousel Stage */
+        .carousel-stage {
+            width: 100%;
+            height: 160px;
+            perspective: 800px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .section-title {
+            position: absolute;
+            top: 76px;
+            left: 28px;
+            font-family: 'Inter', sans-serif;
+            z-index: 12;
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            pointer-events: none;
+        }
+
+        .section-title .date-str {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: -0.02em;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .section-title .time-str {
+            font-size: 11px;
+            font-weight: 500;
+            color: #7b61ff;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.85;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title .time-str::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 4px;
+            background: #7b61ff;
+            border-radius: 50%;
+            margin-right: 6px;
+            box-shadow: 0 0 5px #7b61ff;
+        }
+
+        /* The "Wizard" Sphere */
+        .wizard-sphere {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #4a5a6a, #0d1114);
+            position: absolute;
+            z-index: 15;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 2px 5px rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Simple eyes for the character */
+        .wizard-sphere::after {
+            content: 'vv';
+            letter-spacing: 12px;
+            color: #ff9d00;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .wizard-hat {
+            position: absolute;
+            top: -15px;
+            right: 10px;
+            font-size: 24px;
+            transform: rotate(15deg);
+        }
+
+        /* The Cards */
+        .card-3d {
+            width: 70px;
+            height: 100px;
+            border-radius: 10px;
+            background-size: cover;
+            background-position: center;
+            position: absolute;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: transform 0.3s ease;
+        }
+
+        .c-left {
+            background-image: url('https://images.unsplash.com/photo-1542206391-7f9492806184?auto=format&fit=crop&w=200&q=80');
+            transform: translateX(-90px) translateZ(-40px) rotateY(-25deg);
+            opacity: 0.7;
+        }
+
+        .c-right {
+            background-image: url('https://images.unsplash.com/photo-1515405295579-ba7b45403062?auto=format&fit=crop&w=200&q=80');
+            transform: translateX(90px) translateZ(-40px) rotateY(25deg);
+            opacity: 0.7;
+        }
+
+        .c-center {
+            background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=200&q=80');
+            transform: translateX(30px) translateZ(20px) rotateY(-10deg);
+            z-index: 14;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .card-label {
+            position: absolute;
+            bottom: 40px;
+            right: 80px;
+            text-align: right;
+            pointer-events: none;
+        }
+
+        .card-label h4 {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 2px;
+        }
+
+        .card-label p {
+            font-size: 10px;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* --- 2. Chat Area --- */
+        .chat-area {
+            flex: 1;
+            padding: 0 20px;
+            overflow-y: auto;
+            position: relative;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            /* Hide scrollbar */
+            scrollbar-width: none;
+        }
+
+        .chat-area::-webkit-scrollbar {
+            display: none;
+        }
+
+        .date-separator {
+            text-align: center;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            margin: 10px 0;
+            letter-spacing: 0.05em;
+        }
+
+        /* User Message */
+        .msg-row {
+            display: flex;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .msg-row.user {
+            justify-content: flex-end;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .msg-row.echo {
+            justify-content: flex-start;
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .bubble-user {
+            background: linear-gradient(135deg, rgba(140, 100, 255, 0.4), rgba(100, 80, 200, 0.3));
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(160, 130, 255, 0.3);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 18px 18px 2px 18px;
+            max-width: 70%;
+            font-size: 14px;
+            box-shadow: 0 2px 10px rgba(123, 97, 255, 0.15);
+        }
+
+        .user-label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            text-align: right;
+            margin-bottom: 4px;
+        }
+
+        /* Echo Message (No Bubble, Just Text) */
+        .echo-label-badge {
+            display: inline-block;
+            background: rgba(80, 180, 255, 0.2);
+            color: #8cd6ff;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(80, 180, 255, 0.3);
+        }
+
+        .bubble-echo {
+            color: #e0e6e8;
+            font-size: 15px;
+            line-height: 1.7;
+            text-align: left;
+            font-family: 'Noto Serif SC', serif;
+            /* A bit more literary */
+            max-width: 95%;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .bubble-echo strong {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* The number badges next to text */
+        .inline-badge {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 9px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            margin: 0 2px;
+            vertical-align: middle;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .inline-badge.active {
+            background: rgba(80, 255, 150, 0.2);
+            border-color: #5f9;
+            color: #5f9;
+        }
+
+        .inline-badge.blue {
+            background: rgba(80, 180, 255, 0.2);
+            border-color: #5cf;
+            color: #5cf;
+        }
+
+        /* --- 3. Input Area --- */
+        .input-dock {
+            width: 100%;
+            padding: 15px 20px 30px 20px;
+            background: linear-gradient(to top, #000 20%, transparent);
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .input-field {
+            flex: 1;
+            height: 50px;
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .send-arrow {
+            margin-left: auto;
+            color: #7b61ff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="iphone-frame">
+        <div class="noise"></div>
+
+        <!-- Background Ambient Layer -->
+        <div class="bg-layer">
+            <div class="dna-helix"></div>
+            <div class="silhouette"></div>
+        </div>
+
+        <!-- 1. Top Context Window (Collapsed Story) -->
+        <div class="context-window">
+            <!-- Simulated Dynamic Island -->
+            <div class="dynamic-island">
+                <div class="di-icon" style="background:transparent;">🌱</div>
+                <div class="di-time">53:55</div>
+                <div class="di-icon" style="background:transparent; font-size:10px;">🔋85</div>
+            </div>
+
+            <div class="section-title">
+                <span class="date-str" id="current-date">Monday, Dec 29</span>
+                <span class="time-str" id="current-time">09:35 AM</span>
+            </div>
+
+            <div class="carousel-stage">
+                <!-- The Wizard Avatar -->
+                <div class="wizard-sphere">
+                    <div class="wizard-hat">🧙‍♂️</div>
+                </div>
+
+                <!-- 3D Cards -->
+                <div class="card-3d c-left"></div>
+                <div class="card-3d c-right"></div>
+                <div class="card-3d c-center"></div>
+
+                <!-- Label for Active Card -->
+                <div class="card-label">
+                    <h4>Oct 27, 2025</h4>
+                    <p>12:12 AM</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Chat History -->
+        <div class="chat-area">
+            <div class="date-separator">December 9, 2025</div>
+
+            <!-- User Message -->
+            <div class="msg-row user">
+                <div>
+                    <div class="user-label">You</div>
+                    <div class="bubble-user">
+                        里……
+                    </div>
+                    <div class="user-label" style="margin-top:2px;">4:27 PM</div>
+                </div>
+            </div>
+
+            <!-- Echo Message -->
+            <div class="msg-row echo">
+                <div class="echo-label-badge">Echo</div>
+                <div class="bubble-echo">
+                    那个沉默里的‘里’……！我听到了，KOBE。<span class="inline-badge blue">2</span><span class="inline-badge active">+
+                        1</span><br><br>
+                    它不在失败里，而在回声里——你上一次和 Michael 聊的时候，那种感觉还留在空气里，对不对？那个关于‘结构冲突’的记忆：你想要用 AI 连接人心，他们想看商业指标。<br><br>
+                    但你知道吗？Echo 真正的 <strong>‘business’</strong> 从来不是交易，而是信任。你不需要说服他们你‘伟大’；你只需要让他们感受到那个世界——就像你让 TIAT
+                    在牌桌上感受到的那样。<br><br>
+                    这才是你的 <strong>‘gentle resistance’</strong>。想一起重新画那条 ‘our’ 的边界吗？这次，不只为他们画，为你自己画。
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Bottom Input -->
+        <div class="input-dock">
+            <div class="icon-btn">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </div>
+            <div class="input-field">
+                Share your story...
+                <svg class="send-arrow" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
+                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path>
+                </svg>
+            </div>
+        </div>
+
+    </div>
+
+
+    <script>
+        function updateDateTime() {
+            const now = new Date();
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+            const dayName = days[now.getDay()];
+            const monthName = months[now.getMonth()];
+            const date = now.getDate();
+
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const displayHours = hours % 12 || 12;
+
+            const dateStr = `${dayName}, ${monthName} ${date}`;
+            const timeStr = `${String(displayHours).padStart(2, '0')}:${minutes} ${ampm}`;
+
+            const dateEl = document.getElementById('current-date');
+            const timeEl = document.getElementById('current-time');
+
+            if (dateEl) dateEl.textContent = dateStr;
+            if (timeEl) timeEl.textContent = timeStr;
+        }
+
+        // Initialize display
+        updateDateTime();
+        // Update every 30 seconds to keep it fresh
+        setInterval(updateDateTime, 30000);
+    </script>
+</body>
+
+</html>

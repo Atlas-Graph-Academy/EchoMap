@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura | Manga Lightbox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --void-bg: #080808;
+            --card-white: #FAFAFA;
+            --text-muted: #888;
+            --accent-gold: #D4AF37;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: #000;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+
+        .device-frame {
+            width: 430px;
+            height: 932px;
+            background: var(--void-bg);
+            border-radius: 44px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 80px rgba(30,30,30,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- 1. HEADER (Context) --- */
+        .header-meta {
+            padding: 50px 24px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            z-index: 10;
+        }
+
+        .date-group {
+            display: flex; flex-direction: column;
+        }
+        .date-main {
+            font-family: 'Newsreader', serif;
+            font-size: 20px; font-weight: 400; color: #FFF;
+            font-style: italic;
+        }
+        .loc-sub {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px; color: #666; margin-top: 4px;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        .memory-id {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9px; color: #444; border: 1px solid #333;
+            padding: 4px 8px; border-radius: 4px;
+        }
+
+        /* --- 2. THE MANGA CARD (The Artifact) --- */
+        .scroll-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px 20px 140px; /* Bottom padding for dock */
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            /* Hide Scrollbar */
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
+        }
+        .scroll-container::-webkit-scrollbar { display: none; }
+
+        .manga-artifact {
+            width: 100%;
+            /* This ensures the image isn't cropped, it respects the source */
+            background: white;
+            padding: 8px 8px 24px 8px; /* White border effect */
+            border-radius: 2px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .manga-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            filter: contrast(1.1); /* Slight pop for ink */
+        }
+
+        /* The Paper Texture Overlay */
+        .artifact-texture {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("https://www.transparenttextures.com/patterns/cream-paper.png");
+            opacity: 0.15; pointer-events: none; mix-blend-mode: multiply;
+        }
+
+        /* --- 3. THE MEMORY NARRATIVE (Description) --- */
+        .narrative-card {
+            padding: 0 8px;
+            opacity: 0;
+            animation: fadeIn Up 0.8s ease forwards 0.3s;
+        }
+
+        .narrative-title {
+            font-size: 12px; font-weight: 700; color: #555;
+            text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;
+        }
+
+        .narrative-body {
+            font-family: 'Newsreader', serif;
+            font-size: 18px; line-height: 1.6; color: #DDD;
+            margin-bottom: 16px;
+        }
+
+        .narrative-footer {
+            display: flex; gap: 12px; align-items: center;
+        }
+        .tag {
+            font-size: 11px; color: var(--accent-gold);
+            background: rgba(212, 175, 55, 0.1);
+            padding: 4px 10px; border-radius: 20px;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- 4. FLOATING DOCK (Interaction) --- */
+        .floating-dock {
+            position: absolute;
+            bottom: 30px; left: 20px; right: 20px;
+            height: 64px;
+            background: rgba(20, 20, 20, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 6px 0 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            z-index: 100;
+        }
+
+        .dock-prompt {
+            font-size: 14px; color: #888; font-weight: 500;
+        }
+
+        .action-group {
+            display: flex; gap: 8px;
+        }
+
+        .icon-btn {
+            width: 50px; height: 50px;
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-message {
+            background: #FFF; color: #000;
+        }
+        .btn-message:hover { transform: scale(1.05); }
+
+        .btn-react {
+            background: transparent; color: #FFF; font-size: 20px;
+        }
+        .btn-react:hover { background: rgba(255,255,255,0.1); }
+
+        /* Smooth fade at bottom so text doesn't cut off abruptly */
+        .bottom-fade {
+            position: absolute; bottom: 0; left: 0; right: 0; height: 150px;
+            background: linear-gradient(to top, var(--void-bg) 20%, transparent);
+            pointer-events: none; z-index: 20;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="device-frame">
+
+    <!-- 1. Header Metadata -->
+    <div class="header-meta">
+        <div class="date-group">
+            <div class="date-main">October 14, 2023</div>
+            <div class="loc-sub">Setagaya • Afternoon Phase</div>
+        </div>
+        <div class="memory-id">#MEM-8921</div>
+    </div>
+
+    <!-- 2. Scrollable Content Area -->
+    <div class="scroll-container">
+        
+        <!-- The Manga Image (The Artifact) -->
+        <!-- <div class="manga-artifact">
+            <img src="https://i.imgur.com/K5a1a1M.png" class="manga-img" alt="Manga Panel">
+            <div class="artifact-texture"></div>
+        </div> -->
+
+        <!-- The Narrative (The Story) -->
+        <div class="narrative-card">
+            <div class="narrative-title">Director's Note</div>
+            <p class="narrative-body">
+                "I remember showing her this video of the cat. It wasn't really about the haircut. It was just an excuse to hear her laugh again. <br><br>
+                The manga captures the dialogue, but it misses the way the sunlight was hitting the table. That's what I'm trying to hold onto."
+            </p>
+            <div class="narrative-footer">
+                <span class="tag">✨ Core Memory</span>
+                <span class="tag">🐈 Comfort</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 3. Bottom Fade for Smoothness -->
+    <div class="bottom-fade"></div>
+
+    <!-- 4. Interactive Dock -->
+    <div class="floating-dock">
+        <div class="dock-prompt">Unlock connection...</div>
+        <div class="action-group">
+            <div class="icon-btn btn-react">🤍</div>
+            <div class="icon-btn btn-message">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

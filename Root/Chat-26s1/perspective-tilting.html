@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aura - The Ganzfeld Return</title>
+    <style>
+        :root {
+            /* Deep Turrellian Shift */
+            --bg-space: #020105;
+            --void-purple: #120c24;
+            --sunset-orange: #331a0f;
+
+            --echo-glow: rgba(180, 220, 255, 0.6);
+            --memory-gold: rgba(255, 200, 80, 0.9);
+
+            --user-glass: rgba(255, 255, 255, 0.1);
+            --user-border: rgba(255, 255, 255, 0.15);
+
+            --font-main: "SF Pro Text", "Inter", -apple-system, sans-serif;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-space);
+            color: white;
+            font-family: var(--font-main);
+            overflow: hidden;
+        }
+
+        /* --- 1. ATMOSPHERE (More Vibrant) --- */
+        #ganzfeld {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* A deeper, more active gradient */
+            background: radial-gradient(circle at 50% 20%, #243b6e 0%, var(--void-purple) 40%, var(--sunset-orange) 80%, var(--bg-space) 100%);
+            z-index: -2;
+            filter: blur(20px);
+            /* Ambient soften */
+        }
+
+        /* --- 2. THE SINGULARITY & "FUZZY BALLS" --- */
+        #singularity-stage {
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            /* Lowered slightly to be more present in top 40% */
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            pointer-events: none;
+            /* Ensure stretching happens from the top center */
+            transform-origin: top center;
+        }
+
+        #core-aura {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(150, 200, 255, 0.5) 40%, transparent 80%);
+            filter: blur(40px);
+            /* Much fuzzier */
+            opacity: 0.7;
+            transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        #cluster-root {
+            position: relative;
+            width: 20px;
+            height: 20px;
+        }
+
+        /* The "Fuzzy Little Balls" */
+        .luminous-stone {
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle at 40% 40%, #fff, rgba(200, 230, 255, 0.2));
+            /* Increased blur for "fuzzy" effect */
+            box-shadow: 0 0 30px var(--echo-glow), inset 0 0 10px white;
+            filter: blur(8px);
+            opacity: 0;
+            transform: scale(0);
+            animation: materializeStone 2s forwards;
+        }
+
+        @keyframes materializeStone {
+            0% {
+                opacity: 0;
+                transform: scale(0.5) translateY(20px);
+            }
+
+            100% {
+                opacity: 0.9;
+                transform: scale(1.2) translateY(0);
+            }
+        }
+
+        /* --- 3. THE FLUID STREAM --- */
+        #stream-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 20px;
+            gap: 24px;
+            z-index: 5;
+            /* CRITICAL: Perspective allows 3D stretching */
+            perspective: 1000px;
+        }
+
+        .message-row {
+            width: 88%;
+            max-width: 380px;
+            display: flex;
+            flex-shrink: 0;
+            position: relative;
+            /* CRITICAL: Transform origin must be TOP CENTER for upward stretching */
+            transform-origin: top center;
+            will-change: transform, opacity, filter;
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            filter: none;
+        }
+
+        .msg-content {
+            position: relative;
+            padding: 18px 24px;
+            font-size: 17px;
+            line-height: 1.5;
+            border-radius: 24px;
+            transition: background 0.3s ease, border 0.3s ease;
+        }
+
+        /* User Glass - Clear in bottom 65% */
+        .is-user {
+            justify-content: flex-end;
+        }
+
+        .is-user .msg-content {
+            background: var(--user-glass);
+            border: 1px solid var(--user-border);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            color: rgba(255, 255, 255, 0.98);
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Echo Text */
+        .is-echo {
+            justify-content: flex-start;
+        }
+
+        .is-echo .msg-content {
+            background: transparent;
+            color: rgba(220, 240, 255, 0.8);
+            text-shadow: 0 0 20px rgba(100, 180, 255, 0.3);
+            padding-left: 8px;
+            font-weight: 500;
+        }
+
+        /* --- 4. INPUT LAYER --- */
+        #input-layer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to top, #020105 70%, transparent);
+            z-index: 50;
+            transition: height 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding-bottom: env(safe-area-inset-bottom, 20px);
+        }
+
+        #keyboard-spacer {
+            height: 0px;
+            width: 100%;
+            transition: height 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        #input-controls {
+            width: 100%;
+            padding: 0 20px 20px 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        #flux-input {
+            width: 100%;
+            min-height: 50px;
+            max-height: 120px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 18px;
+            color: white;
+            font-size: 17px;
+            padding: 14px 18px;
+            outline: none;
+            resize: none;
+            font-family: inherit;
+        }
+
+        #flux-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .sim-controls {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-sim {
+            flex: 1;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            border-radius: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-voice {
+            color: var(--memory-gold);
+            background: rgba(255, 200, 80, 0.08);
+        }
+
+        .btn-voice:active {
+            background: var(--memory-gold);
+            color: #1a1a1a;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="ganzfeld"></div>
+
+    <div id="singularity-stage">
+        <div id="core-aura"></div>
+        <div id="cluster-root">
+            <div class="luminous-stone" style="width:30px; height:30px; top:-10px; left:10px; animation-delay: 0.1s">
+            </div>
+            <div class="luminous-stone" style="width:20px; height:20px; top:20px; left:-20px; animation-delay: 0.3s">
+            </div>
+        </div>
+    </div>
+
+    <div id="stream-container">
+        <div class="message-row is-echo">
+            <div class="msg-content">The boundary is dissolving.</div>
+        </div>
+        <div class="message-row is-echo">
+            <div class="msg-content">Speak into the light.</div>
+        </div>
+    </div>
+
+    <div id="input-layer">
+        <div id="input-controls">
+            <textarea id="flux-input" rows="1" placeholder="Type or hold to speak..."></textarea>
+
+            <div class="sim-controls">
+                <button class="btn-sim" id="btn-toggle-kb" onclick="toggleKeyboard()">▲ Keyboard</button>
+                <button class="btn-sim btn-voice" id="btn-voice" onmousedown="startVoice()" onmouseup="stopVoice()"
+                    ontouchstart="startVoice()" ontouchend="stopVoice()">● Hold to Speak</button>
+            </div>
+        </div>
+        <div id="keyboard-spacer"></div>
+    </div>
+
+    <script>
+        const stream = document.getElementById('stream-container');
+        const inputField = document.getElementById('flux-input');
+        const keyboardSpacer = document.getElementById('keyboard-spacer');
+        const coreAura = document.getElementById('core-aura');
+        let isKeyboardOpen = false;
+        let voiceInterval = null;
+
+        // --- ARIS PHYSICS ENGINE V3 (The Stretch Returns) ---
+        function updateFieldDynamics() {
+            const messages = Array.from(stream.children);
+            const windowHeight = window.innerHeight;
+
+            // DEFINING THE ZONES AS REQUESTED:
+            // Bottom 60% is CLEAR. Top 40% is BLURRY/STRETCHED.
+            const boundaryLine = windowHeight * 0.4; // The 40% mark from the top.
+
+            messages.forEach(row => {
+                const rect = row.getBoundingClientRect();
+                // Use the middle of the element for smoother transition calculation
+                const elementMidpoint = rect.top + (rect.height / 2);
+
+                if (elementMidpoint > boundaryLine) {
+                    // --- ZONE: CLEAR REALITY (Bottom 60%) ---
+                    // Matches your image_0.png reference.
+                    row.style.transform = 'translateY(0) scale(1)';
+                    row.style.opacity = '1';
+                    row.style.filter = 'none';
+                }
+                else {
+                    // --- ZONE: GANZFIELD DISSOLUTION (Top 40%) ---
+                    // Matches your image_1.png reference.
+
+                    // Calculate progress: 0.0 at boundaryLine -> 1.0 at top of screen
+                    let p = (boundaryLine - elementMidpoint) / boundaryLine;
+                    p = Math.min(Math.max(p, 0), 1); // Clamp between 0 and 1
+
+                    // Easing: starts slow, gets extreme fast
+                    const ease = Math.pow(p, 2);
+
+                    // 1. THE STRETCH (Spaghettification)
+                    // Stretch Y significantly (up to 4x), squeeze X slightly.
+                    const stretchY = 1 + (ease * 3.5);
+                    const squeezeX = 1 - (ease * 0.4);
+
+                    // 2. THE LIFT (Pulling into the singularity)
+                    // Move it upwards faster as it gets higher
+                    const lift = ease * -100;
+
+                    row.style.transform = `translateY(${lift}px) scale(${squeezeX}, ${stretchY})`;
+
+                    // 3. THE BLUR (Loss of focus)
+                    // Intense blur up to 30px
+                    const blurAmount = ease * 30;
+                    // Brightness increases as it enters the light
+                    const brightness = 1 + (ease * 1.5);
+                    row.style.filter = `blur(${blurAmount}px) brightness(${brightness})`;
+
+                    // 4. THE FADE
+                    // Only fade out in the top 20% of the journey
+                    const opacity = p > 0.8 ? 1 - ((p - 0.8) * 5) : 1;
+                    row.style.opacity = opacity.toString();
+                }
+            });
+
+            requestAnimationFrame(updateFieldDynamics);
+        }
+
+        // --- Interaction ---
+
+        function toggleKeyboard() {
+            isKeyboardOpen = !isKeyboardOpen;
+            const btn = document.getElementById('btn-toggle-kb');
+            if (isKeyboardOpen) {
+                keyboardSpacer.style.height = '300px';
+                btn.innerText = "▼ Hide";
+                stream.style.height = 'calc(80% - 300px)';
+            } else {
+                keyboardSpacer.style.height = '0px';
+                btn.innerText = "▲ Keyboard";
+                stream.style.height = '80%';
+            }
+        }
+
+        function startVoice() {
+            const phrases = ["Dissolving", "boundaries", "between", "thought", "and", "light", "entering", "the", "void"];
+            inputField.placeholder = "Listening...";
+            // Aura reacts intensely
+            coreAura.style.transform = "scale(2.5)";
+            coreAura.style.background = "var(--memory-gold)";
+            coreAura.style.filter = "blur(50px)";
+
+            voiceInterval = setInterval(() => {
+                const word = phrases[Math.floor(Math.random() * phrases.length)];
+                inputField.value += word + " ";
+                inputField.scrollTop = inputField.scrollHeight;
+                // Spawn fuzzy balls while speaking
+                spawnCrystal(true);
+            }, 200);
+        }
+
+        function stopVoice() {
+            clearInterval(voiceInterval);
+            if (inputField.value.trim().length > 0) sendMsg();
+            inputField.placeholder = "Type or hold to speak...";
+            coreAura.style.transform = "scale(1)";
+            coreAura.style.background = "";
+            coreAura.style.filter = "blur(40px)";
+        }
+
+        inputField.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); sendMsg(); }
+        });
+
+        function sendMsg() {
+            const text = inputField.value.trim();
+            if (!text) return;
+            addMessage(text, 'user');
+            inputField.value = '';
+            setTimeout(() => {
+                const replies = ["Ascending.", "Form becomes light.", "Accepted."];
+                addMessage(replies[Math.floor(Math.random() * replies.length)], 'echo');
+            }, 800);
+        }
+
+        function addMessage(text, type) {
+            const div = document.createElement('div');
+            div.className = `message-row is-${type}`;
+            div.innerHTML = `<div class="msg-content">${text}</div>`;
+            stream.appendChild(div);
+            if (stream.children.length > 12) stream.removeChild(stream.firstElementChild);
+            if (type === 'user') spawnCrystal();
+        }
+
+        // Updated "Fuzzy Ball" Spawner
+        function spawnCrystal(isAggressive = false) {
+            const stone = document.createElement('div');
+            stone.className = 'luminous-stone';
+            // Larger, fuzzier sizes
+            const baseSize = isAggressive ? 30 : 20;
+            const size = baseSize + Math.random() * 25;
+            stone.style.width = size + 'px';
+            stone.style.height = size + 'px';
+
+            // Tighter cluster near the center top
+            const angle = Math.random() * Math.PI * 2;
+            const radius = Math.random() * 60; // Tighter radius
+            stone.style.left = (Math.cos(angle) * radius) + 'px';
+            stone.style.top = (Math.sin(angle) * radius - 20) + 'px'; // Offset upwards
+
+            document.getElementById('cluster-root').appendChild(stone);
+            setTimeout(() => { if (stone.parentNode) stone.parentNode.removeChild(stone); }, 2500);
+        }
+
+        requestAnimationFrame(updateFieldDynamics);
+
+    </script>
+</body>
+
+</html>
