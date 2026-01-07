@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Echo - The Living Stream</title>
+    <style>
+        :root {
+            --bg-space: #050505;
+            --void-purple: #0b0812;
+            --nebula-blue: #141b2e;
+
+            --echo-glow: rgba(180, 220, 255, 0.6);
+            --memory-gold: rgba(255, 215, 100, 0.9);
+
+            --user-glass: rgba(255, 255, 255, 0.08);
+            --user-border: rgba(255, 255, 255, 0.12);
+
+            --font-main: "SF Pro Text", "Inter", -apple-system, sans-serif;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-space);
+            color: white;
+            font-family: var(--font-main);
+            overflow: hidden;
+            /* 禁止原生滚动，我们用物理引擎接管 */
+        }
+
+        /* --- 1. ATMOSPHERE (背景场) --- */
+        #ganzfeld {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 30%, var(--nebula-blue), var(--void-purple) 60%, var(--bg-space) 90%);
+            z-index: -2;
+            transition: filter 1s ease;
+        }
+
+        /* --- 2. THE SINGULARITY (核心引力源) --- */
+        #singularity-stage {
+            position: absolute;
+            top: 12%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* 光晕与结晶容器 */
+        #core-aura {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(140, 180, 255, 0.3) 60%, transparent 100%);
+            filter: blur(30px);
+            opacity: 0.5;
+            transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        #cluster-root {
+            position: relative;
+            width: 40px;
+            height: 40px;
+        }
+
+        .luminous-stone {
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #fff, rgba(255, 255, 255, 0.1));
+            box-shadow: 0 0 15px var(--echo-glow);
+            filter: blur(2px);
+            opacity: 0;
+            transform: scale(0);
+            animation: materializeStone 1s forwards;
+        }
+
+        @keyframes materializeStone {
+            to {
+                opacity: 0.8;
+                transform: scale(1);
+            }
+        }
+
+        /* --- 3. THE FLUID STREAM (消息流) --- */
+        #stream-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            /* 高度是动态的，由 JS 控制 (Available Height) */
+            height: 80%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            /* 底部对齐，往上推 */
+            align-items: center;
+            padding-bottom: 20px;
+            gap: 16px;
+            z-index: 5;
+        }
+
+        .message-row {
+            width: 90%;
+            max-width: 400px;
+            display: flex;
+            flex-shrink: 0;
+            /* 防止被挤压 */
+            position: relative;
+            /* 核心：变形原点设置在屏幕顶端的光源处 */
+            transform-origin: 50% -300%;
+            will-change: transform, opacity, filter;
+        }
+
+        .msg-content {
+            position: relative;
+            padding: 14px 20px;
+            font-size: 16px;
+            line-height: 1.5;
+            border-radius: 20px;
+            transition: background 0.5s ease, border 0.5s ease, color 0.5s ease;
+        }
+
+        /* 用户态：玻璃容器 */
+        .is-user {
+            justify-content: flex-end;
+        }
+
+        .is-user .msg-content {
+            background: var(--user-glass);
+            border: 1px solid var(--user-border);
+            backdrop-filter: blur(10px);
+            color: rgba(255, 255, 255, 0.95);
+            border-bottom-right-radius: 4px;
+        }
+
+        /* Echo态：纯净文字 */
+        .is-echo {
+            justify-content: flex-start;
+        }
+
+        .is-echo .msg-content {
+            background: transparent;
+            color: rgba(200, 230, 255, 0.9);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            padding-left: 4px;
+        }
+
+        /* --- 4. THE FLUX POOL (输入区域) --- */
+        #input-layer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to top, #000 80%, transparent);
+            z-index: 50;
+            transition: height 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding-bottom: env(safe-area-inset-bottom, 20px);
+        }
+
+        /* 模拟键盘高度的容器 */
+        #keyboard-spacer {
+            height: 0px;
+            width: 100%;
+            background: #1a1a1a;
+            transition: height 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #555;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        #input-controls {
+            width: 100%;
+            padding: 10px 20px 20px 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* 会自动长高的输入框 */
+        #flux-input {
+            width: 100%;
+            min-height: 40px;
+            max-height: 120px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            padding: 10px 15px;
+            outline: none;
+            resize: none;
+            overflow-y: hidden;
+            font-family: inherit;
+        }
+
+        #flux-input:focus {
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* 模拟控制按钮 */
+        .sim-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+        }
+
+        .btn-sim {
+            flex: 1;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-sim:active,
+        .btn-sim.active {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .btn-voice {
+            background: rgba(255, 215, 100, 0.1);
+            color: var(--memory-gold);
+        }
+
+        .btn-voice:active {
+            background: var(--memory-gold);
+            color: black;
+            box-shadow: 0 0 20px var(--memory-gold);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="ganzfeld"></div>
+
+    <div id="singularity-stage">
+        <div id="core-aura"></div>
+        <div id="cluster-root">
+            <div class="luminous-stone" style="width:20px; height:20px; opacity:0.6; transform:scale(1);"></div>
+        </div>
+    </div>
+
+    <div id="stream-container">
+        <div class="message-row is-echo">
+            <div class="msg-content">此处是深空。</div>
+        </div>
+        <div class="message-row is-echo">
+            <div class="msg-content">保持安静，或者留下回响。</div>
+        </div>
+    </div>
+
+    <div id="input-layer">
+        <div id="input-controls">
+            <textarea id="flux-input" rows="1" placeholder="Type or hold to speak..."></textarea>
+
+            <div class="sim-controls">
+                <button class="btn-sim" id="btn-toggle-kb" onclick="toggleKeyboard()">▲ Keyboard</button>
+                <button class="btn-sim btn-voice" id="btn-voice" onmousedown="startVoice()" onmouseup="stopVoice()"
+                    ontouchstart="startVoice()" ontouchend="stopVoice()">● Hold to Speak</button>
+            </div>
+        </div>
+        <div id="keyboard-spacer">KEYBOARD AREA (300px)</div>
+    </div>
+
+    <script>
+        // --- Configuration ---
+        const stream = document.getElementById('stream-container');
+        const inputLayer = document.getElementById('input-layer');
+        const inputField = document.getElementById('flux-input');
+        const keyboardSpacer = document.getElementById('keyboard-spacer');
+        const coreAura = document.getElementById('core-aura');
+
+        let isKeyboardOpen = false;
+        let voiceInterval = null;
+        let messageCount = 0;
+
+        // --- Physics Engine Loop (The Heartbeat) ---
+        // 实时计算每条消息的形态
+        function updateFieldDynamics() {
+            const messages = Array.from(stream.children);
+
+            // 1. 获取当前“视口”的几何信息
+            // 输入层的高度就是我们的“地面高度”
+            const inputRect = inputLayer.getBoundingClientRect();
+            const horizonY = inputRect.top; // 地平线位置 (px)
+
+            // 2. 定义区域 (The Zones)
+            // 安全区：地平线以上 120px，保持绝对清晰
+            const safetyThreshold = horizonY - 150;
+            // 融合区终点：屏幕顶部 10% 处，完全变成光
+            const eventHorizon = window.innerHeight * 0.1;
+
+            messages.forEach(row => {
+                const content = row.querySelector('.msg-content');
+                const rect = row.getBoundingClientRect();
+                const rowCenterY = rect.top + rect.height / 2;
+
+                // --- Calculation Logic ---
+
+                // 如果在安全区内 (Input上方)
+                if (rect.bottom > safetyThreshold) {
+                    resetPhysics(row, content);
+                }
+                // 如果进入相变区 (Phase Change)
+                else if (rect.bottom > eventHorizon) {
+                    // 计算进度 (0 = 刚离开安全区, 1 = 到达视界)
+                    const dist = safetyThreshold - rect.bottom;
+                    const range = safetyThreshold - eventHorizon;
+                    const progress = Math.min(1, Math.max(0, dist / range)); // 0.0 -> 1.0
+
+                    applyPhaseChange(row, content, progress);
+                }
+                // 如果已经越过视界 (Inside Light)
+                else {
+                    applySingularity(row, content);
+                }
+            });
+
+            requestAnimationFrame(updateFieldDynamics);
+        }
+
+        // --- Physics Helpers ---
+
+        function resetPhysics(row, content) {
+            row.style.transform = 'translateY(0) scale(1)';
+            row.style.opacity = '1';
+            row.style.filter = 'none';
+
+            // 恢复玻璃质感
+            if (row.classList.contains('is-user')) {
+                content.style.background = 'var(--user-glass)';
+                content.style.border = '1px solid var(--user-border)';
+            }
+            content.style.color = '';
+        }
+
+        function applyPhaseChange(row, content, p) {
+            // p goes from 0 to 1
+
+            // 1. 容器解离: 背景和边框迅速消失 (前 50% 阶段)
+            if (p < 0.5) {
+                const fade = 1 - (p * 2); // 1 -> 0
+                if (row.classList.contains('is-user')) {
+                    content.style.background = `rgba(255, 255, 255, ${0.08 * fade})`;
+                    content.style.border = `1px solid rgba(255, 255, 255, ${0.12 * fade})`;
+                }
+            } else {
+                content.style.background = 'transparent';
+                content.style.border = 'none';
+            }
+
+            // 2. 引力拉伸 (Spaghettification)
+            // 向光核拉伸。scaleY 增加，scaleX 减小
+            // 这种拉伸必须配合 transform-origin: top center
+            const stretchY = 1 + (p * 3); // 1.0 -> 4.0
+            const squeezeX = 1 - (p * 0.6); // 1.0 -> 0.4
+
+            // 我们用负的translateY来模拟被吸入的效果
+            const lift = p * -50;
+
+            row.style.transform = `translateY(${lift}px) scale(${squeezeX}, ${stretchY})`;
+
+            // 3. 模糊与发光
+            const blur = p * 10;
+            const brightness = 1 + (p * 2);
+            row.style.filter = `blur(${blur}px) brightness(${brightness})`;
+
+            // 4. 透明度在最后阶段消失
+            row.style.opacity = 1 - (p * 0.2); // 保持稍微可见
+        }
+
+        function applySingularity(row, content) {
+            // 完全光化
+            row.style.transform = `translateY(-100px) scale(0.1, 8)`;
+            row.style.filter = `blur(20px) brightness(4)`;
+            row.style.opacity = '0'; // 最终不可见
+        }
+
+        // --- Interaction Simulation ---
+
+        // 1. 模拟键盘弹起
+        function toggleKeyboard() {
+            const btn = document.getElementById('btn-toggle-kb');
+            isKeyboardOpen = !isKeyboardOpen;
+
+            if (isKeyboardOpen) {
+                keyboardSpacer.style.height = '300px'; // 键盘占位
+                btn.classList.add('active');
+                // 调整 Stream 容器的高度，这会迫使 flex-end 的内容被顶上去
+                // 从而自动触发上方的物理场
+                stream.style.height = 'calc(80% - 300px)';
+            } else {
+                keyboardSpacer.style.height = '0px';
+                btn.classList.remove('active');
+                stream.style.height = '80%';
+            }
+        }
+
+        // 2. 模拟语音流式输入 (Streaming)
+        function startVoice() {
+            const phrases = ["意识", "正在", "穿越", "这一层", "薄薄的", "现实", "进入", "光的", "领域"];
+            let wordIndex = 0;
+
+            inputField.value = "";
+            inputField.placeholder = "Listening...";
+
+            // 激活光核反馈
+            coreAura.style.transform = "scale(1.5)";
+            coreAura.style.background = "var(--memory-gold)";
+
+            voiceInterval = setInterval(() => {
+                const word = phrases[Math.floor(Math.random() * phrases.length)];
+                inputField.value += word + " ";
+
+                // 自动增高输入框
+                inputField.style.height = 'auto';
+                inputField.style.height = inputField.scrollHeight + 'px';
+
+                // 模拟：如果有换行，文字多了，会自动把上面的内容顶上去
+                // 这是一个视觉技巧，无需额外代码，因为 Input 在 Document 流中
+
+                // 甚至我们可以更激进一点，每当语音变长，我们就发一条临时消息
+                if (inputField.value.length > 15 && Math.random() > 0.7) {
+                    sendMsg(); // 模拟断句发送
+                }
+
+            }, 300); // 每300ms出一个词
+        }
+
+        function stopVoice() {
+            clearInterval(voiceInterval);
+            if (inputField.value.trim().length > 0) {
+                sendMsg();
+            }
+            inputField.style.height = 'auto'; // Reset
+            inputField.placeholder = "Type or hold to speak...";
+
+            // 恢复光核
+            coreAura.style.transform = "scale(1)";
+            coreAura.style.background = ""; // back to gradient
+        }
+
+        // 发送消息
+        inputField.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMsg();
+            }
+        });
+
+        function sendMsg() {
+            const text = inputField.value.trim();
+            if (!text) return;
+
+            addMessage(text, 'user');
+            inputField.value = '';
+            inputField.style.height = 'auto'; // Reset height
+
+            // Echo 回复
+            setTimeout(() => {
+                const replies = ["已被吸收。", "光变得更亮了。", "继续..."];
+                addMessage(replies[Math.floor(Math.random() * replies.length)], 'echo');
+            }, 1000);
+        }
+
+        function addMessage(text, type) {
+            messageCount++;
+            const div = document.createElement('div');
+            div.className = `message-row is-${type}`;
+            div.innerHTML = `<div class="msg-content">${text}</div>`;
+            stream.appendChild(div);
+
+            // Auto scroll to bottom of stream container
+            // 但因为我们是 justify-content: flex-end，新元素自动在底部
+            // 我们只需要确保旧元素被挤出 DOM 即可
+            if (stream.children.length > 15) {
+                stream.removeChild(stream.firstElementChild);
+            }
+
+            // 触发结晶生成 (Visual Feedback)
+            spawnCrystal();
+        }
+
+        function spawnCrystal() {
+            const stone = document.createElement('div');
+            stone.className = 'luminous-stone';
+            const size = 10 + Math.random() * 20;
+            stone.style.width = size + 'px';
+            stone.style.height = size + 'px';
+
+            // 随机散落在光核周围
+            const angle = Math.random() * Math.PI * 2;
+            const radius = Math.random() * 40;
+            const x = Math.cos(angle) * radius;
+            const y = Math.sin(angle) * radius;
+
+            stone.style.left = x + 'px';
+            stone.style.top = y + 'px';
+
+            document.getElementById('cluster-root').appendChild(stone);
+        }
+
+        // 启动物理引擎
+        requestAnimationFrame(updateFieldDynamics);
+
+    </script>
+</body>
+
+</html> fsda
