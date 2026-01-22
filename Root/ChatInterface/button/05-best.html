@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Aura | Borderless Flux</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* --- System Variables --- */
+    :root {
+      --turrell-void: #09090b;
+      --glass-surface: rgba(20, 20, 25, 0.6);
+      --neon-red: #FF3B30;
+      --light-warmth: 255, 240, 220;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--turrell-void);
+      color: #ffffff;
+      height: 100vh;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+      user-select: none;
+    }
+
+    /* Ambient Background */
+    .ambient-glow {
+      position: absolute;
+      top: -10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120%;
+      height: 60%;
+      background: radial-gradient(circle, rgba(70, 80, 120, 0.2) 0%, rgba(10, 10, 12, 0) 70%);
+      filter: blur(80px);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* --- THE VOICE LIGHT FIELD --- */
+    #light-field {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 0%;
+      pointer-events: none;
+      z-index: 25;
+      background: radial-gradient(
+        ellipse at center bottom, 
+        rgba(var(--light-warmth), 0.5) 0%, 
+        rgba(var(--light-warmth), 0.15) 40%, 
+        rgba(var(--light-warmth), 0) 70%
+      );
+      transition: opacity 0.5s ease-out;
+      opacity: 0;
+      mix-blend-mode: screen; 
+      filter: blur(25px); /* Softened further for borderless look */
+    }
+
+    /* Glass Panels (For History & Dock) */
+    .glass-pane {
+      background: var(--glass-surface);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    
+    /* --- INTERACTION STATES --- */
+
+    /* 1. Deep Dimming of History */
+    #chat-history { transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+    body.is-interacting #chat-history {
+      opacity: 0.05; /* Almost black to let floating text pop */
+      filter: blur(12px);
+      transform: scale(0.96);
+    }
+
+    /* 2. Floating Live Text (Borderless) */
+    #live-container {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    body.is-interacting #live-container {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* 3. Status Dot Logic */
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      margin-right: 12px;
+      transition: all 0.3s ease;
+    }
+    .status-dot.warmup {
+      background-color: rgba(255, 255, 255, 0.4);
+      animation: pulse-warmup 1s infinite alternate;
+    }
+    .status-dot.hot {
+      background-color: var(--neon-red);
+      box-shadow: 0 0 15px var(--neon-red);
+      transform: scale(1.2);
+    }
+    .status-dot.processing {
+      background-color: #3b82f6;
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+      animation: spin-pulse 1s infinite linear;
+    }
+    @keyframes pulse-warmup { from { opacity: 0.3; } to { opacity: 0.8; } }
+    @keyframes spin-pulse { 0% { opacity: 0.5; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.5; transform: scale(0.9); } }
+
+    /* 4. Text Flux Effect */
+    .flux-text { display: inline; transition: filter 0.5s ease, opacity 0.5s ease; }
+    .flux-text.typing { filter: blur(6px); opacity: 0.6; }
+    .flux-text.done { filter: blur(0); opacity: 1; }
+    .cursor {
+      display: inline-block; width: 2px; height: 1.4em;
+      background-color: #fff; margin-left: 4px; vertical-align: bottom;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* 5. The Ethereal Instruction (No Box) */
+    #instruction-label {
+      position: absolute;
+      bottom: 100px; /* Floats high above button */
+      left: 0;
+      width: 100%;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.5s ease;
+      pointer-events: none;
+      z-index: 60;
+    }
+    body.is-interacting #instruction-label {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .ethereal-hint {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.25em; /* Extremely wide tracking */
+      color: rgba(255, 255, 255, 0.5);
+      text-transform: uppercase;
+      text-shadow: 0 0 10px rgba(255,255,255,0.1);
+    }
+
+    #push-btn { transition: transform 0.1s; }
+    #push-btn:active { transform: scale(0.97); }
+
+  </style>
+</head>
+<body class="flex flex-col relative">
+
+  <!-- Ambient Light -->
+  <div class="ambient-glow"></div>
+
+  <!-- THE VOICE LIGHT -->
+  <div id="light-field"></div>
+
+  <!-- Header -->
+  <header class="relative z-10 p-6 flex justify-between items-center w-full">
+    <div class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center glass-pane">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="text-xs font-medium tracking-widest uppercase opacity-40">Memory 003</div>
+  </header>
+
+  <!-- Chat History -->
+  <main id="chat-history" class="flex-1 overflow-y-auto px-4 pb-32 pt-4 no-scrollbar relative z-10 space-y-6">
+    <div class="flex flex-col items-start max-w-[85%]">
+      <div class="glass-pane rounded-2xl rounded-tl-sm p-4 text-sm leading-relaxed text-gray-200">
+        You know, it will never be right...
+      </div>
+      <span class="text-[10px] text-gray-500 mt-1 pl-1">8:24 AM</span>
+    </div>
+    <div class="flex flex-col items-end w-full">
+      <div class="glass-pane rounded-2xl rounded-tr-sm p-4 text-sm leading-relaxed text-gray-100 max-w-[90%] border-l-2 border-l-blue-500/50">
+        我完全理解你的绝望感。但还记得项目改名 Echo 时的兴奋吗？
+      </div>
+      <span class="text-[10px] text-gray-500 mt-1 pr-1">8:25 AM</span>
+    </div>
+    <div class="h-24"></div>
+  </main>
+
+  <!-- BORDERLESS LIVE CONTAINER -->
+  <!-- No background, no border. Just content floating in the void. -->
+  <div id="live-container" class="absolute bottom-36 right-6 left-6 z-40 pointer-events-none flex flex-col justify-end min-h-[100px]">
+    
+    <!-- Status Indicator (Floating) -->
+    <div class="flex items-center mb-4 pl-1">
+      <div id="status-dot" class="status-dot warmup"></div>
+      <span id="status-text" class="text-[10px] font-bold tracking-widest uppercase text-white/40">Connecting...</span>
+    </div>
+
+    <!-- Live Text (Large, Clean) -->
+    <div class="text-xl font-light text-white leading-relaxed tracking-wide" style="text-shadow: 0 2px 20px rgba(0,0,0,0.8);">
+      <span id="stream-content"></span><span class="cursor"></span>
+    </div>
+
+  </div>
+
+  <!-- ETHEREAL INSTRUCTION -->
+  <div id="instruction-label">
+    <span class="ethereal-hint">Release to Send</span>
+  </div>
+
+  <!-- Footer -->
+  <footer class="absolute bottom-0 w-full p-4 pb-8 z-50">
+    <div class="flex items-end gap-3">
+      <button class="w-12 h-12 rounded-full glass-pane flex items-center justify-center text-white/60">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="11" width="18" height="10" rx="2" /><circle cx="12" cy="5" r="2" /><path d="M12 7v4" />
+        </svg>
+      </button>
+
+      <button id="push-btn" class="flex-1 h-14 rounded-full glass-pane border border-white/10 flex items-center justify-center gap-3 select-none touch-manipulation relative overflow-hidden bg-black/20">
+        <span class="text-sm font-medium text-white/90 relative z-10">Hold to Speak</span>
+      </button>
+    </div>
+  </footer>
+
+  <script>
+    // --- Config ---
+    const CONNECT_DELAY = 1500;
+    const PROCESS_DELAY = 1200;
+    const LIGHT_DAMPING = 0.08; 
+    
+    // --- Elements ---
+    const pushBtn = document.getElementById('push-btn');
+    const body = document.body;
+    const streamContent = document.getElementById('stream-content');
+    const chatHistory = document.getElementById('chat-history');
+    const lightField = document.getElementById('light-field');
+    const statusDot = document.getElementById('status-dot');
+    const statusText = document.getElementById('status-text');
+    const instructionLabel = document.getElementById('instruction-label');
+
+    // --- State ---
+    let interactionState = 'idle'; 
+    let connectionTimer = null;
+    let transcriptionTimer = null;
+    let animationFrameId = null;
+    let targetLightHeight = 0;
+    let currentLightHeight = 0;
+    
+    let simulatedPhrase = "We have removed the boundaries. The text now floats directly in the ether, anchored only by the light below.We have removed the boundaries. The text now floats directly in the ether, anchored only by the light below.We have removed the boundaries. The text now floats directly in the ether, anchored only by the light below.We have removed the boundaries. The text now floats directly in the ether, anchored only by the light below.";
+    let charIndex = 0;
+
+    // --- PHYSICS ---
+    function animateLightPhysics() {
+      if (interactionState !== 'recording') {
+        currentLightHeight += (0 - currentLightHeight) * 0.1; 
+      } else {
+        const time = Date.now() / 800;
+        const breath = Math.sin(time) * 10; 
+        const isSpeaking = Math.random() > 0.6; 
+        const speechPower = isSpeaking ? (Math.random() * 45) : 0;
+        targetLightHeight = 35 + breath + speechPower; // Slightly higher light for borderless
+        currentLightHeight += (targetLightHeight - currentLightHeight) * LIGHT_DAMPING;
+      }
+
+      lightField.style.height = `${Math.max(0, currentLightHeight)}%`;
+      lightField.style.opacity = (interactionState === 'recording' || interactionState === 'processing') 
+        ? 0.4 + (currentLightHeight / 150) 
+        : currentLightHeight / 50; 
+
+      if (currentLightHeight > 0.1 || interactionState !== 'idle') {
+        animationFrameId = requestAnimationFrame(animateLightPhysics);
+      }
+    }
+
+    // --- TEXT ENGINE ---
+    function typeNextChar() {
+      if (interactionState === 'idle' || charIndex >= simulatedPhrase.length) return;
+
+      const char = simulatedPhrase[charIndex];
+      const span = document.createElement('span');
+      span.innerText = char;
+      span.className = 'flux-text typing';
+      streamContent.appendChild(span);
+      charIndex++;
+
+      const sharpenDelay = interactionState === 'processing' ? 100 : 500;
+      setTimeout(() => { span.classList.remove('typing'); span.classList.add('done'); }, sharpenDelay);
+
+      const speed = interactionState === 'processing' ? 30 : Math.random() * (150 - 60) + 60;
+      transcriptionTimer = setTimeout(typeNextChar, speed);
+    }
+
+    // --- HANDLERS ---
+    function startHolding(e) {
+      e.preventDefault();
+      if (interactionState !== 'idle') return;
+
+      interactionState = 'connecting';
+      body.classList.add('is-interacting'); 
+      
+      statusDot.className = 'status-dot warmup';
+      statusText.innerText = 'Connecting...';
+      streamContent.innerHTML = '';
+      charIndex = 0;
+      
+      animateLightPhysics();
+      if (navigator.vibrate) navigator.vibrate(10);
+
+      connectionTimer = setTimeout(() => {
+        if (interactionState === 'connecting') enterRecordingState();
+      }, CONNECT_DELAY);
+    }
+
+    function enterRecordingState() {
+      interactionState = 'recording';
+      if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
+
+      statusDot.className = 'status-dot hot';
+      statusText.innerText = 'Listening';
+      statusText.className = "text-[10px] font-bold tracking-widest uppercase text-white/90 drop-shadow-md"; // Make it brighter
+      
+      typeNextChar();
+    }
+
+    function stopHolding(e) {
+      if (interactionState === 'idle' || interactionState === 'processing') return;
+
+      clearTimeout(connectionTimer);
+
+      if (interactionState === 'recording') {
+        enterProcessingState();
+      } else {
+        resetToIdle();
+      }
+    }
+
+    function enterProcessingState() {
+      interactionState = 'processing';
+      
+      statusDot.className = 'status-dot processing';
+      statusText.innerText = 'Optimizing...';
+      instructionLabel.style.opacity = '0';
+
+      setTimeout(() => {
+        commitMessageToHistory();
+        resetToIdle();
+      }, PROCESS_DELAY);
+    }
+
+    function resetToIdle() {
+      interactionState = 'idle';
+      body.classList.remove('is-interacting');
+      clearTimeout(transcriptionTimer);
+      cancelAnimationFrame(animationFrameId);
+      
+      setTimeout(() => {
+         statusDot.className = 'status-dot warmup';
+         statusText.innerText = 'Connecting...';
+         statusText.className = "text-[10px] font-bold tracking-widest uppercase text-white/40";
+         instructionLabel.style.opacity = ''; 
+      }, 500);
+    }
+
+    function commitMessageToHistory() {
+      const finalText = streamContent.innerText;
+      if (!finalText) return;
+
+      const msgWrapper = document.createElement('div');
+      msgWrapper.className = 'flex flex-col items-end w-full animate-fade-in-up';
+      msgWrapper.innerHTML = `
+        <div class="glass-pane rounded-2xl rounded-tr-sm p-4 text-sm leading-relaxed text-gray-100 max-w-[90%] border-l-2 border-l-purple-500/50">
+          ${finalText}
+        </div>
+        <span class="text-[10px] text-gray-500 mt-1 pr-1">Just now</span>
+      `;
+      
+      chatHistory.insertBefore(msgWrapper, chatHistory.lastElementChild);
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+    }
+
+    pushBtn.addEventListener('mousedown', startHolding);
+    pushBtn.addEventListener('touchstart', startHolding);
+    window.addEventListener('mouseup', stopHolding);
+    window.addEventListener('touchend', stopHolding);
+
+  </script>
+</body>
+</html>

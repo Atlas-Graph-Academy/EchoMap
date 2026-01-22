@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aura | Kinetic Voice Interface</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* --- Aris Aesthetic System: Deep Field & Light --- */
+        :root {
+            --turrell-void: #050507;
+            --glass-surface: rgba(30, 30, 35, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --energy-orange: #FF6B4A; /* Warm energy color for voice */
+            --signal-green: #32D74B;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--turrell-void);
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+            /* Prevent iOS rubber banding */
+            overscroll-behavior-y: none; 
+            touch-action: none;
+        }
+
+        /* --- Ambient Environment --- */
+        .ambient-layer {
+            position: absolute;
+            top: -20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140%;
+            height: 80%;
+            background: radial-gradient(circle, rgba(60, 40, 90, 0.2) 0%, rgba(5, 5, 7, 0) 70%);
+            filter: blur(80px);
+            z-index: 0;
+            transition: opacity 1s ease;
+        }
+
+        /* --- Glass Components --- */
+        .glass-pane {
+            background: var(--glass-surface);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        /* --- Text Rendering Mechanics (The Polaroid Effect) --- */
+        .flux-text {
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            display: inline-block;
+            will-change: filter, opacity, transform;
+        }
+
+        /* Stage 1: Ghost (In-flight, unstable) */
+        .flux-text.ghost {
+            filter: blur(2.5px);
+            opacity: 0.5;
+            transform: scale(0.98);
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Stage 2: Solid (Settled, finalized) */
+        .flux-text.solid {
+            filter: blur(0px);
+            opacity: 1;
+            transform: scale(1);
+            color: #ffffff;
+        }
+
+        /* --- The Focus State --- */
+        #chat-container {
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        
+        /* When active, push history back into the void */
+        body.mode-focus #chat-container {
+            opacity: 0.2;
+            filter: blur(6px);
+            transform: scale(0.96);
+        }
+
+        /* --- The Live Input Bubble --- */
+        #live-bubble {
+            opacity: 0;
+            transform: translateY(30px) scale(0.9);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        body.mode-focus #live-bubble {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* --- The Kinetic Button --- */
+        #push-btn {
+            transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease, border-color 0.3s ease;
+            position: relative;
+            overflow: visible; /* Allow glow to spill out */
+        }
+
+        /* State: Pressed / Handshaking */
+        #push-btn.state-handshake {
+            transform: scale(0.92);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        /* State: Recording (The Energy Core) */
+        #push-btn.state-recording {
+            transform: scale(1);
+            background-color: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.5);
+            /* The glow is handled by JS for audio reactivity, but here is the base */
+            box-shadow: 0 0 0px var(--energy-orange); 
+        }
+
+        /* Loading Spinner for Handshake */
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Cursor blinking */
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.2em;
+            background-color: var(--energy-orange);
+            margin-left: 2px;
+            vertical-align: sub;
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* Helper to hide scrollbar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="flex flex-col relative justify-between">
+
+    <!-- Ambient Background -->
+    <div class="ambient-layer"></div>
+
+    <!-- Header -->
+    <header class="relative z-10 px-6 py-6 flex justify-between items-center w-full">
+        <button class="w-10 h-10 rounded-full glass-pane flex items-center justify-center active:scale-90 transition-transform">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="text-[10px] font-medium tracking-[0.2em] uppercase text-white/30">Sync State: Active</div>
+    </header>
+
+    <!-- Chat History (The Context) -->
+    <main id="chat-container" class="flex-1 overflow-y-auto px-4 w-full relative z-10 space-y-8 pb-32 no-scrollbar">
+        <!-- AI Message -->
+        <div class="flex flex-col items-start max-w-[85%] animate-fade-in">
+            <div class="glass-pane rounded-2xl rounded-tl-sm p-4 text-[15px] leading-relaxed text-gray-200">
+                I'm listening. The environment is ready. Hold the connection to manifest your thought.
+            </div>
+        </div>
+        
+        <!-- Placeholder for scroll alignment -->
+        <div id="scroll-anchor" class="h-1"></div>
+    </main>
+
+    <!-- The "Developing" Input Bubble (Overlay) -->
+    <div id="live-bubble" class="absolute bottom-36 left-4 right-4 z-30 pointer-events-none">
+        <div class="glass-pane rounded-2xl rounded-tr-sm p-6 min-h-[100px] flex flex-col justify-center border border-white/20 shadow-2xl">
+            <!-- Status Header -->
+            <div class="flex items-center gap-2 mb-3 opacity-80">
+                <div id="status-dot" class="w-2 h-2 rounded-full bg-gray-500 transition-colors duration-300"></div>
+                <span id="status-text" class="text-xs font-semibold tracking-wide text-white/60 uppercase">Ready</span>
+            </div>
+            <!-- The Transcript Content -->
+            <div class="text-lg font-medium text-white leading-relaxed break-words">
+                <span id="transcript-stream"></span><span id="live-cursor" class="cursor hidden"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- The Control Dock -->
+    <footer class="relative z-40 w-full p-4 pb-8 bg-gradient-to-t from-[#050507] via-[#050507] to-transparent">
+        <div class="flex items-center gap-3">
+            <!-- Keyboard Toggle -->
+            <button class="w-14 h-14 rounded-full glass-pane flex items-center justify-center text-white/50 active:bg-white/10 transition-colors">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="10" rx="2" /><path d="M12 7v4" /></svg>
+            </button>
+
+            <!-- THE KINETIC BUTTON -->
+            <button id="push-btn" class="flex-1 h-16 rounded-full glass-pane border border-white/10 flex items-center justify-center gap-3 select-none touch-manipulation">
+                
+                <!-- Inner Container for Label/Icon -->
+                <div class="flex items-center gap-3 pointer-events-none">
+                    <!-- Icon / Spinner Area -->
+                    <div id="btn-icon-area" class="w-6 h-6 flex items-center justify-center">
+                        <svg id="mic-icon" class="w-5 h-5 text-white/80" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
+                        <div id="loader" class="spinner hidden"></div>
+                    </div>
+                    
+                    <!-- Text Label -->
+                    <span id="btn-label" class="text-sm font-medium text-white/90 tracking-wide">Hold to Speak</span>
+                </div>
+            </button>
+        </div>
+    </footer>
+
+    <script>
+        /**
+         * ARIS INTERACTION ENGINE
+         * -----------------------
+         * Philosophy: The button is a living cell. It breathes with the voice.
+         * The text is a developing photograph.
+         */
+
+        // --- Configuration ---
+        const CONSTANTS = {
+            HANDSHAKE_TIME: 600, // ms to establish "connection"
+            SETTLING_SPEED: 50,  // ms per character to stabilize
+            MIN_HOLD_TIME: 500   // Prevent accidental taps
+        };
+
+        const STATES = {
+            IDLE: 'idle',
+            HANDSHAKE: 'handshake', // Pre-recording, connecting
+            RECORDING: 'recording', // Active Mic
+            SETTLING: 'settling'    // Post-release, processing buffer
+        };
+
+        // --- DOM Elements ---
+        const els = {
+            body: document.body,
+            btn: document.getElementById('push-btn'),
+            btnLabel: document.getElementById('btn-label'),
+            btnIcon: document.getElementById('mic-icon'),
+            loader: document.getElementById('loader'),
+            bubble: document.getElementById('live-bubble'),
+            transcript: document.getElementById('transcript-stream'),
+            cursor: document.getElementById('live-cursor'),
+            statusDot: document.getElementById('status-dot'),
+            statusText: document.getElementById('status-text'),
+            chatContainer: document.getElementById('chat-container')
+        };
+
+        // --- State Management ---
+        let currentState = STATES.IDLE;
+        let audioVisualizerInterval;
+        let textStreamInterval;
+        let connectionTimer;
+        
+        // Simulated Text Data
+        const phrases = [
+            "We need to refocus the", " energy on the", " transition layer.", 
+            " It feels a bit", " too rigid right now.", " Let's add more", " liquid damping."
+        ];
+        let phraseIndex = 0;
+        let tempTranscript = []; // Stores { text: string, state: 'ghost'|'solid' }
+
+        // --- Interaction Handlers ---
+
+        function handleTouchDown(e) {
+            e.preventDefault();
+            if (currentState !== STATES.IDLE) return;
+
+            // 1. Enter Handshake Phase
+            currentState = STATES.HANDSHAKE;
+            
+            // UI: Button Physical compression
+            els.btn.classList.add('state-handshake');
+            els.btnLabel.innerText = "Connecting...";
+            els.btnIcon.classList.add('hidden');
+            els.loader.classList.remove('hidden');
+            els.statusText.innerText = "Handshaking";
+            els.statusDot.className = "w-2 h-2 rounded-full bg-yellow-500 animate-pulse";
+
+            // Logic: Wait for WebSocket "Connection"
+            connectionTimer = setTimeout(establishConnection, CONSTANTS.HANDSHAKE_TIME);
+        }
+
+        function establishConnection() {
+            if (currentState !== STATES.HANDSHAKE) return; // User let go too early
+
+            // 2. Enter Recording Phase
+            currentState = STATES.RECORDING;
+
+            // Haptic: The "Go" Signal (Crisp Tap)
+            if (navigator.vibrate) navigator.vibrate(20);
+
+            // UI: Focus Mode
+            els.body.classList.add('mode-focus');
+            els.btn.classList.remove('state-handshake');
+            els.btn.classList.add('state-recording');
+            
+            els.loader.classList.add('hidden');
+            els.btnIcon.classList.remove('hidden');
+            els.btnLabel.innerText = "Listening...";
+            
+            els.statusText.innerText = "Recording";
+            els.statusDot.className = "w-2 h-2 rounded-full bg-[#FF6B4A]"; // Orange/Red Energy
+            
+            els.cursor.classList.remove('hidden');
+            els.transcript.innerHTML = ''; // Clear previous
+            tempTranscript = [];
+            phraseIndex = 0;
+
+            // Start Simulations
+            startAudioVisualizer();
+            startTextStreaming();
+        }
+
+        function handleTouchUp(e) {
+            e.preventDefault();
+
+            // Scenario A: Released during Handshake (Too fast)
+            if (currentState === STATES.HANDSHAKE) {
+                clearTimeout(connectionTimer);
+                resetToIdle();
+                return;
+            }
+
+            // Scenario B: Released during Recording (Normal Flow)
+            if (currentState === STATES.RECORDING) {
+                // 3. Enter Settling Phase (Don't send yet!)
+                enterSettlingPhase();
+            }
+        }
+
+        // --- Phase Logic ---
+
+        function startAudioVisualizer() {
+            // Simulates the button glowing based on voice volume
+            let baseScale = 1;
+            audioVisualizerInterval = setInterval(() => {
+                // Random "volume"
+                const volume = Math.random(); 
+                
+                // Visual 1: Glow Intensity
+                const glowSize = 10 + (volume * 40);
+                const glowAlpha = 0.2 + (volume * 0.4);
+                els.btn.style.boxShadow = `0 0 ${glowSize}px rgba(255, 107, 74, ${glowAlpha})`;
+                
+                // Visual 2: Slight button scaling (breathing)
+                const scale = 1 + (volume * 0.05);
+                els.btn.style.transform = `scale(${scale})`;
+
+            }, 100);
+        }
+
+        function startTextStreaming() {
+            // Simulates words coming in from Whisper
+            textStreamInterval = setInterval(() => {
+                if (phraseIndex < phrases.length) {
+                    // Add new chunk as "Ghost"
+                    const chunk = phrases[phraseIndex];
+                    tempTranscript.push({ text: chunk, type: 'ghost' });
+                    renderTranscript();
+                    phraseIndex++;
+                    
+                    // Auto scroll bubble
+                    // els.bubble.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                }
+            }, 600); // Speed of speech chunks
+        }
+
+        function enterSettlingPhase() {
+            currentState = STATES.SETTLING;
+
+            // Stop Microphone Visuals
+            clearInterval(audioVisualizerInterval);
+            clearInterval(textStreamInterval);
+            
+            // UI: Button cools down
+            els.btn.style.boxShadow = 'none';
+            els.btn.style.transform = 'scale(1)';
+            els.btn.classList.remove('state-recording');
+            els.btnLabel.innerText = "Processing...";
+            els.statusText.innerText = "Finalizing";
+            els.statusDot.className = "w-2 h-2 rounded-full bg-blue-400 animate-pulse";
+            els.cursor.classList.add('hidden'); // Freeze cursor
+
+            // Logic: Convert Ghost Text to Solid Text (The "Developing" effect)
+            processBufferedText();
+        }
+
+        function processBufferedText() {
+            let currentIndex = 0;
+            
+            const settleInterval = setInterval(() => {
+                if (currentIndex < tempTranscript.length) {
+                    // Flip status from ghost to solid
+                    tempTranscript[currentIndex].type = 'solid';
+                    renderTranscript();
+                    currentIndex++;
+                    
+                    // Tiny haptic tick for each finalized chunk? (Optional)
+                    // if (navigator.vibrate) navigator.vibrate(5);
+                } else {
+                    // All text settled. Send it.
+                    clearInterval(settleInterval);
+                    finalizeAndSend();
+                }
+            }, 200); // Speed of stabilization
+        }
+
+        function renderTranscript() {
+            // Re-build the HTML based on state
+            els.transcript.innerHTML = tempTranscript.map(item => 
+                `<span class="flux-text ${item.type}">${item.text}</span>`
+            ).join('');
+        }
+
+        function finalizeAndSend() {
+            // 4. Send Animation
+            const fullText = tempTranscript.map(t => t.text).join('');
+            
+            if (fullText.trim().length > 0) {
+                // Create message in history
+                const msg = document.createElement('div');
+                msg.className = "flex flex-col items-end w-full animate-fade-in";
+                msg.innerHTML = `
+                    <div class="glass-pane rounded-2xl rounded-tr-sm p-4 text-[15px] leading-relaxed text-gray-100 max-w-[90%] border-l-2 border-[#FF6B4A]">
+                        ${fullText}
+                    </div>
+                `;
+                els.chatContainer.insertBefore(msg, document.getElementById('scroll-anchor'));
+                els.chatContainer.scrollTop = els.chatContainer.scrollHeight;
+            }
+
+            resetToIdle();
+        }
+
+        function resetToIdle() {
+            currentState = STATES.IDLE;
+            
+            // Reset UI
+            els.body.classList.remove('mode-focus');
+            els.btnLabel.innerText = "Hold to Speak";
+            els.btnIcon.classList.remove('hidden');
+            els.loader.classList.add('hidden');
+            els.btn.classList.remove('state-handshake');
+            els.btn.style.boxShadow = 'none';
+            els.btn.style.transform = 'scale(1)';
+            els.statusText.innerText = "Ready";
+            els.statusDot.className = "w-2 h-2 rounded-full bg-gray-500";
+            
+            // Clear Bubble
+            setTimeout(() => {
+                if(currentState === STATES.IDLE) {
+                    els.transcript.innerHTML = '';
+                    tempTranscript = [];
+                }
+            }, 500);
+        }
+
+        // Attach Events
+        els.btn.addEventListener('mousedown', handleTouchDown);
+        els.btn.addEventListener('touchstart', handleTouchDown, {passive: false});
+        
+        window.addEventListener('mouseup', handleTouchUp);
+        window.addEventListener('touchend', handleTouchUp);
+
+    </script>
+</body>
+</html>

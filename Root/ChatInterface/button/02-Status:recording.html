@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aura | Voice Interface</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* --- Aris Aesthetic System --- */
+        :root {
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-surface: rgba(20, 20, 25, 0.6);
+            --glass-highlight: rgba(255, 255, 255, 0.03);
+            --neon-red: #FF3B30;
+            --turrell-void: #09090b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--turrell-void);
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* The Ganzfeld Background */
+        .ambient-glow {
+            position: absolute;
+            top: -10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120%;
+            height: 60%;
+            background: radial-gradient(circle, rgba(70, 80, 120, 0.25) 0%, rgba(10, 10, 12, 0) 70%);
+            filter: blur(60px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Glassmorphism Cards */
+        .glass-pane {
+            background: var(--glass-surface);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Scrollbar hiding */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* --- Interaction States --- */
+        
+        /* The Dimming Effect */
+        #chat-history {
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        body.is-recording #chat-history {
+            opacity: 0.3;
+            filter: blur(4px);
+            transform: scale(0.98);
+        }
+
+        /* The Active Input Bubble */
+        #live-bubble {
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+        }
+        
+        body.is-recording #live-bubble {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            background: rgba(30, 30, 35, 0.85); /* Slightly lighter/illuminated */
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.05); /* Inner glow */
+        }
+
+        /* The Recording Ember (Red Dot) */
+        .recording-ember {
+            width: 8px;
+            height: 8px;
+            background-color: var(--neon-red);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--neon-red);
+            animation: pulse-ember 1.5s infinite ease-in-out;
+            display: inline-block;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes pulse-ember {
+            0% { transform: scale(1); opacity: 1; box-shadow: 0 0 5px var(--neon-red); }
+            50% { transform: scale(1.3); opacity: 0.8; box-shadow: 0 0 15px var(--neon-red); }
+            100% { transform: scale(1); opacity: 1; box-shadow: 0 0 5px var(--neon-red); }
+        }
+
+        /* Text Crystalization Effect */
+        .flux-text {
+            display: inline;
+            transition: filter 0.8s ease, color 0.5s ease;
+        }
+        
+        .flux-text.unstable {
+            filter: blur(3px);
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .flux-text.stable {
+            filter: blur(0);
+            color: rgba(255, 255, 255, 1);
+        }
+
+        /* The Cursor */
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.2em;
+            background-color: #fff;
+            margin-left: 2px;
+            vertical-align: sub;
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* The Push Button */
+        #push-btn {
+            transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        #push-btn:active, body.is-recording #push-btn {
+            transform: scale(0.96);
+            background-color: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Loading Spinner for "Thinking" state */
+        .loader {
+            border: 2px solid rgba(255,255,255,0.1);
+            border-left-color: #fff;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    </style>
+</head>
+<body class="flex flex-col relative">
+
+    <!-- Ambient Light Source -->
+    <div class="ambient-glow"></div>
+
+    <!-- Header -->
+    <header class="relative z-10 p-6 flex justify-between items-center w-full">
+        <div class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center glass-pane">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <div class="text-xs font-medium tracking-widest uppercase opacity-40">Memory 003</div>
+    </header>
+
+    <!-- Chat History Area -->
+    <main id="chat-history" class="flex-1 overflow-y-auto px-4 pb-32 pt-4 no-scrollbar relative z-10 space-y-6">
+        
+        <!-- AI Message -->
+        <div class="flex flex-col items-start max-w-[85%]">
+            <div class="glass-pane rounded-2xl rounded-tl-sm p-4 text-sm leading-relaxed text-gray-200">
+                You know, it will never be right. I don't like... You know, I think this experience is horrible if we don't manage it well.
+            </div>
+            <span class="text-[10px] text-gray-500 mt-1 pl-1">8:24 AM</span>
+        </div>
+
+        <!-- User Message (Previous) -->
+        <div class="flex flex-col items-end w-full">
+            <div class="glass-pane rounded-2xl rounded-tr-sm p-4 text-sm leading-relaxed text-gray-100 max-w-[90%] border-l-2 border-l-blue-500/50">
+                我完全理解你的绝望感——这种“永远无法完美”的沮丧。但还记得你给项目改名 Echo 时的兴奋吗？(I001) 正是这种对瑕疵的清醒认知，才是创造革命性体验的起点。
+            </div>
+            <span class="text-[10px] text-gray-500 mt-1 pr-1">8:25 AM</span>
+        </div>
+        
+        <!-- AI Message -->
+        <div class="flex flex-col items-start max-w-[85%]">
+             <div class="glass-pane rounded-2xl rounded-tl-sm p-4 text-sm leading-relaxed text-gray-200">
+                So this is what's going on.
+            </div>
+            <span class="text-[10px] text-gray-500 mt-1 pl-1">8:25 AM</span>
+        </div>
+
+        <!-- Spacer for input area -->
+        <div class="h-24"></div>
+    </main>
+
+    <!-- The Live Transcription Overlay (Absolute Positioned) -->
+    <!-- This sits ON TOP of the history when active -->
+    <div id="live-bubble" class="absolute bottom-32 right-4 left-4 z-30 pointer-events-none">
+        <div class="glass-pane rounded-2xl rounded-tr-sm p-5 min-h-[80px] flex flex-col justify-center border border-white/20">
+            <!-- Header of the bubble: Status -->
+            <div class="flex items-center mb-2">
+                <div class="recording-ember"></div>
+                <span class="text-xs font-semibold tracking-wide text-white/90">Recording...</span>
+            </div>
+            <!-- The Streaming Text -->
+            <div class="text-base font-normal text-white leading-relaxed">
+                <span id="stream-content"></span><span class="cursor"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Control Dock -->
+    <footer class="absolute bottom-0 w-full p-4 pb-8 z-40 bg-gradient-to-t from-[#09090b] via-[#09090b] to-transparent">
+        <div class="flex items-end gap-3">
+            <!-- Keyboard Switcher -->
+            <button class="w-12 h-12 rounded-full glass-pane flex items-center justify-center text-white/60 active:bg-white/10 transition-colors">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="3" y="11" width="18" height="10" rx="2" />
+                    <circle cx="12" cy="5" r="2" />
+                    <path d="M12 7v4" />
+                </svg>
+            </button>
+
+            <!-- The PUSH TO TALK Bar -->
+            <button id="push-btn" class="flex-1 h-14 rounded-full glass-pane border border-white/10 flex items-center justify-center gap-3 select-none touch-manipulation">
+                <!-- Icon changes based on state -->
+                <div id="btn-icon-state" class="w-2 h-2 rounded-full bg-white/40"></div>
+                <span id="btn-text" class="text-sm font-medium text-white/80">Hold to Speak</span>
+            </button>
+        </div>
+    </footer>
+
+    <script>
+        // Aris Logic Module
+        const pushBtn = document.getElementById('push-btn');
+        const body = document.body;
+        const streamContent = document.getElementById('stream-content');
+        const chatHistory = document.getElementById('chat-history');
+        const liveBubble = document.getElementById('live-bubble');
+
+        let isRecording = false;
+        let transcriptionInterval;
+        let stabilityTimeout;
+
+        // Simulated Text Stream (What the user "says")
+        const simulatedPhrase = "We need to optimize the cursor latency. It feels... liquid, but not responsive enough yet. Let's try the blur filter approach.We need to optimize the cursor latency. It feels... liquid, but not responsive enough yet. Let's try the blur filter approach.We need to optimize the cursor latency. It feels... liquid, but not responsive enough yet. Let's try the blur filter approach.";
+        let charIndex = 0;
+
+        // Start Interaction
+        function startRecording(e) {
+            e.preventDefault(); // Prevent context menu
+            if (isRecording) return;
+            isRecording = true;
+
+            // 1. Trigger Haptics (Visual & Physical if supported)
+            if (navigator.vibrate) navigator.vibrate(15);
+            
+            // 2. Visual State Change
+            body.classList.add('is-recording');
+            document.getElementById('btn-text').innerText = "Release to Send";
+            document.getElementById('btn-icon-state').classList.replace('bg-white/40', 'bg-red-500');
+            document.getElementById('btn-icon-state').classList.add('animate-pulse');
+
+            // 3. Reset and Start Streaming Text
+            streamContent.innerHTML = '';
+            charIndex = 0;
+            startStreamingText();
+        }
+
+        // End Interaction
+        function stopRecording(e) {
+            if (!isRecording) return;
+            isRecording = false;
+
+            // 1. Stop Stream
+            clearInterval(transcriptionInterval);
+            clearTimeout(stabilityTimeout);
+
+            // 2. Commit Message (Simulated)
+            // In a real app, this sends data. Here we animate the transition from Input to History.
+            commitMessageToHistory();
+
+            // 3. Reset Visual State
+            body.classList.remove('is-recording');
+            document.getElementById('btn-text').innerText = "Hold to Speak";
+            document.getElementById('btn-icon-state').classList.replace('bg-red-500', 'bg-white/40');
+            document.getElementById('btn-icon-state').classList.remove('animate-pulse');
+        }
+
+        // The "Liquid Text" Logic
+        function startStreamingText() {
+            transcriptionInterval = setInterval(() => {
+                if (charIndex < simulatedPhrase.length) {
+                    // Get next chunk (1-3 chars for realism)
+                    const chunkLength = Math.floor(Math.random() * 3) + 1;
+                    const chunk = simulatedPhrase.substring(charIndex, charIndex + chunkLength);
+                    
+                    // Create a span for the new chunk
+                    const span = document.createElement('span');
+                    span.innerText = chunk;
+                    span.className = 'flux-text unstable'; // Start blurry (Whisper receiving)
+                    
+                    streamContent.appendChild(span);
+                    charIndex += chunkLength;
+
+                    // "Stabilize" the text after a brief delay (Whisper processing)
+                    setTimeout(() => {
+                        span.classList.remove('unstable');
+                        span.classList.add('stable');
+                    }, 400); // 400ms delay to clear the blur
+
+                    // Auto scroll bubble if text gets long (simple version)
+                    // liveBubble.scrollIntoView({ behavior: "smooth", block: "end" });
+                } else {
+                    clearInterval(transcriptionInterval);
+                }
+            }, 60); // Typing speed
+        }
+
+        function commitMessageToHistory() {
+            const finalText = streamContent.innerText;
+            if (!finalText) return;
+
+            // Create new message bubble in history
+            const msgWrapper = document.createElement('div');
+            msgWrapper.className = 'flex flex-col items-end w-full animate-fade-in-up';
+            msgWrapper.innerHTML = `
+                <div class="glass-pane rounded-2xl rounded-tr-sm p-4 text-sm leading-relaxed text-gray-100 max-w-[90%] border-l-2 border-l-purple-500/50">
+                    ${finalText}
+                </div>
+                <span class="text-[10px] text-gray-500 mt-1 pr-1">Just now</span>
+            `;
+
+            // Append and scroll
+            // Wait a tiny bit for the UI to settle
+            setTimeout(() => {
+                chatHistory.insertBefore(msgWrapper, chatHistory.lastElementChild); // Insert before spacer
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            }, 300);
+        }
+
+        // Event Listeners for Mouse and Touch
+        pushBtn.addEventListener('mousedown', startRecording);
+        pushBtn.addEventListener('touchstart', startRecording);
+
+        window.addEventListener('mouseup', stopRecording);
+        window.addEventListener('touchend', stopRecording);
+
+    </script>
+</body>
+</html>
