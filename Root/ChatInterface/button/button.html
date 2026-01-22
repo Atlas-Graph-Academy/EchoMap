@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura - Volumetric Voice Input</title>
+    <style>
+        :root {
+            --bg-deep: #050608;
+            --bg-gradient: radial-gradient(circle at 50% -20%, #1c2235 0%, #050608 80%);
+            
+            /* The Core Light Color (Warm Tungsten/Human) */
+            --light-hue: 255, 200, 180; 
+            --light-cool: 180, 220, 255;
+            
+            --font-main: "SF Pro Text", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            --ease-fluid: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-deep);
+            color: white;
+            font-family: var(--font-main);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* 1. THE ATMOSPHERE */
+        .viewport {
+            width: 100%;
+            max-width: 420px;
+            height: 100%;
+            position: relative;
+            background: var(--bg-gradient);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            /* Subtle grain for realism */
+        }
+        
+        .viewport::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIj48ZmlsdGVyIGlkPSJ4Ij48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC42IiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsdGVyPSJ1cmwoI3gpIiBvcGFjaXR5PSIwLjAzIi8+PC9zdmc+');
+            opacity: 0.4;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* 2. THE VOLUMETRIC LIGHT (The Upward Cast) */
+        /* This is the light shedding upwards */
+        .volumetric-beam {
+            position: absolute;
+            bottom: 40px; /* Starts from button center */
+            left: 50%;
+            transform: translateX(-50%) scaleY(0); /* Hidden by default */
+            transform-origin: bottom center;
+            width: 300px;
+            height: 600px; /* Shoots way up */
+            background: radial-gradient(
+                ellipse at center bottom, 
+                rgba(var(--light-cool), 0.15) 0%, 
+                rgba(var(--light-cool), 0.05) 40%, 
+                transparent 80%
+            );
+            filter: blur(40px);
+            z-index: 1;
+            transition: opacity 0.2s ease-out;
+            pointer-events: none;
+            mix-blend-mode: screen;
+        }
+
+        /* 3. TRANSCRIPTION PREVIEW (Floating in the light) */
+        .transcription-area {
+            position: absolute;
+            bottom: 160px;
+            left: 30px; 
+            right: 30px;
+            text-align: center;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .ghost-text {
+            font-size: 20px;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s var(--ease-fluid);
+            line-height: 1.4;
+        }
+
+        .ghost-text.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 4. THE INTERFACE LAYER */
+        .bottom-dock {
+            position: relative;
+            z-index: 20;
+            width: 100%;
+            padding-bottom: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            height: 200px;
+        }
+
+        /* 5. THE BUTTON (The Source) */
+        /* Removing hard edges, focusing on "specular" feel */
+        .glass-aperture {
+            position: relative;
+            width: 100%;
+            max-width: 340px;
+            height: 72px;
+            border-radius: 40px;
+            background: rgba(255, 255, 255, 0.01);
+            
+            /* The "Glass Lip" - Only visible on top edges to catch light */
+            box-shadow: 
+                inset 0 1px 1px rgba(255, 255, 255, 0.15),
+                inset 0 -1px 20px rgba(0, 0, 0, 0.2);
+            
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s var(--ease-fluid), background 0.3s;
+            overflow: hidden;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* The Inner Light Source */
+        .lumen-core {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40%;
+            height: 100%;
+            background: radial-gradient(
+                circle, 
+                rgba(var(--light-cool), 0.6) 0%, 
+                rgba(var(--light-cool), 0.1) 50%, 
+                transparent 70%
+            );
+            filter: blur(25px);
+            opacity: 0.3; /* Idle dim state */
+            transition: opacity 0.5s;
+        }
+
+        /* The Button Content */
+        .content-layer {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 2;
+        }
+
+        .status-text {
+            font-size: 16px;
+            letter-spacing: 0.3px;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        /* The Indicator (Subtle, not a sticker) */
+        .indicator-pill {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #ff5555;
+            box-shadow: 0 0 10px #ff5555;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.3s var(--ease-fluid);
+        }
+
+        /* ACTIVE STATES */
+        .glass-aperture:active {
+            transform: scale(0.98);
+        }
+
+        .glass-aperture.listening .status-text {
+            color: rgba(255, 255, 255, 1);
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+        }
+
+        .glass-aperture.listening .indicator-pill {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Chat Context (Background) */
+        .chat-stream {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70%;
+            padding: 24px;
+            box-sizing: border-box;
+            opacity: 0.6;
+            transition: opacity 0.5s;
+        }
+        
+        .chat-bubble {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 16px 20px;
+            border-radius: 20px 20px 20px 4px;
+            max-width: 80%;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            font-size: 15px;
+            color: #d0d0d5;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="viewport">
+        
+        <!-- Background Chat -->
+        <div class="chat-stream" id="chatStream">
+            <div class="chat-bubble">
+                Just breathe. When you are ready, I'm listening.
+            </div>
+        </div>
+
+        <!-- 1. The Upward Light Beam (Behind everything) -->
+        <div class="volumetric-beam" id="beam"></div>
+
+        <!-- 2. The Text Forming in the Light -->
+        <div class="transcription-area">
+            <div class="ghost-text" id="ghostText"></div>
+        </div>
+
+        <!-- 3. The Control Dock -->
+        <div class="bottom-dock">
+            <div class="glass-aperture" id="mainButton">
+                <!-- The Internal Light -->
+                <div class="lumen-core" id="coreLight"></div>
+                
+                <div class="content-layer">
+                    <div class="indicator-pill" id="recIndicator"></div>
+                    <span class="status-text" id="statusLabel">Hold to Speak</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const button = document.getElementById('mainButton');
+        const beam = document.getElementById('beam');
+        const coreLight = document.getElementById('coreLight');
+        const statusLabel = document.getElementById('statusLabel');
+        const ghostText = document.getElementById('ghostText');
+        const chatStream = document.getElementById('chatStream');
+        
+        let isRecording = false;
+        let audioLoop;
+        let time = 0;
+
+        // Simulated Transcription Data
+        const phrases = [
+            "I'm wondering...",
+            "I'm wondering if the light...",
+            "I'm wondering if the light can really hear me.",
+            "I'm wondering if the light can really hear me. It feels warmer now."
+        ];
+        let phraseIndex = 0;
+        let typeInterval;
+
+        // --- INTERACTION HANDLERS ---
+
+        const start = (e) => {
+            e.preventDefault();
+            isRecording = true;
+            
+            // UI State
+            button.classList.add('listening');
+            statusLabel.innerText = "Listening...";
+            chatStream.style.opacity = "0.2"; // Dim background to focus on light
+            
+            // Text State
+            ghostText.innerText = "";
+            ghostText.classList.add('visible');
+            phraseIndex = 0;
+            
+            // Start Loops
+            simulateAudio();
+            typeInterval = setInterval(typeWriter, 800);
+        };
+
+        const stop = () => {
+            if(!isRecording) return;
+            isRecording = false;
+            
+            // Reset UI
+            button.classList.remove('listening');
+            statusLabel.innerText = "Processing...";
+            chatStream.style.opacity = "1";
+            
+            // Kill Loops
+            cancelAnimationFrame(audioLoop);
+            clearInterval(typeInterval);
+
+            // Collapse Light
+            beam.style.transform = `translateX(-50%) scaleY(0)`;
+            beam.style.opacity = 0;
+            coreLight.style.opacity = 0.3; // Back to idle
+            coreLight.style.transform = `translate(-50%, -50%) scale(1)`;
+
+            // Finalize State
+            setTimeout(() => {
+                ghostText.classList.remove('visible');
+                statusLabel.innerText = "Sent";
+                
+                setTimeout(() => {
+                    statusLabel.innerText = "Hold to Speak";
+                    // Add logic here to move ghostText to actual chat bubble
+                }, 1000);
+            }, 400);
+        };
+
+        button.addEventListener('mousedown', start);
+        button.addEventListener('touchstart', start);
+        window.addEventListener('mouseup', stop);
+        window.addEventListener('touchend', stop);
+
+
+        // --- THE PHYSICS ENGINE ---
+
+        function simulateAudio() {
+            if (!isRecording) return;
+            time += 0.1;
+
+            // 1. Generate Organic Noise (Simulated Decibels)
+            // Using multiple sine waves to create irregular speech patterns
+            let volume = (Math.sin(time) + Math.sin(time * 2.5) + Math.sin(time * 0.7)) / 3;
+            // Normalize to 0.0 - 1.0 range
+            volume = (volume + 1) / 2; 
+            
+            // Add jitter for "flicker" realism
+            let flicker = Math.random() * 0.15;
+            let totalIntensity = Math.max(0.1, volume + flicker);
+
+
+            // 2. Control The Upward Beam (The "Shedding" Light)
+            // The beam grows TALLER and BRIGHTER with volume
+            const beamHeight = 0.5 + (totalIntensity * 1.5); // Scale Y
+            const beamOpacity = 0.2 + (totalIntensity * 0.6);
+            
+            beam.style.transform = `translateX(-50%) scaleY(${beamHeight})`;
+            beam.style.opacity = beamOpacity;
+
+
+            // 3. Control The Core (The Button Internal)
+            // The core expands horizontally and gets hotter
+            const coreScale = 1 + (totalIntensity * 0.8);
+            
+            // Color Shift Logic: Cool Blue -> Hot Tungsten
+            // Simple interpolation between cool and warm RGBs
+            const r = 180 + (totalIntensity * 75); // Towards 255
+            const g = 220 - (totalIntensity * 20); // Slight drop
+            const b = 255 - (totalIntensity * 75); // Drop blue significantly
+            
+            coreLight.style.background = `radial-gradient(circle, rgba(${r},${g},${b},0.8) 0%, rgba(${r},${g},${b},0.1) 60%, transparent 80%)`;
+            coreLight.style.transform = `translate(-50%, -50%) scale(${coreScale})`;
+            coreLight.style.opacity = 0.5 + (totalIntensity * 0.5);
+
+            // 4. Subtle Button Ambient movement
+            // The button housing breathes slightly with the light
+            button.style.boxShadow = `inset 0 1px 1px rgba(255,255,255, ${0.1 + totalIntensity * 0.3})`;
+
+            audioLoop = requestAnimationFrame(simulateAudio);
+        }
+
+        function typeWriter() {
+            if(phraseIndex < phrases.length) {
+                ghostText.innerText = phrases[phraseIndex];
+                phraseIndex++;
+            }
+        }
+
+    </script>
+</body>
+</html>
