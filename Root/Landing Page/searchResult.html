@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aris: The Memory Stream</title>
+    <style>
+        :root {
+            --bg-void: #050505;
+            --text-ink: #eeeeee;
+            --text-muted: #666666;
+            --text-dim: #333333;
+            --accent-voice: #6366f1; 
+            --accent-focus: #ffffff;
+            --line-color: rgba(255, 255, 255, 0.12);
+        }
+
+        body {
+            background-color: var(--bg-void);
+            color: var(--text-ink);
+            font-family: 'Inter Tight', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .interface-container {
+            width: 100%;
+            max-width: 440px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* ============================
+           HEADER & SEARCH SECTION
+           Aligned top, minimalist, technical.
+           ============================ */
+        .header-zone {
+            position: sticky;
+            top: 0;
+            background: linear-gradient(180deg, var(--bg-void) 80%, rgba(5,5,5,0));
+            z-index: 10;
+            padding-bottom: 20px;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .header-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            border-bottom: 2px solid var(--text-ink); /* Heavy anchor line */
+            padding-bottom: 12px;
+        }
+
+        .app-title {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+
+        /* THE SEARCH INPUT
+           Invisible UI. Just text and a cursor.
+        */
+        .search-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'SF Mono', 'Roboto Mono', monospace;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .search-label {
+            color: var(--text-dim);
+            user-select: none;
+        }
+
+        .search-input {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--text-dim);
+            color: var(--text-ink);
+            font-family: inherit;
+            font-size: inherit;
+            width: 120px;
+            padding: 2px 0;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-bottom-color: var(--accent-voice);
+            width: 160px; /* Expands slightly on focus */
+        }
+
+        .search-input::placeholder {
+            color: var(--text-dim);
+            opacity: 0.5;
+        }
+
+        /* ============================
+           THE MEMORY LIST
+           ============================ */
+        .memory-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .memory-slice {
+            padding: 28px 0;
+            border-bottom: 1px solid var(--line-color);
+            display: grid;
+            grid-template-columns: 55px 1fr;
+            gap: 20px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .memory-slice:hover {
+            opacity: 1;
+        }
+        
+        /* Slight dimming of non-hovered items for focus effect */
+        .memory-list:hover .memory-slice:not(:hover) {
+            opacity: 0.5;
+        }
+
+        /* Typography & Structure (Inherited from V2) */
+        .temporal-col {
+            display: flex;
+            flex-direction: column;
+            padding-top: 8px;
+        }
+        .time-exact {
+            font-family: 'SF Mono', monospace;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .time-relative {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        .content-col {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .meta-line {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        .hook-text {
+            font-size: 28px;
+            font-weight: 400;
+            line-height: 1.2;
+            letter-spacing: -0.03em;
+            color: #d4d4d4;
+            transition: color 0.2s;
+        }
+        .memory-slice:hover .hook-text {
+            color: #fff;
+        }
+        
+        /* The Serif Quote Voice */
+        .hook-text::before {
+            content: '“';
+            font-family: 'Georgia', serif;
+            color: var(--accent-voice);
+            margin-right: 2px;
+            font-style: italic;
+        }
+        .hook-text::after {
+            content: '”';
+            font-family: 'Georgia', serif;
+            color: var(--accent-voice);
+            margin-left: 2px;
+            font-style: italic;
+        }
+
+        .inline-object {
+            display: inline-block;
+            vertical-align: middle;
+            height: 24px;
+            width: 36px;
+            background-color: #222;
+            border: 1px solid #444;
+            border-radius: 3px;
+            margin: 0 4px;
+            position: relative;
+            top: -3px;
+        }
+        .inline-object img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); opacity: 0.8; }
+        .memory-slice:hover .inline-object img { filter: grayscale(0%); }
+
+        /* ============================
+           THE FOOTER / STATS
+           The "Anchor" of the page.
+           ============================ */
+        .archive-footer {
+            margin-top: 60px;
+            margin-bottom: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed var(--text-dim); /* Dashed line implies "cut here" or end of roll */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-muted);
+            font-family: 'SF Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.05em;
+        }
+
+        .footer-stat {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .stat-label { color: var(--text-dim); }
+        .stat-value { color: var(--text-ink); }
+
+        .end-mark {
+            font-size: 14px;
+            color: var(--text-dim);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="interface-container">
+        
+        <!-- HEADER ZONE -->
+        <div class="header-zone">
+            <div class="header-top-row">
+                <div class="app-title">Index / Memory</div>
+                
+                <!-- THE INVISIBLE SEARCH -->
+                <div class="search-wrapper">
+                    <span class="search-label">QUERY:</span>
+                    <input type="text" class="search-input" placeholder="filter_hooks...">
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTENT STREAM -->
+        <div class="memory-list">
+            
+            <!-- MEMORY 1 -->
+            <div class="memory-slice">
+                <div class="temporal-col">
+                    <span class="time-exact">14:26</span>
+                    <span class="time-relative">Just now</span>
+                </div>
+                <div class="content-col">
+                    <div class="meta-line"><span>Focus Mode</span></div>
+                    <div class="hook-text">
+                        I dislike solid cards. They take up too much space and aren't <span class="inline-object"><img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=100&auto=format&fit=crop" alt="Fluid"></span> flexible enough.
+                    </div>
+                </div>
+            </div>
+
+            <!-- MEMORY 2 -->
+            <div class="memory-slice">
+                <div class="temporal-col">
+                    <span class="time-exact">09:15</span>
+                    <span class="time-relative">2d ago</span>
+                </div>
+                <div class="content-col">
+                    <div class="meta-line"><span style="color: #d97706;">Building</span></div>
+                    <div class="hook-text">
+                        The visual style needs to be primarily textual, showcasing the font itself.
+                    </div>
+                </div>
+            </div>
+
+            <!-- MEMORY 3 -->
+            <div class="memory-slice">
+                <div class="temporal-col">
+                    <span class="time-exact">22:04</span>
+                    <span class="time-relative">5d ago</span>
+                </div>
+                <div class="content-col">
+                    <div class="meta-line"><span style="color: #10b981;">Insight</span></div>
+                    <div class="hook-text">
+                        Design interfaces that feel like looking through a rain-kissed window.
+                    </div>
+                </div>
+            </div>
+
+             <!-- MEMORY 4 (Added for scroll depth feel) -->
+             <div class="memory-slice">
+                <div class="temporal-col">
+                    <span class="time-exact">18:30</span>
+                    <span class="time-relative">1w ago</span>
+                </div>
+                <div class="content-col">
+                    <div class="meta-line"><span>System</span></div>
+                    <div class="hook-text">
+                        Typography is not just reading, it's hearing.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- FOOTER ZONE -->
+        <div class="archive-footer">
+            <div class="footer-stat">
+                <span class="stat-label">TOTAL OBJECTS</span>
+                <span class="stat-value">[ 1,042 ]</span>
+            </div>
+            
+            <div class="end-mark">
+                ///
+            </div>
+
+            <div class="footer-stat">
+                <span class="stat-label">STATUS</span>
+                <span class="stat-value">SYNCED</span>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

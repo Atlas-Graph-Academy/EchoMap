@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aris: The Luminous Stream</title>
+    <style>
+        :root {
+            --bg-deep: #030304;
+            --text-light: #ffffff;
+            --text-dim: rgba(255, 255, 255, 0.5);
+            --text-dark: rgba(255, 255, 255, 0.3);
+            
+            /* Accent Colors (Light Sources) */
+            --glow-focus: rgba(99, 102, 241, 0.15); /* Indigo for Focus */
+            --glow-inspiration: rgba(245, 158, 11, 0.15); /* Amber for Idea */
+            --glow-calm: rgba(16, 185, 129, 0.15); /* Emerald for Journal */
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-light);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", sans-serif;
+            margin: 0;
+            padding: 60px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .stream-container {
+            width: 100%;
+            max-width: 390px; /* iPhone Width */
+            display: flex;
+            flex-direction: column;
+            gap: 48px; /* High breathability */
+        }
+
+        /* 
+           THE MEMORY UNIT 
+           No border. No solid background.
+           Just a subtle blur field.
+        */
+        .memory-unit {
+            position: relative;
+            padding: 20px 16px 16px 16px;
+            border-radius: 16px;
+            /* The "Glass" feel without the heavy border */
+            background: radial-gradient(circle at top left, var(--glow-color, rgba(255,255,255,0.05)), transparent 70%);
+            backdrop-filter: blur(0px); /* Starts clear */
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+
+        /* Hover State: The atmosphere thickens */
+        .memory-unit:hover {
+            backdrop-filter: blur(20px);
+            background: radial-gradient(circle at top left, var(--glow-color), rgba(255,255,255,0.02) 100%);
+            transform: scale(1.02);
+        }
+
+        /* 
+           LAYER 1: THE HOOK (The Voice)
+           High contrast, glowing, serif/sans mix potential.
+        */
+        .hook-layer {
+            position: relative;
+            font-size: 22px;
+            font-weight: 600;
+            line-height: 1.3;
+            letter-spacing: -0.02em;
+            color: #fff;
+            margin-bottom: 16px;
+            text-shadow: 0 0 15px rgba(255,255,255,0.1); /* Subtle inner glow */
+        }
+
+        /* The Phantom Quotes */
+        .quote-mark {
+            display: inline-block;
+            color: rgba(255,255,255,0.8);
+            font-family: serif; /* Contrast font for quotes */
+            font-size: 1.2em;
+            filter: blur(2.5px); /* The "Bokeh" effect */
+            transform: translateY(2px);
+            opacity: 0.8;
+            margin: 0 2px;
+        }
+
+        /* 
+           LAYER 2: CONTEXT & IDENTITY 
+           Row layout below the text.
+        */
+        .info-layer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            font-size: 11px;
+            letter-spacing: 0.03em;
+        }
+
+        .left-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        /* The Scenario Badge */
+        .scenario-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--accent-color);
+            opacity: 0.9;
+        }
+
+        .scenario-icon {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: currentColor;
+            box-shadow: 0 0 8px currentColor; /* Icon glows */
+        }
+
+        /* The User Identity */
+        .user-id {
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+
+        /* 
+           LAYER 3: RELATIONAL TIMING
+           Monolinear, technical, detached.
+        */
+        .time-stamp {
+            text-align: right;
+            font-family: 'SF Mono', 'Menlo', monospace; /* Monospaced for data feel */
+            font-size: 10px;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+        }
+        
+        .time-ago {
+            color: var(--text-dim);
+        }
+
+        /* Divider Line: A fading light trail */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            margin-top: 24px;
+            width: 100%;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="stream-container">
+
+        <!-- UNIT 1: FOCUS MODE (Indigo) -->
+        <div class="memory-unit" style="--glow-color: var(--glow-focus); --accent-color: #a5b4fc;">
+            <div class="hook-layer">
+                <span class="quote-mark">“</span>
+                My memory system is probably the best because it ignores the noise.
+                <span class="quote-mark">”</span>
+            </div>
+            
+            <div class="info-layer">
+                <div class="left-meta">
+                    <div class="scenario-pill">
+                        <div class="scenario-icon"></div>
+                        Focus Mode
+                    </div>
+                    <div class="user-id">@KOBE-WANG</div>
+                </div>
+                
+                <div class="time-stamp">
+                    <span class="time-ago">3m ago</span>
+                    <span>Tue 20:00</span>
+                </div>
+            </div>
+            <!-- Optional subtle divider if units are close, otherwise remove -->
+        </div>
+
+        <!-- UNIT 2: INSPIRATION (Amber) -->
+        <div class="memory-unit" style="--glow-color: var(--glow-inspiration); --accent-color: #fcd34d;">
+            <div class="hook-layer">
+                <span class="quote-mark">“</span>
+                Design is not about the container. It is about the <span style="color:#fff; text-shadow: 0 0 10px rgba(255,255,255,0.6);">light</span> within.
+                <span class="quote-mark">”</span>
+            </div>
+            
+            <div class="info-layer">
+                <div class="left-meta">
+                    <div class="scenario-pill">
+                        <div class="scenario-icon"></div>
+                        Spark
+                    </div>
+                    <div class="user-id">@ARIS</div>
+                </div>
+                
+                <div class="time-stamp">
+                    <span class="time-ago">4d ago</span>
+                    <span>Sat 14:15</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- UNIT 3: JOURNAL (Emerald) -->
+        <div class="memory-unit" style="--glow-color: var(--glow-calm); --accent-color: #6ee7b7;">
+            <div class="hook-layer">
+                <span class="quote-mark">“</span>
+                The interface breathes. I can feel the pulse of the data stream.
+                <span class="quote-mark">”</span>
+            </div>
+            
+            <div class="info-layer">
+                <div class="left-meta">
+                    <div class="scenario-pill">
+                        <div class="scenario-icon"></div>
+                        Reflection
+                    </div>
+                    <div class="user-id">@SYSTEM</div>
+                </div>
+                
+                <div class="time-stamp">
+                    <span class="time-ago">1w ago</span>
+                    <span>Jan 21</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aris: The Transcript</title>
+    <style>
+        :root {
+            --bg-void: #050505;
+            --text-ink: #e5e5e5;
+            --text-dim: #525252;
+            --accent-quote: #444; /* Darker quote color to not distract */
+            --accent-highlight: #6366f1; 
+            --line-color: rgba(255, 255, 255, 0.12);
+        }
+
+        body {
+            background-color: var(--bg-void);
+            color: var(--text-ink);
+            font-family: 'Inter Tight', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .transcript-container {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-dim);
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--text-dim);
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* 
+           UNIT: THE TRANSCRIPT ROW
+        */
+        .row {
+            display: grid;
+            grid-template-columns: 65px 1fr; /* Fixed Width Time | Content */
+            gap: 20px;
+            padding: 24px 0;
+            border-bottom: 1px solid var(--line-color);
+            position: relative;
+        }
+
+        /* 
+           LEFT COLUMN: COMPLEX TIME STACK 
+           "Flight Schedule" aesthetic
+        */
+        .time-stack {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+            font-family: 'SF Mono', 'Roboto Mono', monospace;
+            line-height: 1.4;
+        }
+
+        .time-ago {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff; /* Most important info */
+        }
+
+        .time-day {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .time-exact {
+            font-size: 11px;
+            color: #444; /* Least important, subtle detail */
+        }
+
+        /* 
+           RIGHT COLUMN: CONTENT 
+        */
+        .content-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 12px; /* Space between Quote and Metadata */
+        }
+
+        /* 
+           THE HOOK (QUOTED)
+           Using CSS pseudo-elements for the quotes to ensure elegant hanging
+        */
+        .hook-wrapper {
+            font-size: 28px; /* High Impact */
+            font-weight: 400;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            color: #d4d4d4;
+            position: relative;
+        }
+
+        /* The Opening Quote */
+        .hook-wrapper::before {
+            content: '“';
+            position: absolute;
+            left: -0.6em; /* Hanging punctuation */
+            color: var(--accent-quote);
+            font-family: 'Georgia', serif; /* Serif quotes look more human */
+        }
+
+        /* The Closing Quote */
+        .hook-wrapper::after {
+            content: '”';
+            margin-left: 2px;
+            color: var(--accent-quote);
+            font-family: 'Georgia', serif;
+        }
+        
+        /* Highlight specific words logic */
+        .highlight {
+            color: #fff;
+            text-decoration: underline;
+            text-decoration-color: rgba(255,255,255,0.3);
+            text-underline-offset: 4px;
+        }
+
+        /* 
+           METADATA LINE (Scenario -> Name)
+           Moved to bottom as requested.
+        */
+        .meta-footer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.03em;
+        }
+
+        .scenario-pill {
+            color: var(--accent-highlight);
+            text-transform: uppercase;
+        }
+
+        .divider {
+            color: #333;
+        }
+
+        .user-name {
+            color: #666;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="transcript-container">
+        
+        <div class="header">
+            <span>Recall Stream</span>
+            <span>Live</span>
+        </div>
+
+        <!-- ROW 1: Recent -->
+        <div class="row">
+            <div class="time-stack">
+                <span class="time-ago">2h ago</span>
+                <span class="time-day">Today</span>
+                <span class="time-exact">14:26</span>
+            </div>
+            <div class="content-stack">
+                <div class="hook-wrapper">
+                    I really need to <span class="highlight">reconstruct</span> the search logic for the new database.
+                </div>
+                <div class="meta-footer">
+                    <span class="scenario-pill">Work/Dev</span>
+                    <span class="divider">/</span>
+                    <span class="user-name">@Kobe-Wang</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 2: Yesterday -->
+        <div class="row">
+            <div class="time-stack">
+                <span class="time-ago">1d ago</span>
+                <span class="time-day">Wed</span>
+                <span class="time-exact">09:15</span>
+            </div>
+            <div class="content-stack">
+                <div class="hook-wrapper">
+                    The coffee machine is making that weird noise again.
+                </div>
+                <div class="meta-footer">
+                    <span class="scenario-pill">Home</span>
+                    <span class="divider">/</span>
+                    <span class="user-name">@Sarah_L</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 3: Older -->
+        <div class="row">
+            <div class="time-stack">
+                <span class="time-ago">4d ago</span>
+                <span class="time-day">Sun</span>
+                <span class="time-exact">22:40</span>
+            </div>
+            <div class="content-stack">
+                <div class="hook-wrapper">
+                    Don't forget to buy the <span class="highlight">tickets</span> before the price goes up.
+                </div>
+                <div class="meta-footer">
+                    <span class="scenario-pill">Travel Plan</span>
+                    <span class="divider">/</span>
+                    <span class="user-name">@System_Reminder</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
