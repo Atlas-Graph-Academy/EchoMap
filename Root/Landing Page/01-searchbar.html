@@ -27,6 +27,10 @@
 
         body {
             background-color: var(--bg-void);
+            background-image: url("images/landing.png");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
             height: 100vh;
             overflow: hidden;
@@ -42,6 +46,7 @@
             height: 60%;
             background: radial-gradient(circle at 50% 30%, #1a1a1a 0%, #000 70%);
             z-index: 0;
+            display: none;
         }
 
         /* 
@@ -72,6 +77,35 @@
             padding: 24px 24px 10px;
             flex-shrink: 0;
         }
+        .search-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            letter-spacing: 0.06em;
+            color: rgba(255,255,255,0.65);
+            margin-bottom: 6px;
+            font-family: "SF Pro Display", sans-serif;
+            text-transform: none;
+        }
+        .search-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .search-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.7);
+            animation: pulse 1.6s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.5); opacity: 1; }
+        }
         .search-input {
             width: 100%;
             background: transparent;
@@ -85,6 +119,35 @@
             font-family: "SF Pro Display", sans-serif;
         }
         .search-input::placeholder { color: rgba(255,255,255,0.3); font-style: italic; }
+        .search-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .search-btn {
+            appearance: none;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #111111;
+            background: #ffffff;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(6px) scale(0.98);
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .search-zone.has-text .search-btn {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+        .search-btn:hover {
+            box-shadow: 0 8px 22px rgba(0,0,0,0.2);
+        }
 
         /* 
            2. THE NEURAL FEED
@@ -124,6 +187,7 @@
             letter-spacing: -0.5px;
             /* Gradient Text for Artistry */
             background: linear-gradient(90deg, #fff, rgba(255,255,255,0.5));
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -170,30 +234,25 @@
         
         .memory-node:active { opacity: 0.6; }
 
-        /* Time & Avatar Row */
-        .node-meta {
+        /* Time Row (Bottom Right) */
+        .time-row {
             display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .avatar-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
+            justify-content: flex-start;
+            margin-top: 6px;
         }
 
         .time-stamp {
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.08em;
+            color: rgba(255, 255, 255, 0.45);
         }
 
         /* Time Logic colors */
-        .time-now { color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.5); }
-        .time-recent { color: var(--text-mid); }
-        .time-old { color: var(--text-dim); }
+        .time-now { color: rgba(255, 255, 255, 0.55); text-shadow: none; }
+        .time-recent { color: rgba(255, 255, 255, 0.4); }
+        .time-old { color: rgba(255, 255, 255, 0.28); }
 
         /* The Content Text */
         .node-text {
@@ -230,7 +289,16 @@
         
         <!-- Search: The Prompt -->
         <div class="search-zone">
-            <input type="text" class="search-input" placeholder="Find resonance...">
+            <div class="search-label">
+                <span class="search-indicator">
+                    <span class="search-dot"></span>
+                    People are searching
+                </span>
+            </div>
+            <div class="search-row">
+                <input type="text" class="search-input" placeholder="Search...">
+                <button class="search-btn" type="button">Search</button>
+            </div>
         </div>
 
         <div class="feed-container">
@@ -247,34 +315,31 @@
                 <div class="memory-stream">
                     <!-- Memory 1: NOW -->
                     <div class="memory-node">
-                        <div class="node-meta">
-                            <div class="avatar-dot" style="background: var(--color-burn)"></div>
-                            <span class="time-stamp time-now">Just Now</span>
-                        </div>
                         <div class="node-text">
                             "Everything is loud but nothing is happening."
+                        </div>
+                        <div class="time-row">
+                            <span class="time-stamp time-now">Just Now</span>
                         </div>
                     </div>
 
                     <!-- Memory 2: 10m ago -->
                     <div class="memory-node">
-                        <div class="node-meta">
-                            <div class="avatar-dot" style="background: var(--color-burn); opacity: 0.7"></div>
-                            <span class="time-stamp time-recent">10m ago</span>
-                        </div>
                         <div class="node-text">
                             "Screen glare is burning my retinas."
+                        </div>
+                        <div class="time-row">
+                            <span class="time-stamp time-recent">10m ago</span>
                         </div>
                     </div>
 
                     <!-- Memory 3: 2h ago -->
                     <div class="memory-node">
-                        <div class="node-meta">
-                            <div class="avatar-dot" style="background: var(--text-dim)"></div>
-                            <span class="time-stamp time-recent">2h ago</span>
-                        </div>
                         <div class="node-text faded">
                             "Can't hear my own thoughts over the slack pings."
+                        </div>
+                        <div class="time-row">
+                            <span class="time-stamp time-recent">2h ago</span>
                         </div>
                     </div>
                 </div>
@@ -293,23 +358,21 @@
                 <div class="memory-stream">
                     <!-- Memory 1: 5m ago -->
                     <div class="memory-node">
-                        <div class="node-meta">
-                            <div class="avatar-dot" style="background: var(--color-void)"></div>
-                            <span class="time-stamp time-recent">5m ago</span>
-                        </div>
                         <div class="node-text">
                             "Walking fast to nowhere."
+                        </div>
+                        <div class="time-row">
+                            <span class="time-stamp time-recent">5m ago</span>
                         </div>
                     </div>
 
                     <!-- Memory 2: Yesterday -->
                     <div class="memory-node">
-                        <div class="node-meta">
-                            <div class="avatar-dot" style="background: var(--text-dim)"></div>
-                            <span class="time-stamp time-old">Yesterday</span>
-                        </div>
                         <div class="node-text faded">
                             "The fog looked like it wanted to eat the bridge."
+                        </div>
+                        <div class="time-row">
+                            <span class="time-stamp time-old">Yesterday</span>
                         </div>
                     </div>
                 </div>
@@ -328,23 +391,21 @@
                 <div class="memory-stream">
                     <!-- Memory 1: 1 Month Ago -->
                     <div class="memory-node">
-                        <div class="node-meta">
-                            <div class="avatar-dot" style="background: var(--text-dim)"></div>
-                            <span class="time-stamp time-old">1 Month Ago</span>
-                        </div>
                         <div class="node-text ancient">
                             "Same sunset, different panic."
+                        </div>
+                        <div class="time-row">
+                            <span class="time-stamp time-old">1 Month Ago</span>
                         </div>
                     </div>
                     
                     <!-- Memory 2: 2 Months Ago -->
                     <div class="memory-node">
-                        <div class="node-meta">
-                            <div class="avatar-dot" style="background: var(--text-dim)"></div>
-                            <span class="time-stamp time-old">2 Months Ago</span>
-                        </div>
                         <div class="node-text ancient">
                             "I wish I could pause this moment."
+                        </div>
+                        <div class="time-row">
+                            <span class="time-stamp time-old">2 Months Ago</span>
                         </div>
                     </div>
                 </div>
@@ -354,4 +415,51 @@
     </div>
 
 </body>
+<script>
+    const searchZone = document.querySelector(".search-zone");
+    const promptInput = document.querySelector(".search-input");
+    const suggestions = [
+        "BDA Neo",
+        "Bouffon Show",
+        "Souza Fan Revolution",
+        "the show you want",
+        "周二下午的昏昏欲睡",
+        "你是你，所以你看到什么？"
+    ];
+
+    let suggestionIndex = 0;
+    let charIndex = 0;
+    let dots = 0;
+
+    function typeLoop() {
+        if (promptInput.value.trim().length > 0) {
+            setTimeout(typeLoop, 300);
+            return;
+        }
+        const text = suggestions[suggestionIndex];
+        if (charIndex <= text.length) {
+            promptInput.setAttribute("placeholder", `Search “${text.slice(0, charIndex)}”`);
+            charIndex += 1;
+            setTimeout(typeLoop, 60);
+            return;
+        }
+        if (dots < 3) {
+            dots += 1;
+            promptInput.setAttribute("placeholder", `Search “${text}”${".".repeat(dots)}`);
+            setTimeout(typeLoop, 300);
+            return;
+        }
+        charIndex = 0;
+        dots = 0;
+        suggestionIndex = (suggestionIndex + 1) % suggestions.length;
+        setTimeout(typeLoop, 500);
+    }
+
+    promptInput.addEventListener("input", () => {
+        const hasText = promptInput.value.trim().length > 0;
+        searchZone.classList.toggle("has-text", hasText);
+    });
+
+    typeLoop();
+</script>
 </html>
