@@ -39,6 +39,121 @@
             overflow: hidden;
             color: var(--text-highlight);
         }
+        body.location-off .fog-layer {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        body.location-on .fog-layer {
+            opacity: 0;
+            pointer-events: none;
+        }
+        body.location-off .living-header::before {
+            opacity: 0.65;
+        }
+        body.location-on .living-header::before {
+            opacity: 0.25;
+        }
+
+        .fog-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 6;
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(18px);
+            transition: opacity 0.4s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .living-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 110px;
+            padding-top: 44px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            z-index: 12;
+            cursor: pointer;
+        }
+        .living-header::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: url("images/landing.png");
+            background-size: cover;
+            background-position: center top;
+            filter: blur(18px) brightness(0.55);
+            opacity: 0.5;
+            transition: opacity 0.4s ease;
+        }
+        .living-header::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0) 100%);
+            pointer-events: none;
+        }
+        .status-bar {
+            position: relative;
+            z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(18, 18, 22, 0.55);
+            backdrop-filter: blur(14px);
+            color: rgba(255, 255, 255, 0.88);
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+        .living-header:active .status-bar {
+            transform: scale(0.98);
+            background: rgba(18, 18, 22, 0.7);
+        }
+        .status-dot {
+            position: relative;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #9ca3af;
+            box-shadow: 0 0 6px rgba(148, 163, 184, 0.4);
+        }
+        .status-dot::after {
+            content: "";
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            animation: radar 2.4s ease-out infinite;
+        }
+        @keyframes radar {
+            0% { transform: scale(0.6); opacity: 0.8; }
+            100% { transform: scale(1.8); opacity: 0; }
+        }
+        .status-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .status-primary {
+            font-size: 11px;
+            letter-spacing: 0.04em;
+            color: rgba(255, 255, 255, 0.75);
+        }
+        .status-secondary {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .status-action {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.55);
+            letter-spacing: 0.04em;
+            margin-left: 6px;
+        }
 
         /* Background Visuals (The Galaxy) */
         .galaxy-bg {
@@ -445,6 +560,18 @@
 <body>
 
     <div class="galaxy-bg"></div>
+    <div class="fog-layer" aria-hidden="true"></div>
+
+    <header class="living-header" id="location-status" role="button" tabindex="0" aria-pressed="false">
+        <div class="status-bar" aria-live="polite">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span class="status-text">
+                <span class="status-primary">Location off · Tuesday morning</span>
+                <span class="status-secondary">Turn on location to see events map</span>
+            </span>
+            <span class="status-action">Tap to enable</span>
+        </div>
+    </header>
 
     <div class="resonance-sheet">
         
@@ -674,5 +801,76 @@
 
     modalClose.addEventListener("click", closeModal);
     modalBackdrop.addEventListener("click", closeModal);
+</script>
+<script>
+    const statusHeader = document.getElementById("location-status");
+    const bodyEl = document.body;
+    const statusPrimary = statusHeader.querySelector(".status-primary");
+    const statusSecondary = statusHeader.querySelector(".status-secondary");
+    const statusAction = statusHeader.querySelector(".status-action");
+
+    let locationEnabled = false;
+    bodyEl.classList.add("location-off");
+
+    function getTimeDescriptor() {
+        const now = new Date();
+        const hours = now.getHours();
+        const dayName = now.toLocaleDateString("en-US", { weekday: "long" });
+        const period = hours < 12 ? "morning" : hours < 18 ? "afternoon" : "evening";
+        return `${dayName} ${period}`;
+    }
+
+    function renderLocationState() {
+        bodyEl.classList.toggle("location-on", locationEnabled);
+        bodyEl.classList.toggle("location-off", !locationEnabled);
+        if (locationEnabled) {
+            statusPrimary.textContent = `Marina · San Francisco · ${getTimeDescriptor()}`;
+            statusSecondary.textContent = "12 online · 48 new memories";
+            statusAction.textContent = "Tap to turn off";
+            statusHeader.setAttribute("aria-pressed", "true");
+        } else {
+            statusPrimary.textContent = `Location off · ${getTimeDescriptor()}`;
+            statusSecondary.textContent = "Turn on location to see nearby Echo Gatherings";
+            statusAction.textContent = "Tap to enable";
+            statusHeader.setAttribute("aria-pressed", "false");
+        }
+    }
+
+    function requestLocation() {
+        if (!navigator.geolocation) {
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(
+            () => {
+                locationEnabled = true;
+                renderLocationState();
+            },
+            () => {
+                locationEnabled = false;
+                renderLocationState();
+            },
+            { enableHighAccuracy: true, timeout: 8000 }
+        );
+    }
+
+    function handleToggle() {
+        if (locationEnabled) {
+            locationEnabled = false;
+            renderLocationState();
+            return;
+        }
+        statusSecondary.textContent = "Requesting location…";
+        requestLocation();
+    }
+
+    statusHeader.addEventListener("click", handleToggle);
+    statusHeader.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            handleToggle();
+        }
+    });
+
+    renderLocationState();
 </script>
 </html>
