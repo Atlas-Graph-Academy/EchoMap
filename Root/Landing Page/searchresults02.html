@@ -87,37 +87,39 @@
         .search-container {
             position: relative;
             margin-bottom: 24px;
+            padding-bottom: 16px;
+        }
+
+        .search-label {
+            font-size: 12px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--lumen-dim);
+            margin-bottom: 6px;
+            font-family: 'Space Mono', monospace;
         }
 
         input.search-bar {
             width: 100%;
             background: transparent;
             border: none;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
             color: var(--lumen-high);
             font-family: 'Inter Tight', sans-serif;
             font-size: 20px;
             font-weight: 300;
             padding: 8px 0;
             outline: none;
-            text-shadow: var(--glow-text);
+            letter-spacing: 0.02em;
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
             transition: all 0.4s ease;
         }
 
         input.search-bar:focus {
-            border-bottom-color: rgba(255,255,255,0.6);
-            text-shadow: var(--glow-active);
+            text-shadow: 0 0 16px rgba(255, 255, 255, 0.2);
         }
 
-        .search-icon {
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            opacity: 0.5;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+        input.search-bar::placeholder {
+            color: rgba(255, 255, 255, 0.35);
         }
 
         /* CONTROLS & STATS */
@@ -179,7 +181,7 @@
             flex-grow: 1;
             overflow-y: auto;
             position: relative;
-            padding: 0 24px 120px 24px; /* Big bottom padding for scroll feel */
+            padding: 8px 24px 140px 24px; /* Pull query closer to input */
             
             /* THE ARIS FADE: Mask image creates the smooth gradient top and bottom */
             mask-image: linear-gradient(
@@ -314,6 +316,51 @@
         .node:nth-child(n+6) { opacity: 0.6; }
         .node:nth-child(n+8) { opacity: 0.3; }
 
+        /* --- STATIC INTRO / MANUAL --- */
+        .intro-block {
+            padding: 6px 0 22px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            margin-bottom: 8px;
+        }
+
+        .query-text {
+            font-size: 24px;
+            font-weight: 400;
+            line-height: 1.3;
+            letter-spacing: -0.01em;
+            color: #d8d8d8;
+            outline: none;
+            opacity: 0.72;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.18);
+            filter: blur(0.2px);
+        }
+
+        .query-text:focus {
+            opacity: 0.9;
+            filter: none;
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.25);
+        }
+
+        .query-foot {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-top: 14px;
+            font-family: 'Space Mono', monospace;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        .query-action {
+            color: var(--lumen-med);
+        }
+
+        .controls-row {
+            margin: 14px 0 4px 0;
+        }
+
     </style>
 </head>
 <body>
@@ -324,8 +371,24 @@
         <!-- HEADER ZONE -->
         <div class="sheet-header">
             <div class="search-container">
-                <input type="text" class="search-bar" value="fragmented memories about 'waiting'" autofocus>
-                <div class="search-icon">Edit Query</div>
+                <div class="search-label">You are looking into the echoes of</div>
+                <input type="text" class="search-bar" value="waiting" autofocus>
+            </div>
+
+        </div>
+
+        <!-- SCROLLABLE LIST WITH FADE MASKS -->
+        <div class="scroll-mask">
+
+            <!-- QUERY NODE (AI INTERPRETATION) -->
+            <div class="intro-block">
+                <div class="query-text" contenteditable="true" spellcheck="false">
+                    restless waiting / delayed arrivals / quiet rooms / held breath
+                </div>
+                <div class="query-foot">
+                    <span>(FROM: "waiting")</span>
+                    <span class="query-action">EDIT QUERY</span>
+                </div>
             </div>
 
             <div class="controls-row">
@@ -338,10 +401,6 @@
                     <div><b>842</b> MINDS ACTIVE</div>
                 </div>
             </div>
-        </div>
-
-        <!-- SCROLLABLE LIST WITH FADE MASKS -->
-        <div class="scroll-mask">
             
             <!-- Node 1: High Relevance -->
             <div class="node">
