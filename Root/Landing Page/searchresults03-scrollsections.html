@@ -10,9 +10,9 @@
     
     <style>
         :root {
-            /* Palette: Turrell Atmosphere */
-            --void-base: #020204;
-            --glass-surface: rgba(20, 20, 25, 0.65);
+            /* Palette: Deep Void */
+            --void-base: #050505;
+            --glass-surface: rgba(5, 5, 5, 0.75);
             --glass-border: rgba(255, 255, 255, 0.08);
             
             /* Light Sources */
@@ -31,10 +31,7 @@
 
         body {
             background-color: var(--void-base);
-            /* Deep atmospheric background gradient */
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(40, 20, 60, 0.4) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(20, 40, 70, 0.3) 0%, transparent 40%);
+            background-image: none;
             color: var(--lumen-med);
             font-family: 'Inter Tight', sans-serif;
             margin: 0;
@@ -142,6 +139,10 @@
             position: relative;
             transition: color 0.3s ease;
             letter-spacing: 0.02em;
+        }
+
+        .toggle-btn.muted {
+            opacity: 0.4; /* distant label */
         }
 
         .toggle-btn.active {
@@ -395,12 +396,12 @@
 
             <div class="controls-row">
                 <div class="toggle-group">
-                    <div class="toggle-btn active">Global Stream</div>
-                    <div class="toggle-btn">My Echoes</div>
+                    <div class="toggle-btn muted">Others' Echoes</div>
+                    <div class="toggle-btn active">My Memories</div>
                 </div>
                 <div class="stats-display">
-                    <div><b>12,408</b> FRAGMENTS FOUND</div>
-                    <div><b>842</b> MINDS ACTIVE</div>
+                    <div>Memories <b>12,408</b></div>
+                    <div>People <b>842</b></div>
                 </div>
             </div>
         </div>
