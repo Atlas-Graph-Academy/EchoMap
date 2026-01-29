@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aura: Memory Search</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;600&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Palette: Turrell Atmosphere */
+            --void-base: #020204;
+            --glass-surface: rgba(20, 20, 25, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            
+            /* Light Sources */
+            --lumen-high: #ffffff;
+            --lumen-med: #a3a3a3;
+            --lumen-dim: #525252;
+            --lumen-warm: #ffdec7; /* Memory warmth */
+            --lumen-cold: #c7d2ff; /* Tech/System */
+            
+            /* Glows */
+            --glow-text: 0 0 12px rgba(255, 255, 255, 0.15);
+            --glow-active: 0 0 15px rgba(255, 255, 255, 0.4);
+        }
+
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+        body {
+            background-color: var(--void-base);
+            /* Deep atmospheric background gradient */
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(40, 20, 60, 0.4) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(20, 40, 70, 0.3) 0%, transparent 40%);
+            color: var(--lumen-med);
+            font-family: 'Inter Tight', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden; /* Prevent body scroll, handle inside sheet */
+            display: flex;
+            justify-content: center;
+            align-items: flex-end; /* Anchor sheet to bottom */
+        }
+
+        /* FILM GRAIN OVERLAY */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.07'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* --- THE SHEET (90% Height) --- */
+        .memory-sheet {
+            width: 100%;
+            max-width: 450px; /* Mobile Constraints */
+            height: 90vh;
+            background: var(--glass-surface);
+            backdrop-filter: blur(24px) saturate(120%);
+            -webkit-backdrop-filter: blur(24px) saturate(120%);
+            border-top-left-radius: 32px;
+            border-top-right-radius: 32px;
+            border-top: 1px solid var(--glass-border);
+            border-left: 1px solid rgba(255,255,255,0.03);
+            border-right: 1px solid rgba(255,255,255,0.03);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 -20px 60px rgba(0,0,0,0.5);
+        }
+
+        /* --- SEARCH HEADER (Fixed Top of Sheet) --- */
+        .sheet-header {
+            padding: 32px 24px 20px 24px;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        /* INPUT FIELD */
+        .search-container {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        input.search-bar {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            color: var(--lumen-high);
+            font-family: 'Inter Tight', sans-serif;
+            font-size: 20px;
+            font-weight: 300;
+            padding: 8px 0;
+            outline: none;
+            text-shadow: var(--glow-text);
+            transition: all 0.4s ease;
+        }
+
+        input.search-bar:focus {
+            border-bottom-color: rgba(255,255,255,0.6);
+            text-shadow: var(--glow-active);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.5;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* CONTROLS & STATS */
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .toggle-group {
+            display: flex;
+            gap: 24px;
+        }
+
+        .toggle-btn {
+            font-family: 'Inter Tight', sans-serif;
+            font-size: 14px;
+            color: var(--lumen-dim);
+            cursor: pointer;
+            position: relative;
+            transition: color 0.3s ease;
+            letter-spacing: 0.02em;
+        }
+
+        .toggle-btn.active {
+            color: var(--lumen-high);
+            text-shadow: var(--glow-text);
+        }
+
+        .toggle-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            background: var(--lumen-high);
+            border-radius: 50%;
+            box-shadow: 0 0 8px #fff;
+        }
+
+        .stats-display {
+            text-align: right;
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            color: var(--lumen-dim);
+            line-height: 1.4;
+            opacity: 0.7;
+        }
+
+        .stats-display b {
+            color: var(--lumen-med);
+            font-weight: 400;
+        }
+
+        /* --- SCROLLABLE CONTENT --- */
+        .scroll-mask {
+            flex-grow: 1;
+            overflow-y: auto;
+            position: relative;
+            padding: 0 24px 120px 24px; /* Big bottom padding for scroll feel */
+            
+            /* THE ARIS FADE: Mask image creates the smooth gradient top and bottom */
+            mask-image: linear-gradient(
+                to bottom,
+                transparent 0%,
+                black 8%,
+                black 80%,
+                transparent 100%
+            );
+            -webkit-mask-image: linear-gradient(
+                to bottom,
+                transparent 0%,
+                black 8%,
+                black 80%,
+                transparent 100%
+            );
+            
+            /* Hide Scrollbar */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        .scroll-mask::-webkit-scrollbar { 
+            display: none; 
+        }
+
+        /* --- MEMORY NODE (The Row) --- */
+        .node {
+            display: grid;
+            grid-template-columns: 65px 1fr; /* Fixed Width Time | Content */
+            gap: 20px;
+            padding: 24px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+            transition: opacity 0.5s ease;
+        }
+
+        /* TIME COLUMN (Memory Hook Style) */
+        .time-col {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+            font-family: 'Space Mono', monospace;
+            line-height: 1.4;
+            text-align: left;
+            padding-top: 2px;
+        }
+
+        .t-rel {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--lumen-high);
+            margin-bottom: 2px;
+        }
+
+        .t-abs {
+            font-size: 11px;
+            color: var(--lumen-dim);
+            text-transform: uppercase;
+        }
+
+        .t-day {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.45);
+            text-transform: uppercase;
+        }
+
+        /* CONTENT COLUMN (Memory Hook Style) */
+        .content-col {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .memory-text {
+            font-size: 28px; /* High Impact */
+            font-weight: 400;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            color: #d4d4d4;
+            position: relative;
+        }
+
+        .memory-text::before {
+            content: '“';
+            position: absolute;
+            left: -0.6em; /* Hanging punctuation */
+            color: rgba(255, 255, 255, 0.2);
+            font-family: 'Georgia', serif;
+        }
+
+        .memory-text::after {
+            content: '”';
+            margin-left: 2px;
+            color: rgba(255, 255, 255, 0.2);
+            font-family: 'Georgia', serif;
+        }
+
+        /* Emissive Highlight Logic */
+        .lux {
+            color: var(--lumen-high);
+            text-decoration: underline;
+            text-decoration-color: rgba(255,255,255,0.3);
+            text-underline-offset: 4px;
+        }
+
+        /* Metadata Footer */
+        .meta-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.03em;
+        }
+
+        .tag {
+            color: var(--lumen-cold);
+            text-transform: uppercase;
+        }
+
+        .separator {
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        .author {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Visual Rhythm: Distant nodes fade slightly */
+        .node:nth-child(n+6) { opacity: 0.6; }
+        .node:nth-child(n+8) { opacity: 0.3; }
+
+    </style>
+</head>
+<body>
+
+    <!-- THE GLASS INTERFACE -->
+    <div class="memory-sheet">
+        
+        <!-- HEADER ZONE -->
+        <div class="sheet-header">
+            <div class="search-container">
+                <input type="text" class="search-bar" value="fragmented memories about 'waiting'" autofocus>
+                <div class="search-icon">Edit Query</div>
+            </div>
+
+            <div class="controls-row">
+                <div class="toggle-group">
+                    <div class="toggle-btn active">Global Stream</div>
+                    <div class="toggle-btn">My Echoes</div>
+                </div>
+                <div class="stats-display">
+                    <div><b>12,408</b> FRAGMENTS FOUND</div>
+                    <div><b>842</b> MINDS ACTIVE</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCROLLABLE LIST WITH FADE MASKS -->
+        <div class="scroll-mask">
+            
+            <!-- Node 1: High Relevance -->
+            <div class="node">
+                <div class="time-col">
+                    <span class="t-rel">2m</span>
+                    <span class="t-day">Today</span>
+                    <span class="t-abs">14:02</span>
+                </div>
+                <div class="content-col">
+                    <div class="memory-text">
+                        I've been sitting here so long the sunlight has moved across the entire <span class="lux">floorboards</span>. I don't want to leave.
+                    </div>
+                    <div class="meta-line">
+                        <span class="tag">Transit / Airport</span>
+                        <span class="separator">/</span>
+                        <span class="author">@K_Vant_88</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Node 2 -->
+            <div class="node">
+                <div class="time-col">
+                    <span class="t-rel">4h</span>
+                    <span class="t-day">Today</span>
+                    <span class="t-abs">10:15</span>
+                </div>
+                <div class="content-col">
+                    <div class="memory-text">
+                        Waiting for the test results creates a specific kind of <span class="lux">silence</span> in the house. Even the fridge hum feels aggressive.
+                    </div>
+                    <div class="meta-line">
+                        <span class="tag">Medical / Anxiety</span>
+                        <span class="separator">/</span>
+                        <span class="author">@Sarah_L</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Node 3 -->
+            <div class="node">
+                <div class="time-col">
+                    <span class="t-rel">1d</span>
+                    <span class="t-day">NOV 04</span>
+                    <span class="t-abs">21:30</span>
+                </div>
+                <div class="content-col">
+                    <div class="memory-text">
+                        She said five minutes. It's been an hour. I realized I'm not waiting for her, I'm waiting for the <span class="lux">courage</span> to leave.
+                    </div>
+                    <div class="meta-line">
+                        <span class="tag">Relationship</span>
+                        <span class="separator">/</span>
+                        <span class="author">@Anon_User</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Node 4 -->
+            <div class="node">
+                <div class="time-col">
+                    <span class="t-rel">3d</span>
+                    <span class="t-day">NOV 01</span>
+                    <span class="t-abs">07:18</span>
+                </div>
+                <div class="content-col">
+                    <div class="memory-text">
+                        The train is delayed. Again. There is a collective sigh on the platform that sounds like a <span class="lux">dying lung</span>.
+                    </div>
+                    <div class="meta-line">
+                        <span class="tag">Commute</span>
+                        <span class="separator">/</span>
+                        <span class="author">@City_Drifter</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Node 5 -->
+            <div class="node">
+                <div class="time-col">
+                    <span class="t-rel">1w</span>
+                    <span class="t-day">OCT 28</span>
+                    <span class="t-abs">18:04</span>
+                </div>
+                <div class="content-col">
+                    <div class="memory-text">
+                        Do you remember waiting for the dial-up internet sound? That anticipation felt like <span class="lux">magic</span>. Now loading bars just feel like theft.
+                    </div>
+                    <div class="meta-line">
+                        <span class="tag">Nostalgia</span>
+                        <span class="separator">/</span>
+                        <span class="author">@Retro_Gen</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Node 6 -->
+            <div class="node">
+                <div class="time-col">
+                    <span class="t-rel">1y</span>
+                    <span class="t-day">2024</span>
+                    <span class="t-abs">—</span>
+                </div>
+                <div class="content-col">
+                    <div class="memory-text">
+                        I am still waiting for the apology that I know will never arrive. It is a <span class="lux">heavy coat</span> I wear in summer.
+                    </div>
+                    <div class="meta-line">
+                        <span class="tag">Grief</span>
+                        <span class="separator">/</span>
+                        <span class="author">@Echo_44</span>
+                    </div>
+                </div>
+            </div>
+
+             <!-- Node 7 -->
+             <div class="node">
+                <div class="time-col">
+                    <span class="t-rel">4y</span>
+                    <span class="t-day">2021</span>
+                    <span class="t-abs">—</span>
+                </div>
+                <div class="content-col">
+                    <div class="memory-text">
+                        Waiting in line for the vaccine. It felt like the whole world was holding its <span class="lux">breath</span> together.
+                    </div>
+                    <div class="meta-line">
+                        <span class="tag">History</span>
+                        <span class="separator">/</span>
+                        <span class="author">@Civic_Mind</span>
+                    </div>
+                </div>
+            </div>
+
+             <!-- Node 8 -->
+             <div class="node">
+                <div class="time-col">
+                    <span class="t-rel">--</span>
+                    <span class="t-day">----</span>
+                    <span class="t-abs">--</span>
+                </div>
+                <div class="content-col">
+                    <div class="memory-text" style="opacity: 0.5">
+                        [Older fragments are dissolving into the static...]
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

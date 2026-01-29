@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aura - Neural Fabric</title>
+    <style>
+        /* 
+           ARIS SYSTEM: NEURAL FABRIC
+           --------------------------
+           No Cards. No Borders. Pure Signal.
+        */
+        :root {
+            --bg-void: #000000;
+            --sheet-glass: rgba(10, 10, 12, 0.95); /* Darker, denser glass */
+            --text-highlight: #FFFFFF;
+            --text-mid: #A1A1AA;
+            --text-dim: #52525B;
+            
+            /* The Resonance Colors */
+            --color-burn: #FF2D55;   /* Intense/Pain */
+            --color-void: #BF5AF2;   /* Confusion/Dream */
+            --color-drift: #0A84FF;  /* Melancholy/Flow */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-void);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            color: var(--text-highlight);
+        }
+
+        /* Background Visuals (The Galaxy) */
+        .galaxy-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60%;
+            background: radial-gradient(circle at 50% 30%, #1a1a1a 0%, #000 70%);
+            z-index: 0;
+        }
+
+        /* 
+           THE RESONANCE SHEET (Bottom 50%)
+           High Density. Vertical Scroll.
+        */
+        .resonance-sheet {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50vh;
+            background: var(--sheet-glass);
+            border-top: 1px solid rgba(255,255,255,0.08);
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+            backdrop-filter: blur(50px);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        /* 
+           1. THE SEARCH (The Eye) 
+           Minimal. Suggestive.
+        */
+        .search-zone {
+            padding: 24px 24px 10px;
+            flex-shrink: 0;
+        }
+        .search-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            font-size: 20px;
+            font-weight: 300;
+            color: white;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            outline: none;
+            font-family: "SF Pro Display", sans-serif;
+        }
+        .search-input::placeholder { color: rgba(255,255,255,0.3); font-style: italic; }
+
+        /* 
+           2. THE NEURAL FEED
+           Vertical Scroll Container.
+        */
+        .feed-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 0 60px 0;
+        }
+
+        /* 
+           THE CLUSTER (Emotion Node)
+           Organic grouping of a Title + A Stream of Text.
+        */
+        .cluster {
+            margin-bottom: 32px;
+            padding-left: 24px;
+            position: relative;
+        }
+
+        /* The Emotion Anchor (Left Side) */
+        .cluster-header {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .glyph {
+            font-size: 18px;
+            opacity: 0.8;
+        }
+
+        .emotion-name {
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            /* Gradient Text for Artistry */
+            background: linear-gradient(90deg, #fff, rgba(255,255,255,0.5));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Size Logic: Bigger Volume = Bigger Text */
+        .size-l .emotion-name { font-size: 28px; }
+        .size-m .emotion-name { font-size: 20px; }
+        .size-s .emotion-name { font-size: 16px; opacity: 0.7; }
+
+        .count-badge {
+            font-size: 10px;
+            color: var(--text-dim);
+            font-family: monospace;
+            vertical-align: super;
+        }
+
+        /* 
+           THE MEMORY STREAM (Right Side / Flow)
+           Horizontal scrolling text lines. NO CARDS.
+        */
+        .memory-stream {
+            display: flex;
+            gap: 24px; /* Space between memories */
+            overflow-x: auto;
+            padding-right: 24px;
+            scrollbar-width: none;
+            align-items: center;
+            /* Fade out the right edge */
+            mask-image: linear-gradient(to right, black 85%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+        }
+        .memory-stream::-webkit-scrollbar { display: none; }
+
+        /* The Naked Memory Unit */
+        .memory-node {
+            flex-shrink: 0;
+            max-width: 240px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        
+        .memory-node:active { opacity: 0.6; }
+
+        /* Time & Avatar Row */
+        .node-meta {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .avatar-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .time-stamp {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Time Logic colors */
+        .time-now { color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.5); }
+        .time-recent { color: var(--text-mid); }
+        .time-old { color: var(--text-dim); }
+
+        /* The Content Text */
+        .node-text {
+            font-size: 15px;
+            line-height: 1.3;
+            color: var(--text-highlight);
+            font-weight: 400;
+        }
+        
+        /* Fading older memories */
+        .node-text.faded { color: var(--text-mid); }
+        .node-text.ancient { color: var(--text-dim); }
+
+        /* 
+           Visual Separators between clusters
+           A very subtle thread.
+        */
+        .thread-line {
+            position: absolute;
+            left: 24px;
+            bottom: -16px;
+            width: 1px;
+            height: 16px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.1), transparent);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="galaxy-bg"></div>
+
+    <div class="resonance-sheet">
+        
+        <!-- Search: The Prompt -->
+        <div class="search-zone">
+            <input type="text" class="search-input" placeholder="Find resonance...">
+        </div>
+
+        <div class="feed-container">
+
+            <!-- CLUSTER 1: HIGH VOLUME (Huge) -->
+            <!-- Theme: Overwhelm/Chaos -->
+            <div class="cluster size-l">
+                <div class="cluster-header">
+                    <span class="glyph" style="color: var(--color-burn)">⚡</span>
+                    <span class="emotion-name">Static Noise</span>
+                    <span class="count-badge">842</span>
+                </div>
+                
+                <div class="memory-stream">
+                    <!-- Memory 1: NOW -->
+                    <div class="memory-node">
+                        <div class="node-meta">
+                            <div class="avatar-dot" style="background: var(--color-burn)"></div>
+                            <span class="time-stamp time-now">Just Now</span>
+                        </div>
+                        <div class="node-text">
+                            "Everything is loud but nothing is happening."
+                        </div>
+                    </div>
+
+                    <!-- Memory 2: 10m ago -->
+                    <div class="memory-node">
+                        <div class="node-meta">
+                            <div class="avatar-dot" style="background: var(--color-burn); opacity: 0.7"></div>
+                            <span class="time-stamp time-recent">10m ago</span>
+                        </div>
+                        <div class="node-text">
+                            "Screen glare is burning my retinas."
+                        </div>
+                    </div>
+
+                    <!-- Memory 3: 2h ago -->
+                    <div class="memory-node">
+                        <div class="node-meta">
+                            <div class="avatar-dot" style="background: var(--text-dim)"></div>
+                            <span class="time-stamp time-recent">2h ago</span>
+                        </div>
+                        <div class="node-text faded">
+                            "Can't hear my own thoughts over the slack pings."
+                        </div>
+                    </div>
+                </div>
+                <div class="thread-line"></div>
+            </div>
+
+            <!-- CLUSTER 2: MEDIUM VOLUME -->
+            <!-- Theme: Existential/Void -->
+            <div class="cluster size-m">
+                <div class="cluster-header">
+                    <span class="glyph" style="color: var(--color-void)">🌀</span>
+                    <span class="emotion-name">Drifting</span>
+                    <span class="count-badge">312</span>
+                </div>
+
+                <div class="memory-stream">
+                    <!-- Memory 1: 5m ago -->
+                    <div class="memory-node">
+                        <div class="node-meta">
+                            <div class="avatar-dot" style="background: var(--color-void)"></div>
+                            <span class="time-stamp time-recent">5m ago</span>
+                        </div>
+                        <div class="node-text">
+                            "Walking fast to nowhere."
+                        </div>
+                    </div>
+
+                    <!-- Memory 2: Yesterday -->
+                    <div class="memory-node">
+                        <div class="node-meta">
+                            <div class="avatar-dot" style="background: var(--text-dim)"></div>
+                            <span class="time-stamp time-old">Yesterday</span>
+                        </div>
+                        <div class="node-text faded">
+                            "The fog looked like it wanted to eat the bridge."
+                        </div>
+                    </div>
+                </div>
+                <div class="thread-line"></div>
+            </div>
+
+            <!-- CLUSTER 3: HISTORICAL (Old/Faded) -->
+            <!-- Theme: Pattern Recognition -->
+            <div class="cluster size-s">
+                <div class="cluster-header">
+                    <span class="glyph" style="color: var(--color-drift)">🌫️</span>
+                    <span class="emotion-name">Echoes</span>
+                    <span class="count-badge">1.2k</span>
+                </div>
+
+                <div class="memory-stream">
+                    <!-- Memory 1: 1 Month Ago -->
+                    <div class="memory-node">
+                        <div class="node-meta">
+                            <div class="avatar-dot" style="background: var(--text-dim)"></div>
+                            <span class="time-stamp time-old">1 Month Ago</span>
+                        </div>
+                        <div class="node-text ancient">
+                            "Same sunset, different panic."
+                        </div>
+                    </div>
+                    
+                    <!-- Memory 2: 2 Months Ago -->
+                    <div class="memory-node">
+                        <div class="node-meta">
+                            <div class="avatar-dot" style="background: var(--text-dim)"></div>
+                            <span class="time-stamp time-old">2 Months Ago</span>
+                        </div>
+                        <div class="node-text ancient">
+                            "I wish I could pause this moment."
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
