@@ -105,14 +105,6 @@
             box-shadow: 0 0 8px rgba(34, 197, 94, 0.7);
             animation: pulse 1.6s ease-in-out infinite;
         }
-        .browse-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: #8b5cf6;
-            box-shadow: 0 0 8px rgba(139, 92, 246, 0.7);
-            animation: pulse 1.6s ease-in-out infinite;
-        }
         @keyframes pulse {
             0%, 100% { transform: scale(1); opacity: 0.7; }
             50% { transform: scale(1.5); opacity: 1; }
@@ -135,13 +127,25 @@
             align-items: center;
             gap: 12px;
         }
-        .browse-note {
+        .terminal-label {
+            margin: 10px 24px 0;
+            font-family: "SF Mono", "SF Pro Display", monospace;
+            font-size: 11px;
+            color: rgba(110, 132, 148, 0.85);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .terminal-line {
             margin: 2px 24px 0;
             padding: 0 0 10px;
             font-family: "SF Mono", "SF Pro Display", monospace;
             font-size: 11px;
-            color: rgba(255,255,255,0.45);
-            letter-spacing: 0.03em;
+            color: rgba(110, 132, 148, 0.65);
+            letter-spacing: 0.04em;
+        }
+        .terminal-line::before {
+            content: "> ";
+            color: rgba(110, 132, 148, 0.85);
         }
         .search-btn {
             appearance: none;
@@ -251,35 +255,54 @@
             background: rgba(255,255,255,0.55);
             box-shadow: 0 0 6px rgba(255,255,255,0.35);
         }
-        .pattern-tooltip {
+        .pattern-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+        .pattern-modal.is-open {
+            display: flex;
+        }
+        .pattern-modal__backdrop {
             position: absolute;
-            top: -6px;
-            left: calc(100% + 8px);
-            min-width: 220px;
-            max-width: 260px;
-            padding: 10px 12px;
-            background: rgba(0,0,0,0.85);
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+        }
+        .pattern-modal__content {
+            position: relative;
+            width: min(340px, 86vw);
+            padding: 16px 18px;
+            background: rgba(10,10,12,0.96);
             border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 10px;
-            color: rgba(255,255,255,0.75);
-            font-size: 11px;
-            line-height: 1.4;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            opacity: 0;
-            transform: translateY(4px);
-            pointer-events: none;
-            transition: opacity 0.2s ease, transform 0.2s ease;
-            z-index: 20;
+            border-radius: 14px;
+            color: rgba(255,255,255,0.82);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            z-index: 1;
         }
-        .pattern-tooltip strong {
-            color: rgba(255,255,255,0.85);
+        .pattern-modal__title {
+            font-size: 14px;
             font-weight: 600;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 6px;
         }
-        .pattern-info:hover + .pattern-tooltip,
-        .pattern-info.is-open + .pattern-tooltip {
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: auto;
+        .pattern-modal__body {
+            font-size: 12px;
+            line-height: 1.5;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 12px;
+        }
+        .pattern-modal__close {
+            appearance: none;
+            border: 1px solid rgba(255,255,255,0.16);
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.8);
+            padding: 6px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            cursor: pointer;
         }
 
         .glyph {
@@ -426,18 +449,14 @@
                 </span>
             </div>
             <div class="search-row">
-                <input type="text" class="search-input" placeholder="Search...">
+                <input type="text" class="search-input" placeholder="">
                 <button class="search-btn" type="button">Search</button>
             </div>
         </div>
-        <div class="section-label" style="margin: 10px 24px 0;">
-            <span class="section-indicator">
-                <span class="browse-dot"></span>
-                Echo analysis
-            </span>
-        </div>
-        <div class="browse-note">
-            Scanning 1,402 memories in San Francisco... Detected 2 dominant emotional patterns:
+        <div class="terminal-label">Echo Analysis</div>
+        <div class="terminal-line">
+            Scanning 1,402 memories in San Francisco...
+            Detected 2 dominant emotional patterns.
         </div>
 
         <div class="feed-container">
@@ -450,10 +469,7 @@
                         <span class="pattern-left">
                             <span class="pattern-name">Static Noise</span>
                             <span class="pattern-proof">219 people</span>
-                            <button class="pattern-info" type="button" aria-label="Echo insight">i</button>
-                            <div class="pattern-tooltip">
-                                <strong>Echo sensed Static Noise.</strong> Many feel overwhelmed by constant alerts in the city.
-                            </div>
+                            <button class="pattern-info" type="button" aria-label="Echo insight" data-title="Echo sensed Static Noise" data-body="Many feel overwhelmed by constant alerts in the city. 219 people are resonating with this pattern.">i</button>
                         </span>
                     </div>
                 </div>
@@ -500,10 +516,7 @@
                         <span class="pattern-left">
                             <span class="pattern-name">Drifting</span>
                             <span class="pattern-proof">89 people</span>
-                            <button class="pattern-info" type="button" aria-label="Echo insight">i</button>
-                            <div class="pattern-tooltip">
-                                <strong>Echo sensed Drifting.</strong> A shared feeling of being lost in transitions.
-                            </div>
+                            <button class="pattern-info" type="button" aria-label="Echo insight" data-title="Echo sensed Drifting" data-body="A shared feeling of being lost in transitions. 89 people are resonating with this pattern.">i</button>
                         </span>
                     </div>
                 </div>
@@ -540,10 +553,7 @@
                         <span class="pattern-left">
                             <span class="pattern-name">Echoes</span>
                             <span class="pattern-proof">1.2k people</span>
-                            <button class="pattern-info" type="button" aria-label="Echo insight">i</button>
-                            <div class="pattern-tooltip">
-                                <strong>Echo sensed Echoes.</strong> Recurring memories resurfacing across months.
-                            </div>
+                            <button class="pattern-info" type="button" aria-label="Echo insight" data-title="Echo sensed Echoes" data-body="Recurring memories resurfacing across months. 1.2k people are resonating with this pattern.">i</button>
                         </span>
                     </div>
                 </div>
@@ -574,6 +584,15 @@
         </div>
     </div>
 
+    <div class="pattern-modal" id="pattern-modal" aria-hidden="true">
+        <div class="pattern-modal__backdrop"></div>
+        <div class="pattern-modal__content" role="dialog" aria-modal="true" aria-labelledby="pattern-modal-title">
+            <div class="pattern-modal__title" id="pattern-modal-title"></div>
+            <div class="pattern-modal__body" id="pattern-modal-body"></div>
+            <button class="pattern-modal__close" type="button">Close</button>
+        </div>
+    </div>
+
 </body>
 <script>
     const searchZone = document.querySelector(".search-zone");
@@ -598,14 +617,14 @@
         }
         const text = suggestions[suggestionIndex];
         if (charIndex <= text.length) {
-            promptInput.setAttribute("placeholder", `Search “${text.slice(0, charIndex)}”`);
+            promptInput.setAttribute("placeholder", `“${text.slice(0, charIndex)}”`);
             charIndex += 1;
             setTimeout(typeLoop, 60);
             return;
         }
         if (dots < 3) {
             dots += 1;
-            promptInput.setAttribute("placeholder", `Search “${text}”${".".repeat(dots)}`);
+            promptInput.setAttribute("placeholder", `“${text}”${".".repeat(dots)}`);
             setTimeout(typeLoop, 300);
             return;
         }
@@ -624,20 +643,28 @@
 </script>
 <script>
     const infoButtons = document.querySelectorAll(".pattern-info");
+    const modal = document.getElementById("pattern-modal");
+    const modalTitle = document.getElementById("pattern-modal-title");
+    const modalBody = document.getElementById("pattern-modal-body");
+    const modalClose = modal.querySelector(".pattern-modal__close");
+    const modalBackdrop = modal.querySelector(".pattern-modal__backdrop");
+
+    function closeModal() {
+        modal.classList.remove("is-open");
+        modal.setAttribute("aria-hidden", "true");
+    }
+
     infoButtons.forEach((btn) => {
         btn.addEventListener("click", (event) => {
             event.stopPropagation();
-            infoButtons.forEach((other) => {
-                if (other !== btn) {
-                    other.classList.remove("is-open");
-                }
-            });
-            btn.classList.toggle("is-open");
+            modalTitle.textContent = btn.dataset.title || "Echo insight";
+            modalBody.textContent = btn.dataset.body || "";
+            modal.classList.add("is-open");
+            modal.setAttribute("aria-hidden", "false");
         });
     });
 
-    document.addEventListener("click", () => {
-        infoButtons.forEach((btn) => btn.classList.remove("is-open"));
-    });
+    modalClose.addEventListener("click", closeModal);
+    modalBackdrop.addEventListener("click", closeModal);
 </script>
 </html>
