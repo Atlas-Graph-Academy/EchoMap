@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Echo: The Sealed Whisper</title>
+    <!-- 引入更像手指涂鸦的字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-void: #000000;
+            --glow-white: rgba(255, 255, 255, 0.9);
+            --glow-blur: rgba(255, 255, 255, 0.5);
+            --echo-gold: #FFD056;
+            --echo-orange: #FF5500;
+            --glass-panel: rgba(20, 20, 20, 0.6);
+            --border-dim: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+        body {
+            background-color: var(--bg-void);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .device-frame {
+            width: 390px;
+            height: 844px;
+            background: #000;
+            position: relative;
+            border-radius: 44px;
+            box-shadow: 0 0 100px rgba(255, 85, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Ambient Background */
+        .ambient-light {
+            position: absolute;
+            top: -150px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+            filter: blur(80px);
+            z-index: 0;
+            opacity: 0.6;
+            animation: pulse 6s infinite alternate;
+        }
+
+        .content-layer {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* === 1. TOP: The Gain (Value) === */
+        .header-echo {
+            height: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-top: 20px;
+            animation: fadeIn 1s ease;
+        }
+
+        .echo-pill {
+            background: rgba(255, 208, 86, 0.1);
+            border: 1px solid rgba(255, 208, 86, 0.3);
+            padding: 6px 16px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 0 20px rgba(255, 208, 86, 0.1);
+        }
+
+        .echo-icon {
+            width: 12px; height: 12px; background: var(--echo-gold);
+            transform: rotate(45deg); box-shadow: 0 0 10px var(--echo-gold);
+        }
+
+        .echo-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 14px;
+            color: var(--echo-gold);
+            font-weight: 700;
+        }
+
+        /* === 2. CANVAS: The Finger Writing (Hook) === */
+        .canvas-area {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 40px;
+            margin-bottom: 20px;
+        }
+
+        /* The glowing finger trace effect */
+        .handwritten-hook {
+            font-family: 'Gochi Hand', cursive;
+            font-size: 38px;
+            line-height: 1.4;
+            color: var(--glow-white);
+            text-align: center;
+            /* Key Magic: Simulating light bleeding on retina */
+            text-shadow: 0 0 8px var(--glow-blur), 0 0 20px rgba(255,255,255,0.2);
+            transform: rotate(-2deg);
+            opacity: 0;
+            animation: writeIn 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards 0.3s;
+        }
+
+        .timestamp-float {
+            position: absolute;
+            bottom: 20px;
+            right: 30px;
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 1px;
+            transform: rotate(2deg);
+        }
+
+        /* === 3. BOTTOM: The Sealed Privacy Zone (Glass) === */
+        .privacy-sheet {
+            height: 380px;
+            background: rgba(20, 20, 20, 0.7);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border-top: 1px solid rgba(255,255,255,0.08);
+            border-radius: 40px 40px 0 0;
+            padding: 32px 24px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+            position: relative;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideUp 0.8s ease 0.8s forwards;
+        }
+        
+        /* The "Privacy" Lock Indicator */
+        .lock-indicator {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+        }
+
+        .echo-voice-label {
+            font-size: 11px; color: var(--echo-gold); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .echo-voice-label::before { content:''; width: 6px; height: 6px; background: var(--echo-gold); border-radius: 50%; box-shadow: 0 0 8px var(--echo-gold); }
+
+        .analysis-text {
+            font-size: 16px; line-height: 1.5; color: rgba(255,255,255,0.8); margin-bottom: 24px;
+        }
+        .analysis-text span { color: #fff; font-weight: 600; text-decoration: underline; text-decoration-color: rgba(255,255,255,0.3); text-decoration-thickness: 1px;}
+
+        /* Private Memories */
+        .private-evidence {
+            display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: auto;
+        }
+        .evidence-tag {
+            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); padding: 8px 12px; border-radius: 12px;
+            font-size: 12px; color: rgba(255,255,255,0.5); display: flex; align-items: center; gap: 6px;
+        }
+        .lock-icon { width: 10px; height: 10px; fill: rgba(255,255,255,0.3); }
+
+        /* === 4. THE ZIPPER (Slider) === */
+        .zipper-container {
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .others-preview {
+            text-align: center; margin-bottom: 16px; font-size: 12px; color: rgba(255,255,255,0.3);
+            opacity: 0; transform: translateY(10px); transition: all 0.5s ease;
+        }
+
+        .slider-track {
+            width: 100%; height: 60px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 30px;
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.08);
+            cursor: pointer;
+            overflow: hidden;
+            transition: border-color 0.3s;
+        }
+
+        /* The "Zipper" Teeth Pattern */
+        .zipper-pattern {
+            position: absolute; inset: 0;
+            background-image: repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(255,255,255,0.03) 10px, rgba(255,255,255,0.03) 11px);
+            z-index: 1; pointer-events: none;
+        }
+
+        .slider-text {
+            position: absolute; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 14px; font-weight: 600; letter-spacing: 0.5px; color: rgba(255,255,255,0.4);
+            z-index: 2; transition: opacity 0.3s;
+        }
+
+        .slider-fill {
+            position: absolute; left: 0; top: 0; bottom: 0; width: 0%;
+            background: linear-gradient(90deg, var(--echo-orange), #FF8800);
+            z-index: 0; transition: width 0.1s linear;
+        }
+
+        .slider-thumb {
+            width: 50px; height: 50px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute; top: 4px; left: 4px;
+            z-index: 3;
+            box-shadow: 0 0 20px rgba(255,255,255,0.3);
+            display: flex; justify-content: center; align-items: center;
+            transition: transform 0.1s linear;
+        }
+        
+        .thumb-icon { width: 20px; height: 20px; fill: #000; transition: transform 0.3s; }
+
+        /* UNZIPPED STATE */
+        .device-frame.unzipped .privacy-sheet {
+            background: rgba(20, 20, 20, 0.9); /* Gets darker/solid to show content clearly */
+            box-shadow: 0 -20px 60px rgba(255, 85, 0, 0.15);
+        }
+        
+        .device-frame.unzipped .others-preview { opacity: 1; transform: translateY(0); }
+        .device-frame.unzipped .slider-text { opacity: 0; }
+        .device-frame.unzipped .thumb-icon { transform: rotate(-90deg); fill: var(--echo-orange); }
+        .device-frame.unzipped .slider-thumb { background: #000; }
+        .device-frame.unzipped .lock-icon { display: none; }
+        .device-frame.unzipped .evidence-tag { border-color: var(--echo-orange); color: var(--echo-orange); background: rgba(255, 85, 0, 0.1); }
+        .device-frame.unzipped .handwritten-hook { color: rgba(255,255,255,0.4); filter: blur(2px); transition: all 0.8s; } /* Fade out hook to focus on connection */
+
+        /* Animations */
+        @keyframes pulse { 0% { opacity: 0.4; } 100% { opacity: 0.7; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes writeIn { from { opacity: 0; filter: blur(10px); } to { opacity: 1; filter: blur(0); } }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="device-frame" id="device">
+        <div class="ambient-light"></div>
+
+        <div class="content-layer">
+            
+            <!-- 1. Header: Value Gain -->
+            <div class="header-echo">
+                <div class="echo-pill">
+                    <div class="echo-icon"></div>
+                    <div class="echo-value">+42 ECHOES</div>
+                </div>
+            </div>
+
+            <!-- 2. The Finger-Written Hook -->
+            <div class="canvas-area">
+                <div class="handwritten-hook">
+                    "Structural loss...<br>it feels like time is just slipping through my fingers."
+                </div>
+                <div class="timestamp-float">JAN 30 • 18:42</div>
+            </div>
+
+            <!-- 3. The Sealed Privacy Sheet -->
+            <div class="privacy-sheet">
+                <div class="lock-indicator"></div>
+                
+                <div class="echo-voice-label">Identity Analysis</div>
+                <div class="analysis-text">
+                    You are a <span>Time-Lost Architect</span>. The anxiety isn't about the present, but the inability to build structure for the future.
+                </div>
+
+                <div class="private-evidence">
+                    <div class="evidence-tag">
+                        <svg class="lock-icon" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                        Anxiety Loop
+                    </div>
+                    <div class="evidence-tag">
+                        <svg class="lock-icon" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                        Structural Desire
+                    </div>
+                </div>
+
+                <!-- 4. The Zipper (Connection) -->
+                <div class="zipper-container">
+                    <div class="others-preview">✨ 1,402 others are waiting to connect</div>
+                    <div class="slider-track" id="sliderTrack">
+                        <div class="zipper-pattern"></div>
+                        <div class="slider-fill" id="sliderFill"></div>
+                        <div class="slider-text" id="sliderText">SLIDE TO UNSEAL</div>
+                        <div class="slider-thumb" id="sliderThumb">
+                            <svg class="thumb-icon" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const sliderThumb = document.getElementById('sliderThumb');
+        const sliderTrack = document.getElementById('sliderTrack');
+        const sliderFill = document.getElementById('sliderFill');
+        const device = document.getElementById('device');
+        
+        let isDragging = false;
+        let startX, currentX;
+        const maxSlide = 280; // Approximate max width minus thumb
+
+        sliderThumb.addEventListener('mousedown', startDrag);
+        sliderThumb.addEventListener('touchstart', startDrag);
+
+        function startDrag(e) {
+            if(device.classList.contains('unzipped')) return;
+            isDragging = true;
+            startX = (e.type === 'touchstart') ? e.touches[0].clientX : e.clientX;
+        }
+
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('touchmove', drag);
+        document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchend', endDrag);
+
+        function drag(e) {
+            if (!isDragging) return;
+            let clientX = (e.type === 'touchmove') ? e.touches[0].clientX : e.clientX;
+            let delta = clientX - startX;
+            currentX = Math.max(0, Math.min(delta, maxSlide));
+
+            sliderThumb.style.transform = `translateX(${currentX}px)`;
+            sliderFill.style.width = `${currentX + 25}px`;
+            
+            // Dynamic Opacity for text
+            let opacity = 1 - (currentX / 150);
+            document.getElementById('sliderText').style.opacity = Math.max(0, opacity);
+        }
+
+        function endDrag() {
+            if (!isDragging) return;
+            isDragging = false;
+
+            if (currentX > 200) {
+                // Success: Unzip
+                sliderThumb.style.transform = `translateX(${maxSlide}px)`;
+                sliderFill.style.width = `100%`;
+                device.classList.add('unzipped');
+            } else {
+                // Reset
+                sliderThumb.style.transform = `translateX(0px)`;
+                sliderFill.style.width = `0%`;
+                document.getElementById('sliderText').style.opacity = 1;
+            }
+        }
+    </script>
+</body>
+</html>

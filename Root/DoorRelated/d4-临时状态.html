@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Echo: Resonance & Understanding</title>
+    <style>
+        :root {
+            --bg-deep: #050507;
+            --text-primary: rgba(255, 255, 255, 0.95);
+            --text-secondary: rgba(255, 255, 255, 0.65);
+            --text-dim: rgba(255, 255, 255, 0.35);
+            --accent-gold: #FFE6A5;
+            --accent-glow: rgba(255, 230, 165, 0.4);
+            --energy-orange: #FF6B35;
+            --privacy-lock: #8E8E93;
+            --glass-frosted: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --font-main: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .device-screen {
+            width: 390px;
+            height: 844px;
+            background: #050507;
+            position: relative;
+            overflow: hidden;
+            border-radius: 40px;
+            box-shadow: 0 0 60px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 1. Background Atmosphere */
+        .atmosphere-layer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: 
+                radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.03) 0%, transparent 40%),
+                radial-gradient(circle at 50% 80%, rgba(50, 50, 80, 0.1) 0%, transparent 50%);
+        }
+
+        .film-grain {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+            opacity: 0.6;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* 2. Content Layout */
+        .content-layer {
+            position: relative;
+            z-index: 10;
+            padding: 0 24px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* TOP: Total Balance */
+        .top-balance-bar {
+            padding-top: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .balance-label {
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+
+        .balance-value-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .echo-diamond {
+            width: 16px;
+            height: 16px;
+            background: var(--text-primary);
+            transform: rotate(45deg);
+            box-shadow: 0 0 15px rgba(255,255,255,0.4);
+        }
+
+        .balance-number {
+            font-size: 32px;
+            font-weight: 700;
+            font-feature-settings: "tnum";
+            text-shadow: 0 0 20px rgba(255,255,255,0.1);
+        }
+
+        /* MIDDLE: Narrative & Identity */
+        .narrative-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding-top: 20px;
+        }
+
+        .time-anchor {
+            font-size: 13px;
+            color: var(--text-dim);
+            font-family: monospace;
+            margin-bottom: 16px;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 0.5s forwards;
+        }
+
+        .echo-voice {
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            max-width: 90%;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 1.2s forwards;
+        }
+
+        .highlight-text {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .identity-reveal {
+            text-align: left;
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: floatUp 1s ease-out 2s forwards;
+            position: relative;
+        }
+
+        .identity-label-small {
+            font-size: 10px;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .identity-label-small::before {
+            content: '';
+            width: 20px;
+            height: 1px;
+            background: var(--accent-gold);
+        }
+
+        .identity-hero {
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--accent-gold);
+            line-height: 1.2;
+            text-shadow: 0 0 30px var(--accent-glow);
+        }
+
+        /* MEMORIES (Private Facts) */
+        .memory-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            opacity: 0;
+            animation: floatUp 1s ease-out 2.8s forwards;
+        }
+
+        .memory-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--glass-frosted);
+            border: 1px solid var(--glass-border);
+            padding: 14px 16px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .memory-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .lock-icon {
+            width: 12px;
+            height: 12px;
+            fill: var(--text-dim);
+        }
+
+        .memory-text {
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 400;
+        }
+
+        .memory-score {
+            font-size: 12px;
+            color: var(--accent-gold);
+            font-weight: 600;
+            background: rgba(255, 230, 165, 0.1);
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 230, 165, 0.2);
+        }
+
+        /* BOTTOM: Action (Ignite) */
+        .bottom-action-layer {
+            padding-bottom: 48px;
+            padding-top: 20px;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 3.5s forwards;
+        }
+
+        .pitch-text {
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .ignite-slider {
+            position: relative;
+            width: 100%;
+            height: 60px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+
+        .slider-bg-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0%; /* Animates to 100% */
+            background: linear-gradient(90deg, rgba(255, 107, 53, 0.4), rgba(255, 107, 53, 0.8));
+            transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .slider-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding: 0 6px;
+        }
+
+        .slider-knob {
+            width: 48px;
+            height: 48px;
+            background: #FFFFFF;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(255,255,255,0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .knob-icon {
+            width: 20px;
+            height: 20px;
+            fill: #000;
+        }
+
+        .slider-label {
+            flex: 1;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            padding-right: 48px; /* Balance the knob */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .bonus-badge {
+            background: var(--energy-orange);
+            color: white;
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.6);
+        }
+
+        /* STATE: Public */
+        .device-screen.is-public .slider-bg-fill {
+            width: 100%;
+        }
+        
+        .device-screen.is-public .slider-knob {
+            transform: translateX(280px); /* Move to end */
+            background: var(--energy-orange);
+        }
+
+        .device-screen.is-public .knob-icon {
+            fill: #FFF;
+        }
+
+        .device-screen.is-public .slider-label {
+            opacity: 0; /* Hide text on complete */
+        }
+        
+        .device-screen.is-public .pitch-text {
+            color: var(--energy-orange);
+            text-shadow: 0 0 15px rgba(255, 107, 53, 0.4);
+            font-weight: 500;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes floatUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes countUp {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); color: var(--accent-gold); }
+            100% { transform: scale(1); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="device-screen" id="appScreen">
+        <div class="atmosphere-layer"></div>
+        <div class="film-grain"></div>
+
+        <div class="content-layer">
+            
+            <!-- 1. Total Balance (Top) -->
+            <div class="top-balance-bar">
+                <div class="balance-label">Current Resonance</div>
+                <div class="balance-value-container">
+                    <div class="echo-diamond"></div>
+                    <div class="balance-number" id="totalEchoes">3,055</div>
+                </div>
+            </div>
+
+            <!-- 2. Narrative Section (Middle) -->
+            <div class="narrative-section">
+                <!-- Anchor -->
+                <div class="time-anchor">JAN 30, 2026 • 5:48 PM</div>
+                
+                <!-- Echo's Voice -->
+                <div class="echo-voice">
+                    "I've analyzed the frequency of this conversation. <span class="highlight-text">You are not alone in feeling this way.</span> Others have shared similar vibrations regarding 'structural loss'."
+                </div>
+
+                <!-- Identity Reveal -->
+                <div class="identity-reveal">
+                    <div class="identity-label-small">Identity Crystallized</div>
+                    <div class="identity-hero">The Time-Lost<br>Architect</div>
+                </div>
+
+                <!-- 3. Memory Facts (Privacy Stack) -->
+                <div class="memory-stack">
+                    <!-- Memory 1 -->
+                    <div class="memory-row">
+                        <div class="memory-left">
+                            <svg class="lock-icon" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                            <span class="memory-text">Structural Loss</span>
+                        </div>
+                        <div class="memory-score">+15</div>
+                    </div>
+                    <!-- Memory 2 -->
+                    <div class="memory-row">
+                        <div class="memory-left">
+                            <svg class="lock-icon" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                            <span class="memory-text">Output Loop</span>
+                        </div>
+                        <div class="memory-score">+15</div>
+                    </div>
+                    <!-- Memory 3 -->
+                    <div class="memory-row">
+                        <div class="memory-left">
+                            <svg class="lock-icon" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                            <span class="memory-text">Desire to Build</span>
+                        </div>
+                        <div class="memory-score">+20</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 4. Action Layer -->
+            <div class="bottom-action-layer">
+                <div class="pitch-text" id="pitchText">
+                    Your echoes will comfort others like you.<br>Illuminate the timeline?
+                </div>
+
+                <div class="ignite-slider" id="igniteSlider" onclick="triggerIgnite()">
+                    <div class="slider-bg-fill"></div>
+                    <div class="slider-content">
+                        <div class="slider-knob">
+                            <svg class="knob-icon" viewBox="0 0 24 24"><path d="M13 2L3 14h9v8l10-12h-9l9-8z"/></svg>
+                        </div>
+                        <div class="slider-label">
+                            Slide to Share <span class="bonus-badge">+50</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let ignited = false;
+
+        function triggerIgnite() {
+            if (ignited) return;
+            ignited = true;
+
+            const screen = document.getElementById('appScreen');
+            const pitch = document.getElementById('pitchText');
+            const total = document.getElementById('totalEchoes');
+            
+            // 1. Visual State Change
+            screen.classList.add('is-public');
+            
+            // 2. Text Feedback
+            pitch.innerHTML = "You are now a beacon for others.<br>Resonance established.";
+
+            // 3. Score Count Up Animation
+            let start = 3055;
+            let end = 3105; // Added 50
+            let duration = 1500;
+            let startTime = null;
+
+            function animateScore(timestamp) {
+                if (!startTime) startTime = timestamp;
+                let progress = timestamp - startTime;
+                let current = Math.min(Math.floor(start + (end - start) * (progress / duration)), end);
+                
+                total.innerText = current.toLocaleString();
+                
+                // Add a pulse effect to the number during counting
+                if (progress < duration) {
+                    total.style.textShadow = `0 0 ${Math.random() * 20}px rgba(255, 107, 53, 0.8)`;
+                    window.requestAnimationFrame(animateScore);
+                } else {
+                    total.style.textShadow = "0 0 20px rgba(255,255,255,0.1)";
+                    total.style.color = "#FF6B35"; // Final color change to orange
+                }
+            }
+            
+            // Wait slight delay for slider animation to start before counting
+            setTimeout(() => {
+                window.requestAnimationFrame(animateScore);
+            }, 300);
+        }
+    </script>
+</body>
+</html>
