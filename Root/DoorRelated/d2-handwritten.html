@@ -32,6 +32,8 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .device-frame {
@@ -44,6 +46,25 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+        }
+
+        .restart-button {
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 999px;
+            padding: 10px 18px;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        }
+
+        .restart-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #fff;
         }
 
         /* Harmonious Memory Dots (Top Area) */
@@ -67,10 +88,11 @@
             left: 50%;
             transform: translateX(-50%);
             width: 100%;
-            height: 36%;
+            height: 28%;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: top 0.3s ease-out;
         }
 
         .memory-tag {
@@ -248,9 +270,12 @@
 
         </div>
     </div>
+    <button class="restart-button" id="restartButton">Restart</button>
 
     <script>
         const container = document.getElementById('cluster-core');
+        const stage = document.getElementById('echo-stage');
+        const restartButton = document.getElementById('restartButton');
         const tags = [
             'memory thread',
             'soft recall',
@@ -289,21 +314,52 @@
             });
         });
 
+        let hasSettled = false;
+        let startTime = Date.now();
+        const startTop = 4;
+        const endTop = 72;
+
+        const holdDuration = 2000;
+
         function animateCluster() {
-            const time = Date.now();
-            let rawClarity = (Math.sin(time * 0.0016) + 1) / 2;
+            const time = Date.now() - startTime;
+            const holdTime = Math.max(0, time - holdDuration);
+            let rawClarity = (Math.sin(holdTime * 0.0016 - Math.PI / 2) + 1) / 2;
             let clarity = Math.pow(rawClarity, 1.7);
+            if (hasSettled) {
+                clarity = 1;
+            }
+
+            if (stage) {
+                if (!hasSettled) {
+                    const targetTop = time < holdDuration
+                        ? startTop
+                        : startTop + (endTop - startTop) * clarity;
+                    stage.style.top = `${targetTop}%`;
+                    if (clarity > 0.92) {
+                        hasSettled = true;
+                        stage.style.top = `${endTop}%`;
+                    }
+                } else {
+                    stage.style.top = `${endTop}%`;
+                }
+            }
 
             nodes.forEach((node) => {
-                node.angle += node.speed;
+                if (!hasSettled) {
+                    node.angle += node.speed;
+                } else if (node.settledAngle === undefined) {
+                    node.settledAngle = node.angle;
+                }
 
-                const jitterAmt = (1 - clarity) * 12;
-                const x = Math.cos(node.angle) * node.orbit + Math.sin(time * 0.0015 + node.phase) * jitterAmt;
-                const y = Math.sin(node.angle) * node.orbit + Math.cos(time * 0.0015 + node.phase) * jitterAmt;
+                const angle = hasSettled ? node.settledAngle : node.angle;
+                const jitterAmt = hasSettled ? 0 : (1 - clarity) * 12;
+                const x = Math.cos(angle) * node.orbit + Math.sin(time * 0.0015 + node.phase) * jitterAmt;
+                const y = Math.sin(angle) * node.orbit + Math.cos(time * 0.0015 + node.phase) * jitterAmt;
 
-                const blurVal = (1 - clarity) * 12;
-                const scaleVal = 1.15 - (clarity * 0.35);
-                const opacityVal = 0.45 + (clarity * 0.5);
+                const blurVal = hasSettled ? 0 : (1 - clarity) * 12;
+                const scaleVal = hasSettled ? 1 : 1.15 - (clarity * 0.35);
+                const opacityVal = hasSettled ? 1 : 0.45 + (clarity * 0.5);
 
                 node.el.style.filter = `blur(${blurVal}px)`;
                 node.el.style.opacity = opacityVal;
@@ -315,6 +371,16 @@
 
         if (container) {
             animateCluster();
+        }
+
+        if (restartButton) {
+            restartButton.addEventListener('click', () => {
+                hasSettled = false;
+                startTime = Date.now();
+                if (stage) {
+                    stage.style.top = `${startTop}%`;
+                }
+            });
         }
     </script>
 </body>
