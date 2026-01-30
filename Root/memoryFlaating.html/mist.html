@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Echo - Ethereal Mist Cluster</title>
+    <style>
+        :root {
+            --bg-core: #020208;
+            --bg-gradient: radial-gradient(circle at 50% 50%, #0d0d2b, #050510, #000000);
+            --mist-blue: rgba(100, 200, 255, 0.3);
+            --mist-gold: rgba(255, 220, 150, 0.35);
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: var(--bg-core);
+        }
+
+        #ambient-bg {
+            position: absolute;
+            inset: 0;
+            background: var(--bg-gradient);
+            z-index: -1;
+        }
+
+        #echo-stage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* This ensures the mist overlaps beautifully */
+            filter: contrast(110%) brightness(120%);
+        }
+
+        #cluster-core {
+            position: relative;
+            width: 1px;
+            height: 1px;
+        }
+
+        /* The Mist Nodes */
+        .mist-node {
+            position: absolute;
+            border-radius: 50%;
+            /* No borders, just soft gradients */
+            background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%);
+            /* Blurring the element itself to kill the "edge" */
+            filter: blur(25px);
+            /* Blend mode makes overlapping areas brighter */
+            mix-blend-mode: plus-lighter;
+            transform: translate(-50%, -50%);
+            will-change: transform;
+        }
+
+        .mist-blue {
+            background: radial-gradient(circle, var(--mist-blue) 0%, rgba(100, 200, 255, 0) 70%);
+            box-shadow: 0 0 50px rgba(100, 200, 255, 0.2);
+        }
+
+        .mist-gold {
+            background: radial-gradient(circle, var(--mist-gold) 0%, rgba(255, 200, 100, 0) 70%);
+            box-shadow: 0 0 60px rgba(255, 200, 100, 0.2);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="ambient-bg"></div>
+
+    <div id="echo-stage">
+        <div id="cluster-core">
+            </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('cluster-core');
+        const nodeCount = 6;
+        const nodes = [];
+
+        // Dynamic Configuration
+        const config = [
+            { size: 180, type: 'mist-gold', speed: 0.003, radius: 20 }, 
+            { size: 140, type: 'mist-blue', speed: 0.012, radius: 80 }, 
+            { size: 160, type: 'mist-blue', speed: -0.009, radius: 110 }, 
+            { size: 120, type: 'mist-gold', speed: 0.015, radius: 60 }, 
+            { size: 200, type: 'mist-blue', speed: -0.006, radius: 130 }, 
+            { size: 150, type: 'mist-blue', speed: 0.010, radius: 90 }
+        ];
+
+        for (let i = 0; i < nodeCount; i++) {
+            const cloud = document.createElement('div');
+            cloud.classList.add('mist-node', config[i].type);
+            
+            cloud.style.width = config[i].size + 'px';
+            cloud.style.height = config[i].size + 'px';
+            
+            container.appendChild(cloud);
+            
+            nodes.push({
+                el: cloud,
+                angle: (Math.PI * 2 / nodeCount) * i,
+                config: config[i],
+                phase: Math.random() * Math.PI * 2
+            });
+        }
+
+        function animate() {
+            const time = Date.now();
+
+            nodes.forEach((node) => {
+                // Slower, more fluid "drifting" motion
+                const driftX = Math.sin(time * 0.001 + node.phase) * 30;
+                const driftY = Math.cos(time * 0.0012 + node.phase) * 30;
+                
+                node.angle += node.config.speed;
+                const orbitX = Math.cos(node.angle) * node.config.radius;
+                const orbitY = Math.sin(node.angle) * node.config.radius;
+
+                // Subtle "breathing" effect on scale
+                const pulse = 1 + Math.sin(time * 0.0015 + node.phase) * 0.1;
+
+                node.el.style.transform = `
+                    translate(-50%, -50%) 
+                    translate(${orbitX + driftX}px, ${orbitY + driftY}px) 
+                    scale(${pulse})
+                `;
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>

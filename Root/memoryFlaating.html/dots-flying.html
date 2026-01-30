@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Echo - Atomic Cluster</title>
+    <style>
+        :root {
+            --bg-core: #050510;
+            --bg-gradient: radial-gradient(circle at 50% 50%, #1a1b4b, #0a0a1a, #000000);
+            --stone-border: rgba(255, 255, 255, 0.3);
+            --glow-blue: rgba(100, 200, 255, 0.5);
+            --glow-gold: rgba(255, 200, 100, 0.6);
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: var(--bg-core);
+        }
+
+        #ambient-bg {
+            position: absolute;
+            inset: 0;
+            background: var(--bg-gradient);
+            z-index: -1;
+        }
+
+        /* The Stage */
+        #echo-stage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #cluster-core {
+            position: relative;
+            width: 1px;
+            height: 1px;
+        }
+
+        /* The Atom/Dots */
+        .crystal-node {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.1));
+            border: 1px solid var(--stone-border);
+            box-shadow: 0 0 20px var(--glow-blue), inset 0 0 10px rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+            transform: translate(-50%, -50%);
+            transition: opacity 1s ease;
+            will-change: transform;
+        }
+
+        /* Specialized look for the "Nucleus" or key atoms */
+        .node-gold {
+            box-shadow: 0 0 25px var(--glow-gold), inset 0 0 10px rgba(255, 200, 100, 0.3);
+            border-color: rgba(255, 220, 150, 0.5);
+        }
+
+        /* Subtle pulse for the whole group */
+        @keyframes groupPulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
+        #cluster-core {
+            animation: groupPulse 4s infinite alternate ease-in-out;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="ambient-bg"></div>
+
+    <div id="echo-stage">
+        <div id="cluster-core" id="node-container">
+            </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('cluster-core');
+        const nodeCount = 6;
+        const nodes = [];
+
+        // Configuration for the "Atomic" movement
+        const config = [
+            { size: 45, color: 'gold', speed: 0.002, radius: 10 },  // Center Nucleus
+            { size: 25, color: 'blue', speed: 0.015, radius: 50 },  // Electron 1
+            { size: 30, color: 'blue', speed: 0.012, radius: 70 },  // Electron 2
+            { size: 20, color: 'gold', speed: 0.018, radius: 40 },  // Electron 3
+            { size: 35, color: 'blue', speed: 0.008, radius: 90 },  // Electron 4
+            { size: 22, color: 'blue', speed: 0.022, radius: 60 }   // Electron 5
+        ];
+
+        // 1. Initialize the 6 dots
+        for (let i = 0; i < nodeCount; i++) {
+            const dot = document.createElement('div');
+            dot.classList.add('crystal-node');
+            if (config[i].color === 'gold') dot.classList.add('node-gold');
+            
+            dot.style.width = config[i].size + 'px';
+            dot.style.height = config[i].size + 'px';
+            
+            container.appendChild(dot);
+            
+            nodes.push({
+                el: dot,
+                angle: (Math.PI * 2 / nodeCount) * i, // Space them out initially
+                config: config[i],
+                phase: Math.random() * Math.PI * 2 // Random start phase for jitter
+            });
+        }
+
+        // 2. The Animation Loop
+        function animate() {
+            const time = Date.now();
+
+            nodes.forEach((node, index) => {
+                // Atomic movement math
+                // We combine a circular orbit with a "vibration" (sin/cos jitter)
+                const jitterX = Math.sin(time * 0.002 + node.phase) * 15;
+                const jitterY = Math.cos(time * 0.003 + node.phase) * 15;
+                
+                // Orbiting logic
+                node.angle += node.config.speed;
+                const orbitX = Math.cos(node.angle) * node.config.radius;
+                const orbitY = Math.sin(node.angle) * node.config.radius;
+
+                // Apply the combined position
+                const finalX = orbitX + jitterX;
+                const finalY = orbitY + jitterY;
+
+                node.el.style.transform = `translate(-50%, -50%) translate(${finalX}px, ${finalY}px)`;
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
