@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<style>
+  /* LUMEN ENVIRONMENT 
+     设置深色背景以展示光效 (实际使用时可移除 body 样式)
+  */
+  body {
+    background-color: #050b14; /* 深空黑 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  /* COMPONENT WRAPPER 
+     光子容器
+  */
+  .lumen-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 16px; /* 元素间的空间距离 */
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* 隐藏原生 Checkbox */
+  .lumen-input {
+    display: none;
+  }
+
+  /* LAYER 1: TEXT LABEL ("Echo Mode")
+     被动发光体
+  */
+  .lumen-label {
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.3); /* 初始状态：低能见度 */
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    filter: blur(0.5px); /* Z轴深度：略微后退 */
+  }
+
+  /* LAYER 0: THE SWITCH (The Light Source)
+     光子能量井
+  */
+  .lumen-switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.05); /* 玻璃外壳 */
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.5); /* 内部阴影，增加深度感 */
+    transition: all 0.4s ease;
+  }
+
+  /* THE ORB (The Photon)
+     实际的发光核心
+  */
+  .lumen-orb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #4a5568; /* 熄灭状态：冷灰 */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); /* 弹性物理动画 */
+    transform: scale(0.9); /* 休眠状态：体积收缩 */
+  }
+
+  /* --- ACTIVE STATES (ON) --- 
+     当能量接通时
+  */
+
+  /* 1. 文字被照亮 */
+  .lumen-input:checked + .lumen-wrapper .lumen-label {
+    color: #ffffff;
+    filter: blur(0px); /* 聚焦 */
+    text-shadow: 0 0 15px rgba(0, 255, 255, 0.5); /* 接受来自开关的光照 */
+  }
+
+  /* 2. 开关背景微亮 */
+  .lumen-input:checked + .lumen-wrapper .lumen-switch {
+    background: rgba(0, 255, 242, 0.1); /* 极淡的青色背景光 */
+  }
+
+  /* 3. 核心被点燃 (Ignition) */
+  .lumen-input:checked + .lumen-wrapper .lumen-orb {
+    transform: translateX(20px) scale(1.1); /* Z轴突进 + X轴位移 */
+    background: #fff; /* 核心极亮 */
+    /* 复杂的体积光辉光 (Volumetric Bloom) */
+    box-shadow: 
+      0 0 10px 2px rgba(0, 255, 242, 0.6), /* 内层高能光晕 */
+      0 0 20px 5px rgba(0, 255, 242, 0.3), /* 外层散射光 */
+      0 0 40px 10px rgba(0, 255, 242, 0.1); /* 环境光照亮雾气 */
+  }
+
+</style>
+</head>
+<body>
+
+  <input type="checkbox" id="echo-toggle" class="lumen-input">
+  <label for="echo-toggle" class="lumen-wrapper">
+    <span class="lumen-label">Echo</span>
+    <div class="lumen-switch">
+      <div class="lumen-orb"></div>
+    </div>
+  </label>
+
+</body>
+</html>
