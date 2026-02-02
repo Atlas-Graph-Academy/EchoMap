@@ -498,6 +498,7 @@
             flex: 1;
             padding: 12px 14px;
             border-radius: 22px;
+            min-height: 52px;
             background: linear-gradient(180deg, rgba(12, 14, 20, 0.55), rgba(7, 9, 12, 0.72));
             border: 1px solid rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(16px);
@@ -551,6 +552,14 @@
             animation: echoBreath 2.6s ease-in-out infinite;
             position: relative;
             z-index: 1;
+            transition: opacity 0.2s ease, transform 0.2s ease, width 0.2s ease, margin 0.2s ease;
+        }
+
+        .input-row.voice-mode .input-echo-icon {
+            opacity: 0;
+            transform: scale(0.7);
+            width: 0;
+            margin: 0;
         }
         
         body.echo-off .input-echo-icon {
@@ -560,20 +569,119 @@
             display: none;
         }
 
-        .input-field {
-            flex: 1;
+        .input-placeholder,
+        .input-text {
             background: transparent;
             border: none;
             color: var(--text-secondary);
             font-size: 15px;
             font-family: inherit;
             text-align: left;
-            pointer-events: none;
             z-index: 1;
         }
-        
-        .input-button:focus-visible .input-field,
-        .input-button:active .input-field {
+
+        .input-text {
+            flex: 0 0 auto;
+            width: 0;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            outline: none;
+            transition: opacity 0.25s ease, width 0.25s ease;
+        }
+
+        .input-row.keyboard-mode .input-text {
+            flex: 1;
+            width: 100%;
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            color: var(--text-primary);
+        }
+
+        .input-row.keyboard-mode .input-button {
+            cursor: text;
+        }
+
+        .input-row.voice-mode .input-button {
+            cursor: pointer;
+            justify-content: center;
+            gap: 0;
+        }
+
+        .input-row.voice-mode .input-placeholder {
+            text-align: center;
+        }
+
+        .input-row.recording .input-button {
+            background: linear-gradient(180deg, rgba(22, 26, 36, 0.78), rgba(10, 12, 18, 0.92));
+            border-color: rgba(255, 255, 255, 0.28);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45), 0 0 28px rgba(255, 255, 255, 0.22);
+            transform: translateY(-1px);
+        }
+
+        .input-row.recording .input-button::before {
+            opacity: 0.85;
+        }
+
+        .input-row.recording .input-placeholder {
+            color: var(--text-primary);
+        }
+
+        .voice-recorder {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 6px;
+            justify-content: center;
+            z-index: 1;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+
+        .voice-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.45);
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.25);
+            animation: voicePulse 1.2s ease-in-out infinite;
+        }
+
+        .voice-dot:nth-child(2) { animation-delay: 0.2s; }
+        .voice-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        .voice-stack {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 1;
+            flex: 0 0 auto;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-4px);
+            max-width: 0;
+            overflow: hidden;
+            transition: opacity 0.25s ease, transform 0.25s ease, max-width 0.25s ease;
+        }
+
+        .input-row.voice-mode .voice-stack {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            max-width: 220px;
+        }
+
+        .input-row.recording .voice-dot {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.7);
+        }
+
+        @keyframes voicePulse {
+            0%, 100% { opacity: 0.4; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+        .input-button:focus-visible .input-placeholder,
+        .input-button:active .input-placeholder {
             color: var(--text-primary);
         }
         
@@ -599,6 +707,36 @@
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             z-index: 1;
         }
+
+        .send-btn .icon {
+            width: 18px;
+            height: 18px;
+            stroke: #1a1208;
+            stroke-width: 2.2;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .send-btn .icon.keyboard {
+            display: none;
+        }
+
+        .input-row.voice-mode .send-btn .icon.keyboard {
+            display: block;
+        }
+
+        .input-row.voice-mode .send-btn .icon.mic {
+            display: none;
+        }
+
+        .input-row.keyboard-mode .send-btn .icon.mic {
+            display: block;
+        }
+
+        .input-row.keyboard-mode .send-btn .icon.keyboard {
+            display: none;
+        }
         
         .send-btn:hover {
             transform: translateY(-1px);
@@ -611,14 +749,8 @@
             box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45), 0 0 18px rgba(255, 255, 255, 0.7);
         }
         
-        .send-icon {
-            width: 18px;
-            height: 18px;
-            stroke: #1a1208;
-            stroke-width: 2.2;
-            fill: none;
-            stroke-linecap: round;
-            stroke-linejoin: round;
+        .input-button.press-to-talk .input-field {
+            color: var(--text-primary);
         }
         
 
@@ -718,18 +850,31 @@
     <!-- The Control Deck -->
     <footer class="dock-wrapper">
         <div class="input-deck">
-            <button class="input-row" type="button" aria-label="Compose message">
-                <div class="input-echo-icon" aria-hidden="true"></div>
-                <span class="input-field">Message Simon...</span>
-                <div class="input-actions">
-                    <button class="send-btn" aria-label="Send message">
-                        <svg class="send-icon" viewBox="0 0 24 24">
-                            <path d="M22 2L11 13"></path>
-                            <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
-                        </svg>
-                    </button>
-                </div>
-            </button>
+            <div class="input-row voice-mode">
+                <button class="input-button" type="button" aria-label="Press and hold to talk">
+                    <div class="input-echo-icon" aria-hidden="true"></div>
+                    <span class="voice-stack" aria-hidden="true">
+                        <span class="input-placeholder">Press to talk</span>
+                        <span class="voice-recorder">
+                            <span class="voice-dot"></span>
+                            <span class="voice-dot"></span>
+                            <span class="voice-dot"></span>
+                        </span>
+                    </span>
+                    <input type="text" class="input-text" placeholder="Message Simon...">
+                </button>
+                <button class="send-btn" aria-label="Switch to keyboard input">
+                    <svg class="icon mic" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3Z"></path>
+                        <path d="M19 10v1a7 7 0 0 1-14 0v-1"></path>
+                        <path d="M12 18v4"></path>
+                    </svg>
+                    <svg class="icon keyboard" viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="3" y="6" width="18" height="12" rx="2"></rect>
+                        <path d="M7 10h.01M10 10h.01M13 10h.01M16 10h.01M8 14h8"></path>
+                    </svg>
+                </button>
+            </div>
         </div>
     </footer>
     
@@ -746,6 +891,61 @@
             };
             syncEchoState();
             echoToggleInput.addEventListener("change", syncEchoState);
+        }
+
+        const inputRow = document.querySelector(".input-row");
+        const inputButton = document.querySelector(".input-button");
+        const inputPlaceholder = document.querySelector(".input-placeholder");
+        const inputText = document.querySelector(".input-text");
+        const sendButton = document.querySelector(".send-btn");
+        if (inputRow && inputButton && inputPlaceholder && inputText && sendButton) {
+            const setMode = (isKeyboard) => {
+                inputRow.classList.toggle("keyboard-mode", isKeyboard);
+                inputRow.classList.toggle("voice-mode", !isKeyboard);
+                sendButton.setAttribute("aria-label", isKeyboard ? "Switch to voice input" : "Switch to keyboard input");
+                inputPlaceholder.textContent = isKeyboard ? "Message Simon..." : "Press to talk";
+                inputText.disabled = !isKeyboard;
+                inputRow.classList.remove("recording");
+                if (isKeyboard) {
+                    inputText.focus();
+                } else {
+                    inputText.blur();
+                }
+            };
+
+            const startRecording = () => {
+                if (!inputRow.classList.contains("voice-mode")) return;
+                inputRow.classList.add("recording");
+                inputPlaceholder.textContent = "Release to send";
+            };
+
+            const stopRecording = () => {
+                if (!inputRow.classList.contains("recording")) return;
+                inputRow.classList.remove("recording");
+                inputPlaceholder.textContent = "Press to talk";
+            };
+
+            setMode(false);
+            sendButton.addEventListener("click", () => {
+                const toKeyboard = !inputRow.classList.contains("keyboard-mode");
+                setMode(toKeyboard);
+            });
+
+            inputButton.addEventListener("pointerdown", (event) => {
+                if (inputRow.classList.contains("keyboard-mode")) return;
+                event.preventDefault();
+                startRecording();
+            });
+
+            inputButton.addEventListener("pointerup", stopRecording);
+            inputButton.addEventListener("pointerleave", stopRecording);
+            inputButton.addEventListener("pointercancel", stopRecording);
+
+            inputButton.addEventListener("click", () => {
+                if (inputRow.classList.contains("keyboard-mode")) {
+                    inputText.focus();
+                }
+            });
         }
     </script>
 
