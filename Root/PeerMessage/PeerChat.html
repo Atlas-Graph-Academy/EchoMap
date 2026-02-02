@@ -122,67 +122,71 @@
             gap: 4px;
         }
         
-        .echo-status-btn {
+        .lumen-wrapper {
+            position: relative;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 6px 12px;
-            border-radius: 999px;
-            border: 1px solid rgba(0, 240, 255, 0.35);
-            background: linear-gradient(135deg, rgba(0, 240, 255, 0.18), rgba(0, 240, 255, 0.04));
-            color: var(--accent-cyan);
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.7px;
+            gap: 12px;
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
         }
         
-        .echo-status-btn::after {
-            content: "";
+        .lumen-input {
             position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 20% 30%, rgba(0, 240, 255, 0.35), transparent 55%);
-            opacity: 0.45;
+            opacity: 0;
             pointer-events: none;
         }
         
-        .echo-status-btn:hover {
-            border-color: rgba(0, 240, 255, 0.55);
-            box-shadow: 0 0 16px rgba(0, 240, 255, 0.35);
+        .lumen-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.35);
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            filter: blur(0.4px);
         }
         
-        .echo-toggle-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--accent-cyan);
-            box-shadow: 0 0 8px rgba(0, 240, 255, 0.9);
-            animation: echoBreath 2.2s ease-in-out infinite;
-        }
-        
-        .echo-status-text {
+        .lumen-switch {
             position: relative;
-            z-index: 1;
+            width: 44px;
+            height: 24px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s ease;
         }
         
-        .echo-status-btn.is-off {
-            border-color: rgba(255, 255, 255, 0.12);
-            background: rgba(255, 255, 255, 0.04);
-            color: var(--text-secondary);
-            box-shadow: none;
+        .lumen-orb {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4a5568;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform: scale(0.9);
         }
         
-        .echo-status-btn.is-off::after {
-            opacity: 0;
+        .lumen-input:checked + .lumen-wrapper .lumen-label {
+            color: #ffffff;
+            filter: blur(0px);
+            text-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
         }
         
-        .echo-status-btn.is-off .echo-toggle-dot {
-            background: rgba(255, 255, 255, 0.35);
-            box-shadow: none;
-            animation: none;
+        .lumen-input:checked + .lumen-wrapper .lumen-switch {
+            background: rgba(0, 255, 242, 0.1);
+        }
+        
+        .lumen-input:checked + .lumen-wrapper .lumen-orb {
+            transform: translateX(20px) scale(1.1);
+            background: #fff;
+            box-shadow: 
+                0 0 10px 2px rgba(0, 255, 242, 0.6),
+                0 0 20px 5px rgba(0, 255, 242, 0.3),
+                0 0 40px 10px rgba(0, 255, 242, 0.1);
         }
 
         .nav-right {
@@ -585,10 +589,13 @@
         </div>
 
         <div class="nav-right">
-            <button class="echo-status-btn" id="echo-toggle-btn" aria-pressed="true" aria-label="Toggle Echo">
-                <span class="echo-toggle-dot" aria-hidden="true"></span>
-                <span class="echo-status-text">Echo Active</span>
-            </button>
+            <input type="checkbox" id="echo-toggle" class="lumen-input" checked aria-label="Toggle auto-reply">
+            <label for="echo-toggle" class="lumen-wrapper">
+                <span class="lumen-label">Echo</span>
+                <span class="lumen-switch" aria-hidden="true">
+                    <span class="lumen-orb"></span>
+                </span>
+            </label>
             <button class="menu-btn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
             </button>
@@ -674,15 +681,14 @@
         const memoryNode = document.getElementById("echo-memory-count");
         if (memoryNode) memoryNode.textContent = memoryCount;
         
-        const echoToggleBtn = document.getElementById("echo-toggle-btn");
-        if (echoToggleBtn) {
-            echoToggleBtn.addEventListener("click", () => {
-                const isOff = document.body.classList.toggle("echo-off");
-                echoToggleBtn.classList.toggle("is-off", isOff);
-                const label = echoToggleBtn.querySelector(".echo-status-text");
-                if (label) label.textContent = isOff ? "Echo Off" : "Echo Active";
-                echoToggleBtn.setAttribute("aria-pressed", String(!isOff));
-            });
+        const echoToggleInput = document.getElementById("echo-toggle");
+        if (echoToggleInput) {
+            const syncEchoState = () => {
+                const isOff = !echoToggleInput.checked;
+                document.body.classList.toggle("echo-off", isOff);
+            };
+            syncEchoState();
+            echoToggleInput.addEventListener("change", syncEchoState);
         }
     </script>
 

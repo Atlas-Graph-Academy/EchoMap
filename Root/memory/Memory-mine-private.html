@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory-of-Others</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&family=Special+Elite&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-void: #000000;
+            --text-primary: #FFFFFF;
+            --text-secondary: #9CA3AF;
+            --accent-orange: #F97316;
+            --accent-blue: #06B6D4;
+            
+            --glass-panel: rgba(20, 20, 20, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --surface-hover: rgba(255, 255, 255, 0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+
+        body {
+            background-color: #111;
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* --- THE MONOLITH (Device Frame) --- */
+        .device-frame {
+            width: 430px;
+            height: 932px;
+            background: var(--bg-void);
+            border-radius: 54px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 0 14px #080808, 0 0 100px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- 2. HEADER UI --- */
+        .header-ui {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            padding: calc(env(safe-area-inset-top) + 48px) 24px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 20;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+        }
+
+        .memory-tags {
+            position: absolute;
+            top: calc(env(safe-area-inset-top) + 28px);
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            z-index: 25;
+        }
+
+        .memory-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: rgba(20,20,20,0.75);
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 999px;
+            color: rgba(245,246,247,0.9);
+            font-family: 'Special Elite', 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 400;
+            letter-spacing: 0.6px;
+            backdrop-filter: blur(10px);
+            white-space: nowrap;
+        }
+
+        .memory-label {
+            font-family: 'Caveat', 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(245,246,247,0.8);
+            text-shadow:
+                0 0 6px rgba(255,255,255,0.18),
+                0 0 14px rgba(255,255,255,0.12);
+            filter: blur(0.2px);
+        }
+
+        .memory-chip.time {
+            background: rgba(20,20,20,0.65);
+            border-style: dashed;
+            letter-spacing: 1px;
+        }
+
+        .memory-chip.source b { color: #FFFFFF; font-weight: 700; }
+
+        .memory-chip.user img {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .btn-icon {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: rgba(30,30,30,0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            color: white;
+            cursor: pointer;
+        }
+
+        .source-pill {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 16px;
+            background: rgba(20,20,20,0.8);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 100px;
+            backdrop-filter: blur(12px);
+        }
+        
+        .source-icon {
+            width: 10px; height: 14px; background: white; border-radius: 2px;
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+        
+        .source-text { font-size: 11px; color: #ccc; }
+        .source-text b { color: white; font-weight: 600; }
+
+        /* --- 3. CONTENT CORE --- */
+        .content-core {
+            position: absolute;
+            bottom: 260px; /* Space for the dock */
+            left: 0; right: 0;
+            padding: 0 24px;
+            z-index: 10;
+            transform: translateY(0);
+            transition: transform 0.4s ease;
+        }
+
+        .content-core::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: -80px;
+            bottom: -180px;
+            background: linear-gradient(
+                to bottom,
+                rgba(0,0,0,0.45) 0%,
+                rgba(0,0,0,0.6) 30%,
+                rgba(0,0,0,0.78) 60%,
+                rgba(0,0,0,0.98) 100%
+            );
+            filter: blur(8px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .content-core > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* The User Chip (Floating above text) */
+        .user-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #000;
+            border: 1px solid #333;
+            padding: 6px 16px 6px 6px;
+            border-radius: 100px;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .user-avi {
+            width: 28px; height: 28px; border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            color: white; font-weight: 700; font-size: 13px;
+        }
+
+        /* Metadata */
+        .meta-row {
+            display: flex; align-items: center; gap: 8px;
+            margin-bottom: 8px;
+        }
+        .dot { width: 6px; height: 6px; background: var(--accent-orange); border-radius: 50%; box-shadow: 0 0 8px var(--accent-orange); }
+        .meta-text { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--accent-orange); font-weight: 600; letter-spacing: 0.5px; }
+        .time-ago {
+            color: #C9CDD3;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 32px; font-weight: 800; line-height: 1.1;
+            color: white; margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+
+        p {
+            font-size: 15px; line-height: 1.5; color: #B0B0B0;
+            display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;
+            line-clamp: 4; overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        /* Social Pile */
+        .social-row {
+            display: flex; align-items: center; gap: 12px;
+        }
+        .avatars { display: flex; }
+        .av-sm {
+            width: 24px; height: 24px; border-radius: 50%; border: 2px solid #000;
+            margin-left: -8px; display: flex; align-items: center; justify-content: center;
+            font-size: 9px; font-weight: 700; color: #000;
+        }
+        .av-sm:first-child { margin-left: 0; }
+        .social-text { font-size: 12px; color: #777; }
+        .social-text b { color: #ddd; }
+
+        /* --- 4. INTERACTIVE DOCK (Owner Actions) --- */
+        .dock-area {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            padding: 18px 24px 40px;
+            background: #000;
+            z-index: 50;
+        }
+        .dock-note {
+            color: #7DD3FC;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dock-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .action-btn {
+            height: 52px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .action-btn.with-sub {
+            flex-direction: column;
+            gap: 2px;
+            padding: 8px 12px;
+        }
+
+        .action-btn .btn-sub {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(229, 231, 235, 0.8);
+            letter-spacing: 0.2px;
+        }
+
+        .action-btn.primary {
+            background: #0B5C6A;
+            color: #EAFBFF;
+            box-shadow: 0 8px 18px rgba(6, 182, 212, 0.15);
+        }
+
+        .action-btn.secondary {
+            background: #111;
+            color: #E5E7EB;
+            border-color: #2A2A2A;
+        }
+
+        .privacy-status {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .privacy-status.private {
+            background: rgba(248, 113, 113, 0.12);
+            color: #FCA5A5;
+            border: 1px solid rgba(248, 113, 113, 0.35);
+        }
+
+        .match-panel {
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+        }
+
+        .match-header {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            color: #C4C9D4;
+            margin-bottom: 10px;
+            white-space: nowrap;
+        }
+
+        .match-list {
+            display: flex;
+            gap: 12px;
+            overflow: hidden;
+            white-space: nowrap;
+            animation: matchScroll 14s linear infinite;
+        }
+
+        .match-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 12px;
+            background: rgba(8, 8, 8, 0.9);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+            min-width: 190px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .match-avi {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .match-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #9AF5FF;
+            text-shadow:
+                0 0 6px rgba(6, 182, 212, 0.45),
+                0 0 14px rgba(6, 182, 212, 0.35);
+        }
+
+
+        @keyframes matchScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .match-panel + .dock-actions {
+            margin-top: 0;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="device-frame">
+
+    <div class="memory-tags">
+        <span class="memory-label">Memory</span>
+        <div class="memory-chip source">Extracted from <b>this moment</b></div>
+        <div class="memory-chip user">
+            <img src="https://i.pravatar.cc/150?u=will" alt="Will">
+            Will McKelvey
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <div class="header-ui">
+        <div class="btn-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </div>
+        <div class="btn-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="content-core" id="contentCore">
+        
+        <!-- User Badge moved to top tags -->
+
+        <div class="meta-row">
+            <div class="dot"></div>
+            <span class="meta-text">15.01.20, 6:30 PM</span>
+            <span class="meta-text time-ago">• by Will</span>
+            <span class="privacy-status private">Private</span>
+        </div>
+
+        <h1>The Constraints of Creativity</h1>
+        <p>The panel illustrates a profound disconnection. It feels like cognition isn't one's own—much like the neutrinos passing through us. This connects to our discussion on agency in digital spaces.</p>
+
+    </div>
+
+    <!-- OWNER ACTION DOCK -->
+    <div class="dock-area">
+        <div class="match-panel">
+            <div class="match-header">3 people are looking for memories like this.</div>
+            <div class="match-list" aria-label="Memory matching carousel">
+                <div class="match-item">
+                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-1" alt="Memory match 1">
+                    <span class="match-name">Neon Quiet</span>
+                </div>
+                <div class="match-item">
+                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-2" alt="Memory match 2">
+                    <span class="match-name">Soft Static</span>
+                </div>
+                <div class="match-item">
+                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-3" alt="Memory match 3">
+                    <span class="match-name">City Afterglow</span>
+                </div>
+                <div class="match-item">
+                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-1" alt="Memory match 1">
+                    <span class="match-name">Neon Quiet</span>
+                </div>
+                <div class="match-item">
+                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-2" alt="Memory match 2">
+                    <span class="match-name">Soft Static</span>
+                </div>
+                <div class="match-item">
+                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-3" alt="Memory match 3">
+                    <span class="match-name">City Afterglow</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="dock-actions">
+            <button class="action-btn secondary">Edit Memory</button>
+            <button class="action-btn primary with-sub">
+                Publish Memory
+                <span class="btn-sub">Publish so they can discover your memory</span>
+            </button>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
