@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        :root {
+            --bg: #080808;
+            --card-bg: rgba(20, 20, 20, 0.6);
+            --border: rgba(255, 255, 255, 0.1);
+            --text-main: #FFFFFF;
+            --text-sub: #666666;
+            --font-mono: "SF Mono", "Menlo", "Courier New", monospace;
+            
+            /* Spectrum Colors */
+            --c-red: #FF3B30;
+            --c-orange: #FF9500;
+            --c-yellow: #FFCC00;
+            --c-green: #28CD41;
+            --c-teal: #59ADC4;
+            --c-blue: #007AFF;
+            --c-purple: #AF52DE;
+            --c-pink: #FF2D55;
+            --c-grey: #3A3A3C;
+        }
+
+        body {
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            color: white;
+            gap: 40px; /* Space between cards */
+        }
+
+        /* --- THE CARD CONTAINER --- */
+        .signal-card {
+            width: 360px;
+            padding: 24px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Ambient Glow based on emotion */
+        .signal-card::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle at 50% 50%, var(--glow-color), transparent 70%);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* --- HEADER INFO --- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .signal-name {
+            font-family: var(--font-mono);
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #fff;
+            margin: 0;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* The little dot indicator */
+        .status-dot {
+            width: 8px; height: 8px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-color);
+            animation: pulse 2s infinite;
+        }
+
+        .people-count {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-sub);
+            letter-spacing: 0.5px;
+        }
+
+        /* --- THE EMOTION BARCODE (The Core Visual) --- */
+        .spectrum-container {
+            position: relative;
+            margin: 30px 0;
+            z-index: 2;
+        }
+
+        /* The Ruler Lines (Top and Bottom) */
+        .ruler-lines {
+            display: flex;
+            justify-content: space-between;
+            height: 12px;
+            margin-bottom: 4px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .ruler-lines.bottom {
+            margin-top: 4px;
+            margin-bottom: 0;
+            border-bottom: none;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            align-items: flex-end;
+        }
+
+        .tick {
+            width: 1px;
+            height: 6px;
+            background: #444;
+        }
+        .tick.long { height: 100%; background: #666; }
+
+        /* The Barcode Strip */
+        .barcode-strip {
+            height: 24px;
+            display: flex;
+            width: 100%;
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .block {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        /* Guide Lines connecting Barcode to Text labels (The DNA look) */
+        .guides {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+        }
+        .guide-line {
+            position: absolute;
+            top: -15px;
+            width: 1px;
+            height: 54px; /* Spans across the bar */
+            background: rgba(255,255,255,0.3);
+        }
+        .guide-label {
+            position: absolute;
+            top: -30px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-sub);
+            transform: translateX(-50%);
+        }
+
+        /* --- THE DESCRIPTION --- */
+        .description {
+            position: relative;
+            z-index: 2;
+        }
+        .desc-text {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-main);
+            margin: 0;
+            text-shadow: 0 0 15px var(--glow-color); /* Subtle text glow */
+        }
+        .desc-sub {
+            display: block;
+            margin-top: 6px;
+            font-size: 12px;
+            color: var(--text-sub);
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- CARD 1: SPIN-LOCK (Anxiety/Overload) -->
+    <!-- Theme: High Energy, Fragmented, Red/Orange/Purple -->
+    <div class="signal-card" style="--accent-color: #FF3B30; --glow-color: rgba(255, 59, 48, 0.3);">
+        
+        <div class="header">
+            <h2 class="signal-name">
+                <div class="status-dot"></div>
+                SPIN-LOCK
+            </h2>
+            <div class="people-count">219 DETECTED</div>
+        </div>
+
+        <div class="spectrum-container">
+            <!-- Top Ruler (Tick Marks) -->
+            <div class="ruler-lines">
+                <div class="tick"></div><div class="tick"></div><div class="tick long"></div><div class="tick"></div><div class="tick"></div><div class="tick long"></div><div class="tick"></div><div class="tick"></div><div class="tick"></div><div class="tick long"></div>
+            </div>
+
+            <!-- The Color Barcode -->
+            <div class="barcode-strip">
+                <div class="block" style="width: 15%; background: var(--c-red);"></div>
+                <div class="block" style="width: 5%; background: var(--c-orange);"></div>
+                <div class="block" style="width: 2%; background: var(--bg);"></div> <!-- Gap -->
+                <div class="block" style="width: 10%; background: var(--c-purple);"></div>
+                <div class="block" style="width: 20%; background: var(--c-pink);"></div>
+                <div class="block" style="width: 8%; background: var(--c-grey);"></div>
+                <div class="block" style="width: 5%; background: var(--c-red);"></div>
+                <div class="block" style="width: 25%; background: var(--c-orange);"></div>
+                <div class="block" style="width: 10%; background: var(--c-yellow);"></div>
+            </div>
+
+            <!-- Guide Lines (Visual Anchors) -->
+            <div class="guides">
+                <!-- Pointing to specific color blocks -->
+                <div class="guide-line" style="left: 15%;"></div>
+                <div class="guide-label" style="left: 15%;">A</div> <!-- A for Anxiety -->
+
+                <div class="guide-line" style="left: 52%;"></div>
+                <div class="guide-label" style="left: 52%;">P</div> <!-- P for Pressure -->
+
+                <div class="guide-line" style="left: 90%;"></div>
+                <div class="guide-label" style="left: 90%;">N</div> <!-- N for Noise -->
+            </div>
+
+            <!-- Bottom Ruler -->
+            <div class="ruler-lines bottom">
+                <div class="tick long"></div><div class="tick"></div><div class="tick"></div><div class="tick long"></div><div class="tick"></div><div class="tick"></div><div class="tick long"></div><div class="tick"></div><div class="tick"></div><div class="tick"></div>
+            </div>
+        </div>
+
+        <div class="description">
+            <p class="desc-text" style="color: #FFAAAA;">脑子转不停，停不下来</p>
+            <span class="desc-sub">Dominant signals: High Frequency, Looping Thought</span>
+        </div>
+
+    </div>
+
+
+    <!-- CARD 2: JITTER (Depression/Detachment) -->
+    <!-- Theme: Low Energy, Cool, Blue/Teal/Grey, More Gaps -->
+    <div class="signal-card" style="--accent-color: #007AFF; --glow-color: rgba(0, 122, 255, 0.3);">
+        
+        <div class="header">
+            <h2 class="signal-name">
+                <div class="status-dot"></div>
+                JITTER
+            </h2>
+            <div class="people-count">89 DETECTED</div>
+        </div>
+
+        <div class="spectrum-container">
+            <div class="ruler-lines">
+                <div class="tick"></div><div class="tick"></div><div class="tick"></div><div class="tick long"></div><div class="tick"></div><div class="tick long"></div><div class="tick"></div><div class="tick"></div><div class="tick long"></div><div class="tick"></div>
+            </div>
+
+            <div class="barcode-strip">
+                <div class="block" style="width: 8%; background: var(--c-teal);"></div>
+                <div class="block" style="width: 12%; background: var(--c-blue);"></div>
+                <div class="block" style="width: 15%; background: var(--bg);"></div> <!-- Large Gap (Silence) -->
+                <div class="block" style="width: 5%; background: var(--c-grey);"></div>
+                <div class="block" style="width: 20%; background: var(--c-blue);"></div>
+                <div class="block" style="width: 2%; background: #fff;"></div> <!-- Spike -->
+                <div class="block" style="width: 18%; background: var(--c-teal);"></div>
+                <div class="block" style="width: 20%; background: var(--bg);"></div> <!-- Gap -->
+            </div>
+
+             <div class="guides">
+                <div class="guide-line" style="left: 20%;"></div>
+                <div class="guide-label" style="left: 20%;">D</div> <!-- D for Drift -->
+
+                <div class="guide-line" style="left: 60%;"></div>
+                <div class="guide-label" style="left: 60%;">S</div> <!-- S for Silence -->
+            </div>
+
+            <div class="ruler-lines bottom">
+                <div class="tick"></div><div class="tick long"></div><div class="tick"></div><div class="tick"></div><div class="tick long"></div><div class="tick"></div><div class="tick"></div><div class="tick long"></div><div class="tick"></div><div class="tick"></div>
+            </div>
+        </div>
+
+        <div class="description">
+            <p class="desc-text" style="color: #AACCFF;">一点点动静就被拉走</p>
+            <span class="desc-sub">Dominant signals: Low Frequency, Noise Sensitivity</span>
+        </div>
+
+    </div>
+
+</body>
+</html>
