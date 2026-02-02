@@ -215,7 +215,13 @@
         }
 
         .meta-row.dim .meta-text {
-            color: #9CA3AF;
+            color: #6B7280;
+            opacity: 0.7;
+        }
+
+        .meta-row.dim .dot {
+            opacity: 0.4;
+            box-shadow: 0 0 4px rgba(249, 115, 22, 0.35);
         }
 
         /* Typography */
@@ -360,7 +366,7 @@
             border: none;
             border-radius: 0;
             padding: 0;
-            filter: brightness(0.75) saturate(0.85);
+            filter: brightness(1) saturate(1.05);
         }
 
         .match-header {
@@ -653,18 +659,6 @@
                     <span>Edit Memory</span>
                 </span>
             </button>
-            <button class="action-btn primary with-sub" id="publishBtn">
-                <span class="btn-main">
-                    <span class="btn-icon-small" aria-hidden="true">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 5v14"></path>
-                            <path d="M5 12h14"></path>
-                        </svg>
-                    </span>
-                    <span>Make This Visible</span>
-                </span>
-                <span class="btn-sub">Visible only to those who resonate</span>
-            </button>
         </div>
     </div>
 
@@ -694,7 +688,6 @@
     const matchGateModal = document.getElementById("matchGateModal");
     const makeVisibleBtn = document.getElementById("makeVisibleBtn");
     const dismissModalBtn = document.getElementById("dismissModalBtn");
-    const publishBtn = document.getElementById("publishBtn");
 
     const openMatchGate = () => {
         matchGateModal.classList.add("is-open");
@@ -720,9 +713,6 @@
 
     makeVisibleBtn.addEventListener("click", () => {
         closeMatchGate();
-        if (publishBtn) {
-            publishBtn.focus();
-        }
     });
 
     document.addEventListener("keydown", (event) => {
