@@ -125,16 +125,64 @@
         .echo-status-btn {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 4px 10px;
+            gap: 8px;
+            padding: 6px 12px;
             border-radius: 999px;
             border: 1px solid rgba(0, 240, 255, 0.35);
-            background: rgba(0, 240, 255, 0.08);
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.18), rgba(0, 240, 255, 0.04));
             color: var(--accent-cyan);
             font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 0.6px;
+            letter-spacing: 0.7px;
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+        
+        .echo-status-btn::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 20% 30%, rgba(0, 240, 255, 0.35), transparent 55%);
+            opacity: 0.45;
+            pointer-events: none;
+        }
+        
+        .echo-status-btn:hover {
+            border-color: rgba(0, 240, 255, 0.55);
+            box-shadow: 0 0 16px rgba(0, 240, 255, 0.35);
+        }
+        
+        .echo-toggle-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            box-shadow: 0 0 8px rgba(0, 240, 255, 0.9);
+            animation: echoBreath 2.2s ease-in-out infinite;
+        }
+        
+        .echo-status-text {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .echo-status-btn.is-off {
+            border-color: rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-secondary);
+            box-shadow: none;
+        }
+        
+        .echo-status-btn.is-off::after {
+            opacity: 0;
+        }
+        
+        .echo-status-btn.is-off .echo-toggle-dot {
+            background: rgba(255, 255, 255, 0.35);
+            box-shadow: none;
+            animation: none;
         }
 
         .nav-right {
@@ -380,6 +428,11 @@
             0% { opacity: 0; transform: translateY(4px); }
             100% { opacity: 1; transform: translateY(0); }
         }
+        
+        @keyframes echoBreath {
+            0%, 100% { opacity: 0.45; transform: scale(0.92); }
+            50% { opacity: 0.9; transform: scale(1); }
+        }
 
         /* --- Footer / Input Dock --- */
         .dock-wrapper {
@@ -445,6 +498,13 @@
             background: radial-gradient(circle, rgba(0, 240, 255, 0.8), transparent 70%);
             box-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
             flex-shrink: 0;
+            animation: echoBreath 2.6s ease-in-out infinite;
+        }
+        
+        body.echo-off .input-echo-icon {
+            opacity: 0;
+            transform: scale(0.8);
+            transition: opacity 0.2s ease, transform 0.2s ease;
         }
 
         .input-field {
@@ -466,23 +526,37 @@
 
         .send-btn {
             width: 40px;
-            height: 32px;
-            background: var(--echo-active);
-            border-radius: 12px;
-            border: none;
+            height: 40px;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.65), rgba(242, 245, 251, 0.35) 45%, rgba(230, 235, 244, 0.25) 100%);
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.25);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 0 15px rgba(255, 180, 68, 0.5);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.28), 0 0 10px rgba(255, 255, 255, 0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         
-        .send-arrow {
-            width: 0; 
-            height: 0; 
-            border-top: 6px solid transparent;
-            border-bottom: 6px solid transparent;
-            border-left: 10px solid #000;
+        .send-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45), 0 0 18px rgba(255, 255, 255, 0.65);
+        }
+        
+        .input-row:focus-within .send-btn {
+            background: radial-gradient(circle at 30% 30%, #ffffff, #f2f5fb 45%, #e6ebf4 100%);
+            border-color: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45), 0 0 18px rgba(255, 255, 255, 0.7);
+        }
+        
+        .send-icon {
+            width: 18px;
+            height: 18px;
+            stroke: #1a1208;
+            stroke-width: 2.2;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
         
 
@@ -510,8 +584,9 @@
         </div>
 
         <div class="nav-right">
-            <button class="echo-status-btn" aria-label="Toggle Echo">
-                Echo Active
+            <button class="echo-status-btn" id="echo-toggle-btn" aria-pressed="true" aria-label="Toggle Echo">
+                <span class="echo-toggle-dot" aria-hidden="true"></span>
+                <span class="echo-status-text">Echo Active</span>
             </button>
             <button class="menu-btn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
@@ -583,7 +658,10 @@
                 <input type="text" class="input-field" placeholder="Message Simon..." readonly>
                 <div class="input-actions">
                     <button class="send-btn" aria-label="Send message">
-                        <div class="send-arrow"></div>
+                        <svg class="send-icon" viewBox="0 0 24 24">
+                            <path d="M22 2L11 13"></path>
+                            <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
+                        </svg>
                     </button>
                 </div>
             </div>
@@ -594,6 +672,17 @@
         const memoryCount = document.body.dataset.memoryCount || "0";
         const memoryNode = document.getElementById("echo-memory-count");
         if (memoryNode) memoryNode.textContent = memoryCount;
+        
+        const echoToggleBtn = document.getElementById("echo-toggle-btn");
+        if (echoToggleBtn) {
+            echoToggleBtn.addEventListener("click", () => {
+                const isOff = document.body.classList.toggle("echo-off");
+                echoToggleBtn.classList.toggle("is-off", isOff);
+                const label = echoToggleBtn.querySelector(".echo-status-text");
+                if (label) label.textContent = isOff ? "Echo Off" : "Echo Active";
+                echoToggleBtn.setAttribute("aria-pressed", String(!isOff));
+            });
+        }
     </script>
 
 </body>
