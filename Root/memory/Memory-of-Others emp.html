@@ -46,106 +46,6 @@
             flex-direction: column;
         }
 
-        /* --- 1. HERO LAYER (Manga) --- */
-        .hero-layer {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 1;
-        }
-
-        .manga-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            /* Aesthetic grading: slightly raised blacks */
-            filter: contrast(1.05) brightness(0.9);
-            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-
-        /* The Deep Fade */
-        .gradient-overlay {
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            height: 70%;
-            background: linear-gradient(
-                to bottom,
-                transparent 0%,
-                rgba(0,0,0,0.4) 30%,
-                rgba(0,0,0,0.9) 60%,
-                #000000 100%
-            );
-            pointer-events: none;
-        }
-
-        /* Fullscreen image viewer */
-        .image-viewer {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.92);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s ease;
-            z-index: 999;
-        }
-
-        .image-viewer.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .image-viewer img {
-            max-width: 94vw;
-            max-height: 94vh;
-            object-fit: contain;
-            box-shadow: 0 20px 80px rgba(0,0,0,0.6);
-        }
-
-        .image-viewer .close-btn {
-            position: absolute;
-            top: 24px;
-            left: 24px;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(20,20,20,0.6);
-            color: #fff;
-            font-size: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(8px);
-        }
-
-        .image-viewer .save-btn {
-            position: absolute;
-            top: 24px;
-            right: 24px;
-            height: 44px;
-            padding: 0 16px;
-            border-radius: 999px;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(20,20,20,0.6);
-            color: #fff;
-            font-size: 14px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-            backdrop-filter: blur(8px);
-        }
-
-        .image-viewer .save-btn svg {
-            width: 16px;
-            height: 16px;
-            stroke: currentColor;
-        }
-
         /* --- 2. HEADER UI --- */
         .header-ui {
             position: absolute;
@@ -497,12 +397,6 @@
         </div>
     </div>
 
-    <!-- BACKGROUND -->
-    <div class="hero-layer">
-        <img src="../../image/manga.png" class="manga-image" alt="Manga Panel">
-        <div class="gradient-overlay"></div>
-    </div>
-
     <!-- MAIN CONTENT -->
     <div class="content-core" id="contentCore">
         
@@ -569,31 +463,12 @@
 
 </div>
 
-<!-- FULLSCREEN IMAGE VIEWER -->
-<div class="image-viewer" id="imageViewer" aria-hidden="true">
-    <button class="close-btn" id="closeViewer" aria-label="Close">✕</button>
-    <a class="save-btn" id="saveViewer" href="../../image/manga.png" download="manga.png">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
-        </svg>
-        Save to album
-    </a>
-    <img src="../../image/manga.png" alt="Manga Panel Full" id="viewerImage">
-</div>
-
 <script>
     const slider = document.getElementById('slider');
     const handle = document.getElementById('handle');
     const label = document.getElementById('sliderLabel');
     const input = document.getElementById('msgInput');
     const arrow = document.getElementById('arrowIcon');
-    const mangaImage = document.querySelector('.manga-image');
-    const imageViewer = document.getElementById('imageViewer');
-    const closeViewer = document.getElementById('closeViewer');
-    const viewerImage = document.getElementById('viewerImage');
-    const saveViewer = document.getElementById('saveViewer');
     
     let isDragging = false;
     let startX, currentX;
@@ -671,27 +546,6 @@
     function toggleReact(btn) {
         btn.classList.toggle('active');
     }
-
-    function openViewer() {
-        viewerImage.src = mangaImage.src;
-        saveViewer.href = mangaImage.src;
-        imageViewer.classList.add('active');
-        imageViewer.setAttribute('aria-hidden', 'false');
-    }
-
-    function closeViewerFn() {
-        imageViewer.classList.remove('active');
-        imageViewer.setAttribute('aria-hidden', 'true');
-    }
-
-    mangaImage.addEventListener('click', openViewer);
-    closeViewer.addEventListener('click', closeViewerFn);
-    imageViewer.addEventListener('click', closeViewerFn);
-    viewerImage.addEventListener('click', (e) => e.stopPropagation());
-
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeViewerFn();
-    });
 
 </script>
 
