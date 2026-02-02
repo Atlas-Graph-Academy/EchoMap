@@ -262,7 +262,7 @@
 
         .dock-actions {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             gap: 12px;
         }
 
@@ -277,6 +277,11 @@
             justify-content: center;
             border: 1px solid transparent;
             cursor: pointer;
+            flex: 0 0 auto;
+        }
+
+        .action-btn:not(.with-sub) {
+            padding: 0 12px;
         }
 
         .action-btn.with-sub {
@@ -320,9 +325,19 @@
 
         .edit-memory-btn {
             font-family: 'Caveat', 'Inter', sans-serif;
-            font-size: 16px;
+            font-size: 14px;
             letter-spacing: 2px;
             text-transform: uppercase;
+            width: 30%;
+        }
+
+        .edit-memory-btn .btn-main {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        #publishBtn {
+            width: 60%;
         }
 
         .privacy-status {
@@ -621,17 +636,6 @@
         </div>
 
         <div class="dock-actions">
-            <button class="action-btn secondary edit-memory-btn">
-                <span class="btn-main">
-                    <span class="btn-icon-small" aria-hidden="true">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 20h9"></path>
-                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
-                        </svg>
-                    </span>
-                    <span>Edit Memory</span>
-                </span>
-            </button>
             <button class="action-btn primary with-sub" id="publishBtn">
                 <span class="btn-main">
                     <span class="btn-icon-small" aria-hidden="true">
@@ -643,6 +647,17 @@
                     <span>Make This Visible</span>
                 </span>
                 <span class="btn-sub">Visible only to those who resonate</span>
+            </button>
+            <button class="action-btn secondary edit-memory-btn">
+                <span class="btn-main">
+                    <span class="btn-icon-small" aria-hidden="true">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 20h9"></path>
+                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+                        </svg>
+                    </span>
+                    <span>Edit Memory</span>
+                </span>
             </button>
         </div>
     </div>
