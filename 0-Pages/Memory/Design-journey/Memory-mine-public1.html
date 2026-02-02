@@ -464,13 +464,44 @@
             filter: brightness(1) saturate(1.05);
         }
 
+        .match-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
         .match-header {
             font-size: 12px;
             font-weight: 700;
             letter-spacing: 0.4px;
             color: #C4C9D4;
-            margin-bottom: 10px;
             white-space: nowrap;
+        }
+
+        .match-explore {
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(12, 12, 12, 0.6);
+            color: #C9CDD3;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .match-extra {
+            display: none;
+            margin-top: 10px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .match-extra.is-open {
+            display: flex;
         }
 
         .match-list {
@@ -728,7 +759,10 @@
     <!-- OWNER ACTION DOCK -->
     <div class="dock-area">
         <div class="match-panel">
-            <div class="match-header">3 people have similar memories.</div>
+            <div class="match-header-row">
+                <div class="match-header">3 people have similar memories.</div>
+                <button class="match-explore" type="button" id="exploreMoreBtn">Explore more</button>
+            </div>
             <div class="match-list" aria-label="Memory matching carousel">
                 <div class="match-item cyan">
                     <img class="match-avi" src="https://i.pravatar.cc/150?u=match-aurora" alt="Memory match 1">
@@ -753,6 +787,32 @@
                 <div class="match-item purple" aria-hidden="true">
                     <img class="match-avi" src="https://i.pravatar.cc/150?u=match-ember" alt="">
                     <span class="match-name">Ember Corridor</span>
+                </div>
+            </div>
+            <div class="match-extra" id="exploreMoreList" aria-label="More similar memories">
+                <div class="match-item cyan">
+                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-aurora" alt="Memory match 1">
+                    <span class="match-name">Aurora Hush</span>
+                </div>
+                <div class="match-item yellow">
+                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-signal" alt="Memory match 2">
+                    <span class="match-name">Signal in the Snow</span>
+                </div>
+                <div class="match-item purple">
+                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-ember" alt="Memory match 3">
+                    <span class="match-name">Ember Corridor</span>
+                </div>
+                <div class="match-item cyan">
+                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-river" alt="Memory match 4">
+                    <span class="match-name">River Without Sound</span>
+                </div>
+                <div class="match-item yellow">
+                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-glow" alt="Memory match 5">
+                    <span class="match-name">Glasslight</span>
+                </div>
+                <div class="match-item purple">
+                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-bloom" alt="Memory match 6">
+                    <span class="match-name">Quiet Bloom</span>
                 </div>
             </div>
         </div>
@@ -887,6 +947,16 @@
             reactionList.classList.add("is-open");
         });
     });
+
+    const exploreMoreBtn = document.getElementById("exploreMoreBtn");
+    const exploreMoreList = document.getElementById("exploreMoreList");
+
+    if (exploreMoreBtn && exploreMoreList) {
+        exploreMoreBtn.addEventListener("click", () => {
+            const isOpen = exploreMoreList.classList.toggle("is-open");
+            exploreMoreBtn.textContent = isOpen ? "Hide" : "Explore more";
+        });
+    }
 </script>
 
 </body>
