@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUMEN: Stretched Emotional Vectors</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #fcfcfc;
+            font-family: 'Helvetica Neue', sans-serif;
+            overflow: hidden;
+        }
+
+        .gallery {
+            display: flex;
+            gap: 56px;
+            align-items: flex-end; /* 让它们在底部对齐，更有展示架的感觉 */
+        }
+
+        .emotion-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 200px; /* 视觉更紧凑 */
+        }
+
+        svg {
+            width: 200px;
+            height: 200px;
+            overflow: visible;
+        }
+
+        /* --- 核心笔触系统 --- */
+        path, circle, rect, ellipse, line {
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: all 0.5s ease;
+        }
+
+        /* 1. SPIN-LOCK (死锁) - 保持不变 */
+        .spin-lock-fluid {
+            stroke: #00897b;
+            stroke-width: 20px;
+            stroke-dasharray: 600;
+            stroke-dashoffset: 600;
+            opacity: 0.8;
+            animation: draw-loop 6s linear infinite;
+        }
+        .spin-lock-eyes path { stroke: #222; stroke-width: 8px; }
+        .spin-lock-eyes circle { fill: #222; stroke: none; }
+        .spin-lock-eyes { animation: slow-blink 4s ease-in-out infinite; }
+
+        /* 2. JITTER (抖动) - 保持不变 */
+        .jitter-svg { animation: shake-hard 0.2s infinite; }
+        .jitter-fluid {
+            stroke: #e91e63;
+            stroke-width: 20px;
+            opacity: 0.8;
+            stroke-dasharray: 100 30;
+            animation: jitter-flux 0.5s infinite alternate;
+        }
+        .jitter-eyes circle.orbit { stroke: #222; stroke-width: 8px; }
+        .jitter-eyes circle.pupil { fill: #222; stroke: none; }
+        .jitter-eyes line { stroke: #222; stroke-width: 4px; }
+
+        /* 3. OVERFIT-GLOW (过拟合) - 修改为：胶囊单眼 */
+        .overfit-group {
+            transform-origin: center;
+            animation: overfit-float 3s ease-in-out infinite alternate;
+        }
+
+        /* 眼眶：拉长的胶囊 */
+        .overfit-sclera {
+            stroke: #ff9800; /* 烈日橙边框 */
+            stroke-width: 18px;
+            fill: rgba(255, 255, 255, 0.9); /* 填充白色，像眼球 */
+            filter: drop-shadow(0 0 15px rgba(255, 152, 0, 0.5)); /* 外部光晕 */
+            animation: sclera-pulse 2s infinite alternate;
+        }
+
+        /* 瞳孔：螺旋 */
+        .overfit-pupil {
+            stroke: #222; /* 黑色瞳孔 */
+            stroke-width: 6px;
+            transform-origin: center;
+            animation: pupil-spin 1s linear infinite;
+        }
+
+        /* 虹膜/高光：增加一点疯狂感 */
+        .overfit-shine {
+            fill: #fff;
+            stroke: none;
+            opacity: 0.6;
+        }
+
+        /* --- 动画关键帧 --- */
+        @keyframes draw-loop { to { stroke-dashoffset: 0; } }
+        @keyframes slow-blink { 0%, 80%, 100% { transform: scaleY(1); } 90% { transform: scaleY(0.1); } }
+        @keyframes shake-hard { 
+            0% { transform: translate(1px, 1px) rotate(0deg); } 
+            50% { transform: translate(-1px, -1px) rotate(1deg); } 
+            100% { transform: translate(0, 0) rotate(0deg); } 
+        }
+        @keyframes jitter-flux { from { stroke-width: 18px; } to { stroke-width: 24px; } }
+        @keyframes pupil-spin { to { transform: rotate(360deg); } }
+
+        /* 新增：胶囊眼球的呼吸和形变 */
+        @keyframes overfit-float {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(-10px) scale(1.05); }
+        }
+        @keyframes sclera-pulse {
+            0% { stroke-width: 18px; filter: drop-shadow(0 0 15px rgba(255, 152, 0, 0.5)); }
+            100% { stroke-width: 25px; filter: drop-shadow(0 0 30px rgba(255, 152, 0, 0.8)); }
+        }
+
+        /* 文字样式 */
+        .label {
+            margin-top: 24px;
+            font-weight: 800;
+            font-size: 13px;
+            letter-spacing: 1px;
+            text-transform: none;
+            color: #222;
+        }
+        .desc { font-size: 11px; color: #999; margin-top: 6px; text-align: center; }
+
+    </style>
+</head>
+<body>
+
+<div class="gallery">
+
+    <div class="emotion-card">
+        <svg viewBox="0 0 220 220">
+            <path class="spin-lock-fluid" d="M60,110 C60,60 110,60 110,110 C110,160 160,160 160,110 C160,60 110,60 110,110 C110,160 60,160 60,110 Z" />
+            <g class="spin-lock-eyes" transform-origin="center">
+                <path d="M75,105 Q90,95 105,105" />
+                <circle cx="90" cy="115" r="5" />
+                <path d="M115,105 Q130,95 145,105" />
+                <circle cx="130" cy="115" r="5" />
+            </g>
+        </svg>
+        <div class="label">Spin-Lock · 自旋锁死</div>
+        <div class="desc">脑子转不停，停不下来</div>
+    </div>
+
+    <div class="emotion-card">
+        <svg viewBox="0 0 220 220" class="jitter-svg">
+            <path class="jitter-fluid" d="M20,110 C40,30 40,190 60,110 C80,30 80,190 100,110 C120,30 120,190 140,110 C160,30 160,190 180,110" />
+            <g class="jitter-eyes" transform="translate(0, -10)">
+                <circle class="orbit" cx="80" cy="90" r="18" />
+                <circle class="pupil" cx="80" cy="90" r="4" />
+                <circle class="orbit" cx="140" cy="90" r="18" />
+                <circle class="pupil" cx="140" cy="90" r="4" />
+                <line x1="80" y1="65" x2="80" y2="50" />
+                <line x1="140" y1="65" x2="140" y2="50" />
+            </g>
+        </svg>
+        <div class="label">Jitter · 抖动</div>
+        <div class="desc">一点点动静就被拉走</div>
+    </div>
+
+    <div class="emotion-card">
+        <svg viewBox="0 0 240 240">
+            <g class="overfit-group">
+                <rect class="overfit-sclera" x="30" y="70" width="180" height="100" rx="50" ry="50" />
+                
+                <path class="overfit-pupil" d="M120,120 m-5,0 a5,5 0 1,1 10,0 a5,5 0 1,1 -10,0 M120,120 m-15,0 a15,15 0 1,1 30,0 a15,15 0 1,1 -30,0 M120,120 m-25,0 a25,25 0 1,1 50,0 a25,25 0 1,1 -50,0" />
+                
+                <ellipse class="overfit-shine" cx="70" cy="95" rx="15" ry="8" transform="rotate(-20 70 95)" />
+            </g>
+        </svg>
+        <div class="label">Overfit-Glow · 过拟合高热</div>
+        <div class="desc">像打了灯一样硬撑着亮</div>
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -64,6 +64,26 @@
             opacity: 0;
             pointer-events: none;
         }
+    .edge-blur-right {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 38vw;
+        height: 100vh;
+        z-index: 7;
+        pointer-events: none;
+        backdrop-filter: blur(26px) saturate(120%);
+        -webkit-backdrop-filter: blur(26px) saturate(120%);
+        background: linear-gradient(
+            to left,
+            rgba(0, 0, 0, 0.65) 0%,
+            rgba(0, 0, 0, 0.35) 35%,
+            rgba(0, 0, 0, 0.12) 60%,
+            rgba(0, 0, 0, 0) 100%
+        );
+        mask-image: linear-gradient(to left, black 0%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to left, black 0%, transparent 100%);
+    }
 
         .living-header {
             position: fixed;
@@ -323,103 +343,148 @@
         .pattern-left {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            width: 100%;
         }
         .pattern-name {
-            font-family: "Caveat", "SF Pro Display", sans-serif;
-            font-weight: 700;
-            font-size: 26px;
-            letter-spacing: 0.01em;
-            color: rgba(255,255,255,0.72);
-            text-shadow: 0 0 14px rgba(255,255,255,0.22), 0 0 36px rgba(255,255,255,0.12), 0 0 60px rgba(255,255,255,0.08);
-            filter: blur(0.6px);
-            opacity: 0.78;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 78px;
+            height: 60px;
+            font-size: 0;
+            line-height: 0;
+            opacity: 0.85;
+        }
+        .pattern-name svg {
+            width: 72px;
+            height: 72px;
+            overflow: visible;
+        }
+        .pattern-name path,
+        .pattern-name circle,
+        .pattern-name rect,
+        .pattern-name ellipse,
+        .pattern-name line {
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: all 0.5s ease;
+        }
+        .pattern-name .spin-lock-fluid {
+            stroke: #00897b;
+            stroke-width: 20px;
+            stroke-dasharray: 600;
+            stroke-dashoffset: 600;
+            opacity: 0.8;
+            animation: draw-loop 6s linear infinite;
+        }
+        .pattern-name .spin-lock-eyes path { stroke: rgba(255, 255, 255, 0.9); stroke-width: 8px; }
+        .pattern-name .spin-lock-eyes circle { fill: rgba(255, 255, 255, 0.9); stroke: none; }
+        .pattern-name .spin-lock-eyes { animation: slow-blink 4s ease-in-out infinite; }
+
+        .pattern-name .jitter-svg { animation: shake-hard 0.2s infinite; }
+        .pattern-name .jitter-fluid {
+            stroke: #e91e63;
+            stroke-width: 20px;
+            opacity: 0.8;
+            stroke-dasharray: 100 30;
+            animation: jitter-flux 0.5s infinite alternate;
+        }
+        .pattern-name .jitter-eyes circle.orbit { stroke: rgba(255, 255, 255, 0.9); stroke-width: 8px; }
+        .pattern-name .jitter-eyes circle.pupil { fill: rgba(255, 255, 255, 0.9); stroke: none; }
+        .pattern-name .jitter-eyes line { stroke: rgba(255, 255, 255, 0.9); stroke-width: 4px; }
+
+        .pattern-name .overfit-group {
+            transform-origin: center;
+            animation: overfit-float 3s ease-in-out infinite alternate;
+        }
+        .pattern-name .overfit-sclera {
+            stroke: #ff9800;
+            stroke-width: 18px;
+            fill: rgba(255, 255, 255, 0.9);
+            filter: drop-shadow(0 0 15px rgba(255, 152, 0, 0.5));
+            animation: sclera-pulse 2s infinite alternate;
+        }
+        .pattern-name .overfit-pupil {
+            stroke: rgba(255, 255, 255, 0.9);
+            stroke-width: 6px;
+            transform-origin: center;
+            animation: pupil-spin 1s linear infinite;
+        }
+        .pattern-name .overfit-shine {
+            fill: #fff;
+            stroke: none;
+            opacity: 0.6;
+        }
+        .pattern-signal {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 2px 8px 3px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-family: "SF Mono", "SF Pro Display", monospace;
+            letter-spacing: 0.06em;
+            text-transform: none;
+            color: rgba(255,255,255,0.75);
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            box-shadow: inset 0 0 10px rgba(255,255,255,0.06);
+        }
+        .pattern-signal::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            box-shadow: 0 0 10px rgba(255,255,255,0.35);
+        }
+        .signal-spin { border-color: rgba(255, 45, 85, 0.35); color: rgba(255, 195, 205, 0.85); }
+        .signal-spin::before { background: var(--color-burn); box-shadow: 0 0 10px rgba(255, 45, 85, 0.55); animation: glow-dim 2.8s ease-in-out infinite; }
+        .signal-jitter { border-color: rgba(10, 132, 255, 0.35); color: rgba(180, 215, 255, 0.85); }
+        .signal-jitter::before { background: var(--color-drift); box-shadow: 0 0 10px rgba(10, 132, 255, 0.55); animation: glow-flicker 1.6s ease-in-out infinite; }
+        .signal-overfit { border-color: rgba(191, 90, 242, 0.35); color: rgba(220, 185, 255, 0.85); }
+        .signal-overfit::before { background: var(--color-void); box-shadow: 0 0 10px rgba(191, 90, 242, 0.55); animation: glow-pulse 2.2s ease-in-out infinite; }
+        @keyframes glow-dim {
+            0%, 100% { transform: scale(0.95); opacity: 0.55; box-shadow: 0 0 8px rgba(255, 45, 85, 0.35); }
+            50% { transform: scale(1.05); opacity: 0.9; box-shadow: 0 0 14px rgba(255, 45, 85, 0.55); }
+        }
+        @keyframes glow-flicker {
+            0% { opacity: 0.45; transform: scale(0.9); }
+            20% { opacity: 0.9; transform: scale(1.05); }
+            40% { opacity: 0.6; transform: scale(0.95); }
+            60% { opacity: 1; transform: scale(1.08); }
+            80% { opacity: 0.5; transform: scale(0.92); }
+            100% { opacity: 0.75; transform: scale(1); }
+        }
+        @keyframes glow-pulse {
+            0%, 100% { opacity: 0.6; transform: scale(0.96); box-shadow: 0 0 8px rgba(191, 90, 242, 0.35); }
+            50% { opacity: 1; transform: scale(1.08); box-shadow: 0 0 16px rgba(191, 90, 242, 0.6); }
+        }
+        @keyframes draw-loop { to { stroke-dashoffset: 0; } }
+        @keyframes slow-blink { 0%, 80%, 100% { transform: scaleY(1); } 90% { transform: scaleY(0.1); } }
+        @keyframes shake-hard {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            50% { transform: translate(-1px, -1px) rotate(1deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+        @keyframes jitter-flux { from { stroke-width: 18px; } to { stroke-width: 24px; } }
+        @keyframes pupil-spin { to { transform: rotate(360deg); } }
+        @keyframes overfit-float {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(-10px) scale(1.05); }
+        }
+        @keyframes sclera-pulse {
+            0% { stroke-width: 18px; filter: drop-shadow(0 0 15px rgba(255, 152, 0, 0.5)); }
+            100% { stroke-width: 25px; filter: drop-shadow(0 0 30px rgba(255, 152, 0, 0.8)); }
         }
         .pattern-proof {
             font-size: 10px;
             color: var(--text-dim);
             font-family: "SF Mono", "SF Pro Display", monospace;
             white-space: nowrap;
-        }
-        .pattern-info {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 12px;
-            height: 12px;
-            border-radius: 999px;
-            border: 1px solid rgba(255,255,255,0.28);
-            color: rgba(255,255,255,0.6);
-            font-size: 9px;
-            line-height: 1;
-            cursor: pointer;
-            background: rgba(255,255,255,0.05);
-        }
-        .pattern-info::after {
-            content: "";
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.55);
-            box-shadow: 0 0 6px rgba(255,255,255,0.35);
-        }
-        .pattern-modal {
-            position: fixed;
-            inset: 0;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 50;
-        }
-        .pattern-modal.is-open {
-            display: flex;
-        }
-        .pattern-modal__backdrop {
-            position: absolute;
-            inset: 0;
-            background: rgba(0,0,0,0.55);
-        }
-        .pattern-modal__content {
-            position: relative;
-            width: min(340px, 86vw);
-            padding: 16px 18px;
-            background: rgba(10,10,12,0.96);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 14px;
-            color: rgba(255,255,255,0.82);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            z-index: 1;
-        }
-        .pattern-modal__title {
-            font-size: 14px;
-            font-weight: 600;
-            color: rgba(255,255,255,0.9);
-            margin-bottom: 6px;
-        }
-        .pattern-modal__body {
-            font-size: 12px;
-            line-height: 1.5;
-            color: rgba(255,255,255,0.7);
-            margin-bottom: 12px;
-        }
-        .pattern-modal__title,
-        .pattern-modal__body,
-        .pattern-modal__close {
-            font-family: "SF Mono", "SF Pro Display", monospace;
-        }
-        .pattern-modal__close {
-            appearance: none;
-            border: 1px solid rgba(255,255,255,0.16);
-            background: rgba(255,255,255,0.06);
-            color: rgba(255,255,255,0.8);
-            padding: 6px 10px;
-            border-radius: 10px;
-            font-size: 11px;
-            cursor: pointer;
+            margin-left: auto;
         }
 
         .glyph {
@@ -558,6 +623,7 @@
 
     <div class="galaxy-bg"></div>
     <div class="fog-layer" aria-hidden="true"></div>
+    <div class="edge-blur-right" aria-hidden="true"></div>
 
     <header class="living-header" id="location-status" role="button" tabindex="0" aria-pressed="false">
         <div class="status-bar" aria-live="polite">
@@ -596,9 +662,19 @@
                 <div class="cluster-header">
                     <div class="cluster-title">
                         <span class="pattern-left">
-                            <span class="pattern-name">Static Noise</span>
+                            <span class="pattern-name" aria-label="Spin-Lock">
+                                <svg viewBox="0 0 220 220" role="img" aria-hidden="true">
+                                    <path class="spin-lock-fluid" d="M60,110 C60,60 110,60 110,110 C110,160 160,160 160,110 C160,60 110,60 110,110 C110,160 60,160 60,110 Z" />
+                                    <g class="spin-lock-eyes" transform-origin="center">
+                                        <path d="M75,105 Q90,95 105,105" />
+                                        <circle cx="90" cy="115" r="5" />
+                                        <path d="M115,105 Q130,95 145,105" />
+                                        <circle cx="130" cy="115" r="5" />
+                                    </g>
+                                </svg>
+                            </span>
+                            <span class="pattern-signal signal-spin">脑子转不停，停不下来</span>
                             <span class="pattern-proof">219 people</span>
-                            <button class="pattern-info" type="button" aria-label="Echo insight" data-title="Echo sensed Static Noise" data-body="Many feel overwhelmed by constant alerts in the city. 219 people are resonating with this pattern.">i</button>
                         </span>
                     </div>
                 </div>
@@ -643,9 +719,21 @@
                 <div class="cluster-header">
                     <div class="cluster-title">
                         <span class="pattern-left">
-                            <span class="pattern-name">Drifting</span>
+                            <span class="pattern-name" aria-label="Jitter">
+                                <svg viewBox="0 0 220 220" class="jitter-svg" role="img" aria-hidden="true">
+                                    <path class="jitter-fluid" d="M20,110 C40,30 40,190 60,110 C80,30 80,190 100,110 C120,30 120,190 140,110 C160,30 160,190 180,110" />
+                                    <g class="jitter-eyes" transform="translate(0, -10)">
+                                        <circle class="orbit" cx="80" cy="90" r="18" />
+                                        <circle class="pupil" cx="80" cy="90" r="4" />
+                                        <circle class="orbit" cx="140" cy="90" r="18" />
+                                        <circle class="pupil" cx="140" cy="90" r="4" />
+                                        <line x1="80" y1="65" x2="80" y2="50" />
+                                        <line x1="140" y1="65" x2="140" y2="50" />
+                                    </g>
+                                </svg>
+                            </span>
+                            <span class="pattern-signal signal-jitter">一点点动静就被拉走</span>
                             <span class="pattern-proof">89 people</span>
-                            <button class="pattern-info" type="button" aria-label="Echo insight" data-title="Echo sensed Drifting" data-body="A shared feeling of being lost in transitions. 89 people are resonating with this pattern.">i</button>
                         </span>
                     </div>
                 </div>
@@ -680,9 +768,17 @@
                 <div class="cluster-header">
                     <div class="cluster-title">
                         <span class="pattern-left">
-                            <span class="pattern-name">Echoes</span>
+                            <span class="pattern-name" aria-label="Overfit-Glow">
+                                <svg viewBox="0 0 240 240" role="img" aria-hidden="true">
+                                    <g class="overfit-group">
+                                        <rect class="overfit-sclera" x="30" y="70" width="180" height="100" rx="50" ry="50" />
+                                        <path class="overfit-pupil" d="M120,120 m-5,0 a5,5 0 1,1 10,0 a5,5 0 1,1 -10,0 M120,120 m-15,0 a15,15 0 1,1 30,0 a15,15 0 1,1 -30,0 M120,120 m-25,0 a25,25 0 1,1 50,0 a25,25 0 1,1 -50,0" />
+                                        <ellipse class="overfit-shine" cx="70" cy="95" rx="15" ry="8" transform="rotate(-20 70 95)" />
+                                    </g>
+                                </svg>
+                            </span>
+                            <span class="pattern-signal signal-overfit">像打了灯一样硬撑着亮</span>
                             <span class="pattern-proof">1.2k people</span>
-                            <button class="pattern-info" type="button" aria-label="Echo insight" data-title="Echo sensed Echoes" data-body="Recurring memories resurfacing across months. 1.2k people are resonating with this pattern.">i</button>
                         </span>
                     </div>
                 </div>
@@ -710,15 +806,6 @@
                 </div>
             </div>
 
-        </div>
-    </div>
-
-    <div class="pattern-modal" id="pattern-modal" aria-hidden="true">
-        <div class="pattern-modal__backdrop"></div>
-        <div class="pattern-modal__content" role="dialog" aria-modal="true" aria-labelledby="pattern-modal-title">
-            <div class="pattern-modal__title" id="pattern-modal-title"></div>
-            <div class="pattern-modal__body" id="pattern-modal-body"></div>
-            <button class="pattern-modal__close" type="button">Close</button>
         </div>
     </div>
 
@@ -769,32 +856,6 @@
     });
 
     typeLoop();
-</script>
-<script>
-    const infoButtons = document.querySelectorAll(".pattern-info");
-    const modal = document.getElementById("pattern-modal");
-    const modalTitle = document.getElementById("pattern-modal-title");
-    const modalBody = document.getElementById("pattern-modal-body");
-    const modalClose = modal.querySelector(".pattern-modal__close");
-    const modalBackdrop = modal.querySelector(".pattern-modal__backdrop");
-
-    function closeModal() {
-        modal.classList.remove("is-open");
-        modal.setAttribute("aria-hidden", "true");
-    }
-
-    infoButtons.forEach((btn) => {
-        btn.addEventListener("click", (event) => {
-            event.stopPropagation();
-            modalTitle.textContent = btn.dataset.title || "Echo insight";
-            modalBody.textContent = btn.dataset.body || "";
-            modal.classList.add("is-open");
-            modal.setAttribute("aria-hidden", "false");
-        });
-    });
-
-    modalClose.addEventListener("click", closeModal);
-    modalBackdrop.addEventListener("click", closeModal);
 </script>
 <script>
     const statusHeader = document.getElementById("location-status");

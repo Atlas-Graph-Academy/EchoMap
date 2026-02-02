@@ -155,6 +155,12 @@
             justify-content: center;
             padding-top: 20px;
             animation: fadeIn 1s ease;
+            gap: 8px;
+            position: absolute;
+            bottom: 64px;
+            left: 0;
+            width: 100%;
+            z-index: 12;
         }
 
         .echo-pill {
@@ -178,6 +184,33 @@
             font-size: 14px;
             color: var(--echo-gold);
             font-weight: 700;
+        }
+
+        .echo-status {
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.45);
+            text-transform: uppercase;
+            opacity: 0;
+            transform: translateY(-4px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .echo-status.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .echo-indicator {
+            position: absolute;
+            bottom: 24px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            z-index: 12;
+            pointer-events: none;
         }
 
         /* === 2. CANVAS: The Finger Writing (Hook) === */
@@ -254,7 +287,7 @@
             <div class="header-echo">
                 <div class="echo-pill">
                     <div class="echo-icon"></div>
-                    <div class="echo-value">+42 ECHOES</div>
+                    <div class="echo-value">+<span id="echoCount">0</span> ECHOES</div>
                 </div>
             </div>
 
@@ -269,6 +302,9 @@
             </div>
 
         </div>
+        <div class="echo-indicator">
+            <div class="echo-status" id="echoStatus"></div>
+        </div>
     </div>
     <button class="restart-button" id="restartButton">Restart</button>
 
@@ -276,6 +312,8 @@
         const container = document.getElementById('cluster-core');
         const stage = document.getElementById('echo-stage');
         const restartButton = document.getElementById('restartButton');
+        const echoStatus = document.getElementById('echoStatus');
+        const echoCountEl = document.getElementById('echoCount');
         const tags = [
             'memory thread',
             'soft recall',
@@ -316,8 +354,78 @@
 
         let hasSettled = false;
         let startTime = Date.now();
+        let statusTimer = null;
+        let statusIndex = 0;
+        let echoCount = 0;
+        let echoAnimFrame = null;
         const startTop = 4;
         const endTop = 72;
+        const statusSteps = [
+            'moment created',
+            'memory found',
+            'process is over'
+        ];
+
+        function updateEchoCount(delta = 3, duration = 600) {
+            const start = echoCount;
+            const end = echoCount + delta;
+            const startTimeMs = performance.now();
+
+            if (echoAnimFrame) {
+                cancelAnimationFrame(echoAnimFrame);
+                echoAnimFrame = null;
+            }
+
+            const tick = (now) => {
+                const progress = Math.min(1, (now - startTimeMs) / duration);
+                const value = Math.round(start + (end - start) * progress);
+                if (echoCountEl) {
+                    echoCountEl.textContent = String(value);
+                }
+                if (progress < 1) {
+                    echoAnimFrame = requestAnimationFrame(tick);
+                } else {
+                    echoCount = end;
+                    echoAnimFrame = null;
+                }
+            };
+
+            echoAnimFrame = requestAnimationFrame(tick);
+        }
+
+        function resetEchoCount() {
+            echoCount = 0;
+            if (echoCountEl) {
+                echoCountEl.textContent = '0';
+            }
+        }
+
+        function runStatusSequence() {
+            if (!echoStatus) return;
+            if (statusTimer) {
+                clearTimeout(statusTimer);
+                statusTimer = null;
+            }
+            statusIndex = 0;
+            resetEchoCount();
+            echoStatus.textContent = statusSteps[statusIndex];
+            echoStatus.classList.add('is-visible');
+            updateEchoCount(3, 400);
+
+            const advance = () => {
+                statusIndex += 1;
+                if (statusIndex < statusSteps.length) {
+                    echoStatus.textContent = statusSteps[statusIndex];
+                    updateEchoCount(3, 400);
+                    statusTimer = setTimeout(advance, 1100);
+                } else {
+                    echoStatus.classList.remove('is-visible');
+                    statusTimer = null;
+                }
+            };
+
+            statusTimer = setTimeout(advance, 1100);
+        }
 
         const holdDuration = 2000;
 
@@ -373,10 +481,13 @@
             animateCluster();
         }
 
+        runStatusSequence();
+
         if (restartButton) {
             restartButton.addEventListener('click', () => {
                 hasSettled = false;
                 startTime = Date.now();
+                runStatusSequence();
                 if (stage) {
                     stage.style.top = `${startTop}%`;
                 }

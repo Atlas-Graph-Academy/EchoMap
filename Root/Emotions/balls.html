@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUMEN: Discrete Emotional Pods</title>
+    <style>
+        :root {
+            --bg-color: #f4f4f9; /* Slightly off-white background like the reference */
+        }
+
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 60px; /* Space between the discrete pods */
+            padding: 50px;
+        }
+
+        /* --- Common Pod Styling --- */
+        .pod-wrapper {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Debug outline to see the container boundaries */
+            /* border: 1px dashed #ddd; */
+        }
+
+        .label {
+            position: absolute;
+            bottom: -40px;
+            text-align: center;
+            font-weight: bold;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 12px;
+        }
+        .sub-label {
+            display: block;
+            font-weight: normal;
+            font-size: 9px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        /* --- 1. SPIN-LOCK (The Dense, Cold Void) --- */
+        /* Visual Ref: Middle center purple/blue orb in image_1.png */
+        /* Physics: High gravity, deeply sunk in Z-axis, internalized energy. */
+        .spinlock-pod {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #4a5cba, #2a1f61 80%);
+            box-shadow: 
+                inset 0 0 20px #1a0f41, /* Inner shadow for density */
+                0 0 30px rgba(42, 31, 97, 0.5); /* Soft outer glow */
+            filter: blur(4px); /* Less blur = higher density */
+            animation: deep-pulse 4s infinite ease-in-out;
+        }
+
+        /* Add a secondary internal glow */
+        .spinlock-pod::after {
+            content: '';
+            position: absolute;
+            top: 20%; left: 20%;
+            width: 60%; height: 60%;
+            border-radius: 50%;
+            background: radial-gradient(circle, #7f6ad6 0%, transparent 70%);
+            mix-blend-mode: overlay;
+            opacity: 0.7;
+        }
+
+
+        /* --- 2. JITTER (The Unstable Split) --- */
+        /* Visual Ref: Top center splitting blue/purple orbs in image_1.png */
+        /* Physics: Phase instability, trying to split apart, vibrating. */
+        .jitter-container {
+            position: relative;
+            width: 140px; height: 140px;
+            /* The container itself vibrates */
+            animation: tremor 0.2s infinite;
+        }
+
+        .jitter-orb-1, .jitter-orb-2 {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(12px);
+            mix-blend-mode: screen; /* Blending colors for light effect */
+        }
+
+        .jitter-orb-1 {
+            width: 100px; height: 100px;
+            top: 10px; left: 10px;
+            background: radial-gradient(circle, #ff5ac8 0%, rgba(255, 90, 200, 0) 70%);
+            animation: shift-1 3s infinite alternate ease-in-out;
+        }
+        
+        .jitter-orb-2 {
+            width: 100px; height: 100px;
+            bottom: 10px; right: 10px;
+            background: radial-gradient(circle, #4a90e2 0%, rgba(74, 144, 226, 0) 70%);
+            animation: shift-2 3s infinite alternate ease-in-out;
+        }
+
+
+        /* --- 3. OVERFIT-GLOW (The Burning Expansion) --- */
+        /* Visual Ref: Top right red/yellow hot orb in image_1.png */
+        /* Physics: Overheating core pushes light outward, massive bloom. */
+        .overfit-pod {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            /* Core heat source */
+            background: radial-gradient(circle at 40% 40%, #fffba0 10%, #ffdd00 40%, #ff5e3a 80%);
+            /* Extreme blur for atmospheric bloom */
+            filter: blur(15px);
+            /* Outer glowing aura */
+            box-shadow: 
+                0 0 60px rgba(255, 94, 58, 0.6),
+                0 0 100px rgba(255, 221, 0, 0.4);
+            animation: heat-expand 2s infinite alternate ease-in-out;
+        }
+        
+        /* A hot white core */
+        .overfit-pod::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40%; height: 40%;
+            background: #ffffff;
+            filter: blur(5px);
+            border-radius: 50%;
+        }
+
+
+        /* --- Animations (Photon Dynamics) --- */
+        /* Slow, deep breathing for Spin-Lock */
+        @keyframes deep-pulse {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(0.95); opacity: 1; filter: blur(3px); }
+        }
+
+        /* High frequency vibration for Jitter container */
+        @keyframes tremor {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(1px, 1px); }
+            50% { transform: translate(0, -1px); }
+            75% { transform: translate(-1px, 0); }
+            100% { transform: translate(0, 0); }
+        }
+        /* The two parts of Jitter trying to separate */
+        @keyframes shift-1 { 0% { transform: translate(0,0); } 100% { transform: translate(-10px, -10px); } }
+        @keyframes shift-2 { 0% { transform: translate(0,0); } 100% { transform: translate(10px, 10px); } }
+
+        /* Aggressive expansion for Overfit */
+        @keyframes heat-expand {
+            from { transform: scale(1); filter: blur(15px); }
+            to { transform: scale(1.15); filter: blur(18px); opacity: 0.8; }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <div class="pod-wrapper">
+        <div class="spinlock-pod"></div>
+        <div class="label">
+            Spin-Lock
+            <span class="sub-label">Deep Inertia / Waiting</span>
+        </div>
+    </div>
+
+    <div class="pod-wrapper">
+        <div class="jitter-container">
+            <div class="jitter-orb-1"></div>
+            <div class="jitter-orb-2"></div>
+        </div>
+        <div class="label">
+            Jitter
+            <span class="sub-label">Fragmentation / Noise</span>
+        </div>
+    </div>
+
+    <div class="pod-wrapper">
+        <div class="overfit-pod"></div>
+        <div class="label">
+            Overfit-Glow
+            <span class="sub-label">Hallucination / Manic</span>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
