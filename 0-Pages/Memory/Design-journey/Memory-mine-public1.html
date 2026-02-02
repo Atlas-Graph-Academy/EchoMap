@@ -238,6 +238,85 @@
             margin-bottom: 20px;
         }
 
+        .reactions-panel {
+            margin-top: 18px;
+            padding: 0;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+        }
+
+        .reactions-title {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            color: #C9CDD3;
+            margin-bottom: 10px;
+        }
+
+        .reactions-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .reaction-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(20, 20, 20, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #E5E7EB;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .reaction-pill.active {
+            border-color: rgba(6, 182, 212, 0.45);
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+        }
+
+        .reaction-list {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(8, 8, 8, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #C9CDD3;
+            font-size: 12px;
+            display: none;
+        }
+
+        .reaction-list.is-open {
+            display: block;
+        }
+
+        .reaction-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .reaction-list li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reaction-avi {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
         /* Social Pile */
         .social-row {
             display: flex; align-items: center; gap: 12px;
@@ -613,6 +692,19 @@
         <h1>The Constraints of Creativity</h1>
         <p>The panel illustrates a profound disconnection. It feels like cognition isn't one's own—much like the neutrinos passing through us. This connects to our discussion on agency in digital spaces.</p>
 
+        <div class="reactions-panel" id="reactionsPanel">
+            <div class="reactions-row" aria-label="Emoji reactions">
+                <button class="reaction-pill" data-reaction="fire" type="button">🔥 12</button>
+                <button class="reaction-pill" data-reaction="sad" type="button">😢 8</button>
+                <button class="reaction-pill" data-reaction="heart" type="button">💜 23</button>
+                <button class="reaction-pill" data-reaction="agree" type="button">👍 14</button>
+                <button class="reaction-pill" data-reaction="careful" type="button">⚠️ 6</button>
+            </div>
+            <div class="reaction-list" id="reactionList" aria-live="polite">
+                <ul id="reactionNames"></ul>
+            </div>
+        </div>
+
     </div>
 
     <!-- OWNER ACTION DOCK -->
@@ -719,6 +811,63 @@
         if (event.key === "Escape" && matchGateModal.classList.contains("is-open")) {
             closeMatchGate();
         }
+    });
+
+    const reactionData = {
+        fire: [
+            { name: "Neon Quiet", avatar: "https://i.pravatar.cc/150?u=rx-fire-1" },
+            { name: "Soft Static", avatar: "https://i.pravatar.cc/150?u=rx-fire-2" },
+            { name: "City Afterglow", avatar: "https://i.pravatar.cc/150?u=rx-fire-3" }
+        ],
+        sad: [
+            { name: "Velvet Rain", avatar: "https://i.pravatar.cc/150?u=rx-sad-1" },
+            { name: "Echo Field", avatar: "https://i.pravatar.cc/150?u=rx-sad-2" }
+        ],
+        heart: [
+            { name: "Aurora Hush", avatar: "https://i.pravatar.cc/150?u=rx-heart-1" },
+            { name: "Signal in the Snow", avatar: "https://i.pravatar.cc/150?u=rx-heart-2" },
+            { name: "Ember Corridor", avatar: "https://i.pravatar.cc/150?u=rx-heart-3" }
+        ],
+        agree: [
+            { name: "Quiet Harbor", avatar: "https://i.pravatar.cc/150?u=rx-agree-1" },
+            { name: "Blue Static", avatar: "https://i.pravatar.cc/150?u=rx-agree-2" }
+        ],
+        careful: [
+            { name: "Night Signal", avatar: "https://i.pravatar.cc/150?u=rx-careful-1" },
+            { name: "Grainlight", avatar: "https://i.pravatar.cc/150?u=rx-careful-2" }
+        ]
+    };
+
+    const reactionButtons = document.querySelectorAll(".reaction-pill");
+    const reactionList = document.getElementById("reactionList");
+    const reactionNames = document.getElementById("reactionNames");
+
+    const renderReactionNames = (key) => {
+        const entries = reactionData[key] || [];
+        reactionNames.innerHTML = entries
+            .map(
+                (entry) =>
+                    `<li><img class="reaction-avi" src="${entry.avatar}" alt="${entry.name}"><span>${entry.name}</span></li>`
+            )
+            .join("");
+    };
+
+    reactionButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            const key = button.dataset.reaction;
+            const isActive = button.classList.contains("active");
+
+            reactionButtons.forEach((btn) => btn.classList.remove("active"));
+
+            if (isActive) {
+                reactionList.classList.remove("is-open");
+                return;
+            }
+
+            button.classList.add("active");
+            renderReactionNames(key);
+            reactionList.classList.add("is-open");
+        });
     });
 </script>
 
