@@ -47,6 +47,18 @@
             flex-direction: column;
         }
 
+        .page-hero {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.16;
+            filter: contrast(1.05) saturate(0.9);
+            pointer-events: none;
+            z-index: 0;
+        }
+
         /* --- 2. HEADER UI --- */
         .header-ui {
             position: absolute;
@@ -676,6 +688,8 @@
 <body>
 
 <div class="device-frame">
+
+    <img class="page-hero" src="../../image/manga.png" alt="Manga panel">
 
     <div class="memory-tags">
         <span class="memory-label">Memory</span>
