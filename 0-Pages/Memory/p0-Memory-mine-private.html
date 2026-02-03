@@ -148,13 +148,13 @@
         /* --- 3. CONTENT CORE --- */
         .content-core {
             position: absolute;
-            top: 140px;
+            top: clamp(160px, 28vh, 360px);
             bottom: 0;
             left: 0; right: 0;
             padding: 0 24px calc(var(--dock-height) + 28px);
             z-index: 10;
             transform: translateY(0);
-            transition: transform 0.4s ease;
+            transition: transform 0.4s ease, top 0.35s ease;
             display: flex;
             flex-direction: column;
             overflow-y: auto;
@@ -177,6 +177,10 @@
                 rgba(0, 0, 0, 0.45) 92%,
                 rgba(0, 0, 0, 0) 100%
             );
+        }
+
+        .content-core.is-scrolled {
+            top: clamp(140px, 20vh, 320px);
         }
 
         .content-core::-webkit-scrollbar {
@@ -463,10 +467,13 @@
 
         .match-header {
             font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 1.2px;
+            font-weight: 700;
+            letter-spacing: 1.4px;
             text-transform: uppercase;
-            color: rgba(201, 205, 211, 0.75);
+            color: rgba(244, 247, 250, 0.95);
+            text-shadow:
+                0 0 6px rgba(255, 255, 255, 0.45),
+                0 0 12px rgba(255, 255, 255, 0.3);
             margin-bottom: 10px;
             white-space: nowrap;
         }
@@ -793,6 +800,7 @@
     const makeVisibleBtn = document.getElementById("makeVisibleBtn");
     const dismissModalBtn = document.getElementById("dismissModalBtn");
     const publishBtn = document.getElementById("publishBtn");
+    const contentCore = document.getElementById("contentCore");
 
     const openMatchGate = () => {
         matchGateModal.classList.add("is-open");
@@ -809,6 +817,13 @@
     });
 
     dismissModalBtn.addEventListener("click", closeMatchGate);
+
+    if (contentCore) {
+        contentCore.addEventListener("scroll", () => {
+            const shouldLift = contentCore.scrollTop > 12;
+            contentCore.classList.toggle("is-scrolled", shouldLift);
+        });
+    }
 
     matchGateModal.addEventListener("click", (event) => {
         if (event.target === matchGateModal) {
