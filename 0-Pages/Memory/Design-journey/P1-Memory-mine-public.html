@@ -15,6 +15,7 @@
             --text-secondary: #9CA3AF;
             --accent-orange: #F97316;
             --accent-blue: #06B6D4;
+            --dock-height: 250px;
             
             --glass-panel: rgba(20, 20, 20, 0.85);
             --glass-border: rgba(255, 255, 255, 0.12);
@@ -166,16 +167,20 @@
         /* --- 3. CONTENT CORE --- */
         .content-core {
             position: absolute;
-            top: 160px;
-            bottom: 260px; /* Space for the dock */
+            top: clamp(160px, 28vh, 360px);
+            bottom: 0;
             left: 0; right: 0;
-            padding: 0 24px;
+            padding: 0 24px calc(var(--dock-height) + 28px);
             z-index: 10;
             transform: translateY(0);
-            transition: transform 0.4s ease;
+            transition: transform 0.4s ease, top 0.35s ease;
             overflow: hidden;
             display: flex;
             flex-direction: column;
+        }
+
+        .content-core.is-scrolled {
+            top: clamp(140px, 20vh, 320px);
         }
 
         .content-core::before {
@@ -252,12 +257,11 @@
         }
 
         .content-scroll::-webkit-scrollbar {
-            width: 6px;
+            width: 0;
         }
 
         .content-scroll::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.18);
-            border-radius: 999px;
+            background: transparent;
         }
 
         /* The User Chip (Floating above text) */
@@ -971,6 +975,8 @@
     const matchGateModal = document.getElementById("matchGateModal");
     const makeVisibleBtn = document.getElementById("makeVisibleBtn");
     const dismissModalBtn = document.getElementById("dismissModalBtn");
+    const contentCore = document.getElementById("contentCore");
+    const contentScroll = document.querySelector(".content-scroll");
 
     const openMatchGate = () => {
         matchGateModal.classList.add("is-open");
@@ -987,6 +993,21 @@
     });
 
     dismissModalBtn.addEventListener("click", closeMatchGate);
+
+    const updateCoreScrollState = () => {
+        if (!contentCore || !contentScroll) return;
+        const scrollSlack = contentScroll.scrollHeight - contentScroll.clientHeight;
+        const canScroll = scrollSlack > 2;
+        const shouldLift = canScroll && contentScroll.scrollTop > 12;
+        contentCore.classList.toggle("is-scrolled", shouldLift);
+        contentScroll.style.overflowY = canScroll ? "auto" : "hidden";
+    };
+
+    if (contentScroll) {
+        contentScroll.addEventListener("scroll", updateCoreScrollState);
+        window.addEventListener("resize", updateCoreScrollState);
+        updateCoreScrollState();
+    }
 
     matchGateModal.addEventListener("click", (event) => {
         if (event.target === matchGateModal) {

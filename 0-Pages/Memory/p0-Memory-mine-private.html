@@ -818,11 +818,21 @@
 
     dismissModalBtn.addEventListener("click", closeMatchGate);
 
+    const updateCoreScrollState = () => {
+        if (!contentCore) return;
+        const styles = window.getComputedStyle(contentCore);
+        const paddingBottom = parseFloat(styles.paddingBottom) || 0;
+        const scrollSlack = contentCore.scrollHeight - contentCore.clientHeight - paddingBottom;
+        const canScroll = scrollSlack > 2;
+        const shouldLift = canScroll && contentCore.scrollTop > 12;
+        contentCore.classList.toggle("is-scrolled", shouldLift);
+        contentCore.style.overflowY = canScroll ? "auto" : "hidden";
+    };
+
     if (contentCore) {
-        contentCore.addEventListener("scroll", () => {
-            const shouldLift = contentCore.scrollTop > 12;
-            contentCore.classList.toggle("is-scrolled", shouldLift);
-        });
+        contentCore.addEventListener("scroll", updateCoreScrollState);
+        window.addEventListener("resize", updateCoreScrollState);
+        updateCoreScrollState();
     }
 
     matchGateModal.addEventListener("click", (event) => {

@@ -15,6 +15,7 @@
             --text-secondary: #9CA3AF;
             --accent-orange: #F97316;
             --accent-blue: #06B6D4;
+            --dock-height: 250px;
             
             --glass-panel: rgba(20, 20, 20, 0.85);
             --glass-border: rgba(255, 255, 255, 0.12);
@@ -147,12 +148,49 @@
         /* --- 3. CONTENT CORE --- */
         .content-core {
             position: absolute;
-            bottom: 260px; /* Space for the dock */
+            top: clamp(160px, 28vh, 360px);
+            bottom: 0;
             left: 0; right: 0;
-            padding: 0 24px;
+            padding: 0 24px calc(var(--dock-height) + 28px);
             z-index: 10;
             transform: translateY(0);
-            transition: transform 0.4s ease;
+            transition: transform 0.4s ease, top 0.35s ease;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: transparent transparent;
+            -webkit-mask-image: linear-gradient(
+                to bottom,
+                rgba(0, 0, 0, 1) 0%,
+                rgba(0, 0, 0, 1) 72%,
+                rgba(0, 0, 0, 0.8) 84%,
+                rgba(0, 0, 0, 0.45) 92%,
+                rgba(0, 0, 0, 0) 100%
+            );
+            mask-image: linear-gradient(
+                to bottom,
+                rgba(0, 0, 0, 1) 0%,
+                rgba(0, 0, 0, 1) 72%,
+                rgba(0, 0, 0, 0.8) 84%,
+                rgba(0, 0, 0, 0.45) 92%,
+                rgba(0, 0, 0, 0) 100%
+            );
+        }
+
+        .content-core.is-scrolled {
+            top: clamp(140px, 20vh, 320px);
+        }
+
+        .content-core::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+            background: transparent;
+        }
+
+        .content-core::-webkit-scrollbar-thumb {
+            background: transparent;
         }
 
         .content-core::before {
@@ -177,6 +215,24 @@
         .content-core > * {
             position: relative;
             z-index: 1;
+        }
+
+        .content-header {
+            position: sticky;
+            top: 0;
+            padding: 8px 0 12px;
+            background: linear-gradient(
+                to bottom,
+                rgba(0, 0, 0, 0.95) 0%,
+                rgba(0, 0, 0, 0.65) 55%,
+                rgba(0, 0, 0, 0) 100%
+            );
+            z-index: 2;
+        }
+
+        .content-body {
+            margin-top: auto;
+            padding-bottom: 8px;
         }
 
         /* The User Chip (Floating above text) */
@@ -233,8 +289,6 @@
 
         p {
             font-size: 15px; line-height: 1.5; color: #B0B0B0;
-            display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;
-            line-clamp: 4; overflow: hidden;
             margin-bottom: 20px;
         }
 
@@ -723,34 +777,39 @@
         
         <!-- User Badge moved to top tags -->
 
-        <div class="meta-row dim">
-            <div class="dot"></div>
-            <span class="meta-text">15.01.20, 6:30 PM</span>
-            <span class="meta-text time-ago">• by you</span>
-            <span class="privacy-status private dim">Private</span>
-        </div>
-        <div class="meta-row timeline-row">
-            <div class="dot"></div>
-            <span class="meta-text">15.02.20, 7:30 PM</span>
-            <span class="meta-text">• by you</span>
-            <span class="privacy-status public">Public</span>
-        </div>
-
-        <h1>The Constraints of Creativity</h1>
-        <p>The panel illustrates a profound disconnection. It feels like cognition isn't one's own—much like the neutrinos passing through us. This connects to our discussion on agency in digital spaces.</p>
-
-        <div class="reactions-panel" id="reactionsPanel">
-            <div class="echo-count">Echoed 18 times</div>
-            <div class="echo-subtext">Each view or match counts as an Echo.</div>
-            <div class="reactions-row" aria-label="Emoji reactions">
-                <button class="reaction-pill" data-reaction="fire" type="button">🔥 12</button>
-                <button class="reaction-pill" data-reaction="sad" type="button">😢 8</button>
-                <button class="reaction-pill" data-reaction="heart" type="button">💜 23</button>
-                <button class="reaction-pill" data-reaction="agree" type="button">👍 14</button>
-                <button class="reaction-pill" data-reaction="careful" type="button">⚠️ 6</button>
+        <div class="content-header">
+            <div class="meta-row dim">
+                <div class="dot"></div>
+                <span class="meta-text">15.01.20, 6:30 PM</span>
+                <span class="meta-text time-ago">• by you</span>
+                <span class="privacy-status private dim">Private</span>
             </div>
-            <div class="reaction-list" id="reactionList" aria-live="polite">
-                <ul id="reactionNames"></ul>
+            <div class="meta-row timeline-row">
+                <div class="dot"></div>
+                <span class="meta-text">15.02.20, 7:30 PM</span>
+                <span class="meta-text">• by you</span>
+                <span class="privacy-status public">Public</span>
+            </div>
+
+            <h1>The Constraints of Creativity</h1>
+        </div>
+
+        <div class="content-body">
+            <p>The panel illustrates a profound disconnection. It feels like cognition isn't one's own—much like the neutrinos passing through us. This connects to our discussion on agency in digital spaces.</p>
+
+            <div class="reactions-panel" id="reactionsPanel">
+                <div class="echo-count">Echoed 18 times</div>
+                <div class="echo-subtext">Each view or match counts as an Echo.</div>
+                <div class="reactions-row" aria-label="Emoji reactions">
+                    <button class="reaction-pill" data-reaction="fire" type="button">🔥 12</button>
+                    <button class="reaction-pill" data-reaction="sad" type="button">😢 8</button>
+                    <button class="reaction-pill" data-reaction="heart" type="button">💜 23</button>
+                    <button class="reaction-pill" data-reaction="agree" type="button">👍 14</button>
+                    <button class="reaction-pill" data-reaction="careful" type="button">⚠️ 6</button>
+                </div>
+                <div class="reaction-list" id="reactionList" aria-live="polite">
+                    <ul id="reactionNames"></ul>
+                </div>
             </div>
         </div>
 
@@ -858,6 +917,7 @@
     const matchGateModal = document.getElementById("matchGateModal");
     const makeVisibleBtn = document.getElementById("makeVisibleBtn");
     const dismissModalBtn = document.getElementById("dismissModalBtn");
+    const contentCore = document.getElementById("contentCore");
 
     const openMatchGate = () => {
         matchGateModal.classList.add("is-open");
@@ -874,6 +934,23 @@
     });
 
     dismissModalBtn.addEventListener("click", closeMatchGate);
+
+    const updateCoreScrollState = () => {
+        if (!contentCore) return;
+        const styles = window.getComputedStyle(contentCore);
+        const paddingBottom = parseFloat(styles.paddingBottom) || 0;
+        const scrollSlack = contentCore.scrollHeight - contentCore.clientHeight - paddingBottom;
+        const canScroll = scrollSlack > 2;
+        const shouldLift = canScroll && contentCore.scrollTop > 12;
+        contentCore.classList.toggle("is-scrolled", shouldLift);
+        contentCore.style.overflowY = canScroll ? "auto" : "hidden";
+    };
+
+    if (contentCore) {
+        contentCore.addEventListener("scroll", updateCoreScrollState);
+        window.addEventListener("resize", updateCoreScrollState);
+        updateCoreScrollState();
+    }
 
     matchGateModal.addEventListener("click", (event) => {
         if (event.target === matchGateModal) {
