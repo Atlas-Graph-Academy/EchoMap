@@ -15,7 +15,6 @@
             --text-secondary: #9CA3AF;
             --accent-orange: #F97316;
             --accent-blue: #06B6D4;
-            --dock-height: 250px;
             
             --glass-panel: rgba(20, 20, 20, 0.85);
             --glass-border: rgba(255, 255, 255, 0.12);
@@ -57,6 +56,25 @@
             align-items: center;
             z-index: 20;
             background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .edit-memory-top {
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(12, 12, 12, 0.35);
+            color: rgba(229, 231, 235, 0.7);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            cursor: pointer;
+            text-transform: uppercase;
         }
 
         .memory-tags {
@@ -148,45 +166,16 @@
         /* --- 3. CONTENT CORE --- */
         .content-core {
             position: absolute;
-            top: 140px;
-            bottom: 0;
+            top: 160px;
+            bottom: 260px; /* Space for the dock */
             left: 0; right: 0;
-            padding: 0 24px calc(var(--dock-height) + 28px);
+            padding: 0 24px;
             z-index: 10;
             transform: translateY(0);
             transition: transform 0.4s ease;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
-            scrollbar-color: transparent transparent;
-            -webkit-mask-image: linear-gradient(
-                to bottom,
-                rgba(0, 0, 0, 1) 0%,
-                rgba(0, 0, 0, 1) 72%,
-                rgba(0, 0, 0, 0.8) 84%,
-                rgba(0, 0, 0, 0.45) 92%,
-                rgba(0, 0, 0, 0) 100%
-            );
-            mask-image: linear-gradient(
-                to bottom,
-                rgba(0, 0, 0, 1) 0%,
-                rgba(0, 0, 0, 1) 72%,
-                rgba(0, 0, 0, 0.8) 84%,
-                rgba(0, 0, 0, 0.45) 92%,
-                rgba(0, 0, 0, 0) 100%
-            );
-        }
-
-        .content-core::-webkit-scrollbar {
-            width: 0;
-            height: 0;
-            background: transparent;
-        }
-
-        .content-core::-webkit-scrollbar-thumb {
-            background: transparent;
         }
 
         .content-core::before {
@@ -194,22 +183,36 @@
             position: absolute;
             left: 0;
             right: 0;
-            top: -80px;
-            bottom: -180px;
+            top: -120px;
+            bottom: -260px;
             background: linear-gradient(
                 to bottom,
-                rgba(0,0,0,0.45) 0%,
-                rgba(0,0,0,0.6) 30%,
-                rgba(0,0,0,0.78) 60%,
+                rgba(0,0,0,0.15) 0%,
+                rgba(0,0,0,0.45) 35%,
+                rgba(0,0,0,0.7) 65%,
                 rgba(0,0,0,0.98) 100%
             );
-            filter: blur(8px);
+            filter: blur(12px);
             pointer-events: none;
             z-index: 0;
         }
 
         .content-core::after {
-            content: none;
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -40px;
+            height: 120px;
+            background: linear-gradient(
+                to bottom,
+                rgba(0,0,0,0) 0%,
+                rgba(0,0,0,0.65) 60%,
+                rgba(0,0,0,0.95) 100%
+            );
+            filter: blur(10px);
+            pointer-events: none;
+            z-index: 0;
         }
 
         .content-core > * {
@@ -217,22 +220,44 @@
             z-index: 1;
         }
 
-        .content-header {
-            position: sticky;
-            top: 0;
-            padding: 8px 0 12px;
-            background: linear-gradient(
-                to bottom,
-                rgba(0, 0, 0, 0.95) 0%,
-                rgba(0, 0, 0, 0.65) 55%,
-                rgba(0, 0, 0, 0) 100%
-            );
-            z-index: 2;
+        .memory-title-block {
+            position: relative;
+            padding: 4px 0 8px;
         }
 
-        .content-body {
-            margin-top: auto;
-            padding-bottom: 8px;
+        .memory-title-block::after {
+            content: "";
+            position: absolute;
+            left: -24px;
+            right: -24px;
+            bottom: -8px;
+            height: 28px;
+            background: linear-gradient(
+                to bottom,
+                rgba(0,0,0,0.2) 0%,
+                rgba(0,0,0,0.45) 45%,
+                rgba(0,0,0,0.7) 100%
+            );
+            filter: blur(6px);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .content-scroll {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding-bottom: 40px;
+            padding-top: 6px;
+        }
+
+        .content-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .content-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.18);
+            border-radius: 999px;
         }
 
         /* The User Chip (Floating above text) */
@@ -270,6 +295,16 @@
             margin-left: 10px;
         }
 
+        .meta-row.dim .meta-text {
+            color: #6B7280;
+            opacity: 0.7;
+        }
+
+        .meta-row.dim .dot {
+            opacity: 0.4;
+            box-shadow: 0 0 4px rgba(249, 115, 22, 0.35);
+        }
+
         /* Typography */
         h1 {
             font-size: 32px; font-weight: 800; line-height: 1.1;
@@ -280,6 +315,102 @@
         p {
             font-size: 15px; line-height: 1.5; color: #B0B0B0;
             margin-bottom: 20px;
+        }
+
+        .reactions-panel {
+            margin-top: 18px;
+            margin-bottom: 10px;
+            padding: 0;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+        }
+
+        .echo-count {
+            font-size: 12px;
+            font-weight: 700;
+            color: #C4C9D4;
+            letter-spacing: 0.6px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .echo-subtext {
+            font-size: 11px;
+            color: #9CA3AF;
+            letter-spacing: 0.2px;
+            margin-bottom: 10px;
+        }
+
+        .reactions-title {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            color: #C9CDD3;
+            margin-bottom: 10px;
+        }
+
+        .reactions-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .reaction-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(20, 20, 20, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #E5E7EB;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .reaction-pill.active {
+            border-color: rgba(6, 182, 212, 0.45);
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+        }
+
+        .reaction-list {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(8, 8, 8, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #C9CDD3;
+            font-size: 12px;
+            display: none;
+        }
+
+        .reaction-list.is-open {
+            display: block;
+        }
+
+        .reaction-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .reaction-list li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reaction-avi {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            object-fit: cover;
         }
 
         /* Social Pile */
@@ -301,20 +432,24 @@
             position: absolute;
             bottom: 0; left: 0; right: 0;
             padding: 18px 24px 40px;
-            background: transparent;
+            background: #000;
             z-index: 50;
         }
 
         .dock-area::before {
             content: "";
             position: absolute;
-            inset: 0;
+            left: 0;
+            right: 0;
+            top: -90px;
+            height: 90px;
             background: linear-gradient(
                 to top,
-                rgba(0, 0, 0, 0.95) 0%,
-                rgba(0, 0, 0, 0.75) 45%,
-                rgba(0, 0, 0, 0) 100%
+                rgba(0,0,0,0.98) 0%,
+                rgba(0,0,0,0.55) 55%,
+                rgba(0,0,0,0) 100%
             );
+            pointer-events: none;
             z-index: 0;
         }
 
@@ -336,6 +471,8 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
+            position: relative;
+            min-height: 80px;
         }
 
         .action-btn {
@@ -397,6 +534,19 @@
             text-transform: uppercase;
         }
 
+        .action-btn.floating {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 15, 15, 0.9);
+            border-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(16px);
+            box-shadow:
+                0 16px 30px rgba(0, 0, 0, 0.55),
+                0 6px 16px rgba(6, 182, 212, 0.18);
+        }
+
         .privacy-status {
             padding: 4px 10px;
             border-radius: 999px;
@@ -412,63 +562,64 @@
             border: 1px solid rgba(248, 113, 113, 0.35);
         }
 
+        .privacy-status.dim {
+            opacity: 0.35;
+            filter: saturate(0.7);
+        }
+
+        .privacy-status.public {
+            background: rgba(34, 197, 94, 0.12);
+            color: #86EFAC;
+            border: 1px solid rgba(34, 197, 94, 0.45);
+        }
+
         .match-panel {
             background: transparent;
             border: none;
             border-radius: 0;
             padding: 0;
-            filter: brightness(0.75) saturate(0.85);
-            position: relative;
+            filter: brightness(1) saturate(1.05);
+            margin-top: 6px;
         }
 
-        .match-panel::before {
-            content: "";
-            position: absolute;
-            left: -24px;
-            right: -24px;
-            top: -24px;
-            height: 150px;
-            background: linear-gradient(
-                to bottom,
-                rgba(0, 0, 0, 0.8) 0%,
-                rgba(0, 0, 0, 0.55) 35%,
-                rgba(0, 0, 0, 0.18) 72%,
-                rgba(0, 0, 0, 0) 100%
-            );
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .match-panel::after {
-            content: "";
-            position: absolute;
-            left: -24px;
-            right: -24px;
-            bottom: -18px;
-            height: 90px;
-            background: linear-gradient(
-                to top,
-                rgba(0, 0, 0, 0.55) 0%,
-                rgba(0, 0, 0, 0.25) 45%,
-                rgba(0, 0, 0, 0) 100%
-            );
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .match-panel > * {
-            position: relative;
-            z-index: 1;
+        .match-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
         }
 
         .match-header {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            color: #C4C9D4;
+            white-space: nowrap;
+        }
+
+        .match-explore {
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(12, 12, 12, 0.6);
+            color: #C9CDD3;
             font-size: 11px;
             font-weight: 600;
-            letter-spacing: 1.2px;
-            text-transform: uppercase;
-            color: rgba(201, 205, 211, 0.75);
-            margin-bottom: 10px;
+            letter-spacing: 0.3px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            cursor: pointer;
             white-space: nowrap;
+        }
+
+        .match-extra {
+            display: none;
+            margin-top: 10px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .match-extra.is-open {
+            display: flex;
         }
 
         .match-list {
@@ -680,37 +831,65 @@
         <div class="btn-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </div>
-        <div class="btn-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        <div class="header-actions">
+            <button class="edit-memory-top" type="button">Edit Memory</button>
+            <div class="btn-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            </div>
         </div>
     </div>
 
     <!-- MAIN CONTENT -->
     <div class="content-core" id="contentCore">
-        
-        <!-- User Badge moved to top tags -->
-
-        <div class="content-header">
-            <div class="meta-row">
-                <div class="dot"></div>
-                <span class="meta-text">15.01.20, 6:30 PM</span>
-                <span class="meta-text time-ago">• by you</span>
-                <span class="privacy-status private">Private</span>
-            </div>
-
+        <div class="meta-row dim">
+            <div class="dot"></div>
+            <span class="meta-text">15.01.20, 6:30 PM</span>
+            <span class="meta-text time-ago">• by you</span>
+            <span class="privacy-status private dim">Private</span>
+        </div>
+        <div class="meta-row timeline-row">
+            <div class="dot"></div>
+            <span class="meta-text">15.02.20, 7:30 PM</span>
+            <span class="meta-text">• by you</span>
+            <span class="privacy-status public">Public</span>
+        </div>
+        <div class="memory-title-block">
             <h1>The Constraints of Creativity</h1>
         </div>
+        <div class="content-scroll">
+            <!-- User Badge moved to top tags -->
+            <p>The panel illustrates a profound disconnection. It feels like cognition isn't one's own—much like the neutrinos passing through us. This connects to our discussion on agency in digital spaces.</p>
+            <p>We started with a simple prompt: what happens when the interface becomes a witness? The image held tension between light and absence, like the moment just before a message arrives. I tried to trace the edges of that feeling instead of summarizing it.</p>
+            <p>In the sketchbook the notes were shorter, but the memory kept unfolding. It wasn't about the panel anymore; it was about the room it implied, the hum outside the frame, and the way time felt granular that night.</p>
+            <p>There was an urge to edit the story into a clean line, but the constraint was the point. I kept the fragments intact—half sentences, recorded distances, a list of tiny sounds that made the scene feel inhabited.</p>
+            <p>By the end, I could see why the constraint mattered: it stopped me from turning a real experience into a headline. The interface asks for clarity, yet the memory asks for texture. That tension is what I want to preserve.</p>
+            <p>Later, when I re-read it, I noticed the quiet recurrence of "we" and "you." It wasn't a solo memory; it was co-authored by everyone who stayed and looked a little longer.</p>
 
-        <div class="content-body">
-            <p>The panel illustrates a profound disconnection. It feels like cognition isn't one's own—much like the neutrinos passing through us. This connects to our discussion on agency in digital spaces. We started with a simple prompt: what happens when the interface becomes a witness? The image held tension between light and absence, like the moment just before a message arrives. I tried to trace the edges of that feeling instead of summarizing it. In the sketchbook the notes were shorter, but the memory kept unfolding. It wasn't about the panel anymore; it was about the room it implied, the hum outside the frame, and the way time felt granular that evening. The panel illustrates a profound disconnection. It feels like cognition isn't one's own—much like the neutrinos passing through us. This connects to our discussion on agency in digital spaces. We started with a simple prompt: what happens when the interface becomes a witness? The image held tension between light and absence, like the moment just before a message arrives. I tried to trace the edges of that feeling instead of summarizing it. In the sketchbook the notes were shorter, but the memory kept unfolding. It wasn't about the panel anymore; it was about the room it implied, the hum outside the frame, and the way time felt granular that evening. The panel illustrates a profound disconnection. It feels like cognition isn't one's own—much like the neutrinos passing through us. This connects to our discussion on agency in digital spaces. We started with a simple prompt: what happens when the interface becomes a witness? The image held tension between light and absence, like the moment just before a message arrives. I tried to trace the edges of that feeling instead of summarizing it. In the sketchbook the notes were shorter, but the memory kept unfolding. It wasn't about the panel anymore; it was about the room it implied, the hum outside the frame, and the way time felt granular that evening.</p>
         </div>
-
     </div>
 
     <!-- OWNER ACTION DOCK -->
     <div class="dock-area">
+        <div class="reactions-panel" id="reactionsPanel">
+            <div class="echo-count">Echoed 18 times</div>
+            <div class="echo-subtext">Each view or match counts as an Echo.</div>
+            <div class="reactions-row" aria-label="Emoji reactions">
+                <button class="reaction-pill" data-reaction="fire" type="button">🔥 12</button>
+                <button class="reaction-pill" data-reaction="sad" type="button">😢 8</button>
+                <button class="reaction-pill" data-reaction="heart" type="button">💜 23</button>
+                <button class="reaction-pill" data-reaction="agree" type="button">👍 14</button>
+                <button class="reaction-pill" data-reaction="careful" type="button">⚠️ 6</button>
+            </div>
+            <div class="reaction-list" id="reactionList" aria-live="polite">
+                <ul id="reactionNames"></ul>
+            </div>
+        </div>
+
         <div class="match-panel">
-            <div class="match-header">3 people have similar memories.</div>
+            <div class="match-header-row">
+                <div class="match-header">3 people have similar memories.</div>
+                <button class="match-explore" type="button" id="exploreMoreBtn">Explore more</button>
+            </div>
             <div class="match-list" aria-label="Memory matching carousel">
                 <div class="match-item cyan">
                     <img class="match-avi" src="https://i.pravatar.cc/150?u=match-aurora" alt="Memory match 1">
@@ -737,32 +916,32 @@
                     <span class="match-name">Ember Corridor</span>
                 </div>
             </div>
-        </div>
-
-        <div class="dock-actions">
-            <button class="action-btn secondary edit-memory-btn">
-                <span class="btn-main">
-                    <span class="btn-icon-small" aria-hidden="true">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 20h9"></path>
-                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
-                        </svg>
-                    </span>
-                    <span>Edit Memory</span>
-                </span>
-            </button>
-            <button class="action-btn primary with-sub" id="publishBtn">
-                <span class="btn-main">
-                    <span class="btn-icon-small" aria-hidden="true">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 5v14"></path>
-                            <path d="M5 12h14"></path>
-                        </svg>
-                    </span>
-                    <span>Make This Visible</span>
-                </span>
-                <span class="btn-sub">Visible only to those who resonate</span>
-            </button>
+            <div class="match-extra" id="exploreMoreList" aria-label="More similar memories">
+                <div class="match-item cyan">
+                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-aurora" alt="Memory match 1">
+                    <span class="match-name">Aurora Hush</span>
+                </div>
+                <div class="match-item yellow">
+                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-signal" alt="Memory match 2">
+                    <span class="match-name">Signal in the Snow</span>
+                </div>
+                <div class="match-item purple">
+                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-ember" alt="Memory match 3">
+                    <span class="match-name">Ember Corridor</span>
+                </div>
+                <div class="match-item cyan">
+                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-river" alt="Memory match 4">
+                    <span class="match-name">River Without Sound</span>
+                </div>
+                <div class="match-item yellow">
+                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-glow" alt="Memory match 5">
+                    <span class="match-name">Glasslight</span>
+                </div>
+                <div class="match-item purple">
+                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-bloom" alt="Memory match 6">
+                    <span class="match-name">Quiet Bloom</span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -792,7 +971,6 @@
     const matchGateModal = document.getElementById("matchGateModal");
     const makeVisibleBtn = document.getElementById("makeVisibleBtn");
     const dismissModalBtn = document.getElementById("dismissModalBtn");
-    const publishBtn = document.getElementById("publishBtn");
 
     const openMatchGate = () => {
         matchGateModal.classList.add("is-open");
@@ -818,9 +996,6 @@
 
     makeVisibleBtn.addEventListener("click", () => {
         closeMatchGate();
-        if (publishBtn) {
-            publishBtn.focus();
-        }
     });
 
     document.addEventListener("keydown", (event) => {
@@ -828,6 +1003,73 @@
             closeMatchGate();
         }
     });
+
+    const reactionData = {
+        fire: [
+            { name: "Neon Quiet", avatar: "https://i.pravatar.cc/150?u=rx-fire-1" },
+            { name: "Soft Static", avatar: "https://i.pravatar.cc/150?u=rx-fire-2" },
+            { name: "City Afterglow", avatar: "https://i.pravatar.cc/150?u=rx-fire-3" }
+        ],
+        sad: [
+            { name: "Velvet Rain", avatar: "https://i.pravatar.cc/150?u=rx-sad-1" },
+            { name: "Echo Field", avatar: "https://i.pravatar.cc/150?u=rx-sad-2" }
+        ],
+        heart: [
+            { name: "Aurora Hush", avatar: "https://i.pravatar.cc/150?u=rx-heart-1" },
+            { name: "Signal in the Snow", avatar: "https://i.pravatar.cc/150?u=rx-heart-2" },
+            { name: "Ember Corridor", avatar: "https://i.pravatar.cc/150?u=rx-heart-3" }
+        ],
+        agree: [
+            { name: "Quiet Harbor", avatar: "https://i.pravatar.cc/150?u=rx-agree-1" },
+            { name: "Blue Static", avatar: "https://i.pravatar.cc/150?u=rx-agree-2" }
+        ],
+        careful: [
+            { name: "Night Signal", avatar: "https://i.pravatar.cc/150?u=rx-careful-1" },
+            { name: "Grainlight", avatar: "https://i.pravatar.cc/150?u=rx-careful-2" }
+        ]
+    };
+
+    const reactionButtons = document.querySelectorAll(".reaction-pill");
+    const reactionList = document.getElementById("reactionList");
+    const reactionNames = document.getElementById("reactionNames");
+
+    const renderReactionNames = (key) => {
+        const entries = reactionData[key] || [];
+        reactionNames.innerHTML = entries
+            .map(
+                (entry) =>
+                    `<li><img class="reaction-avi" src="${entry.avatar}" alt="${entry.name}"><span>${entry.name}</span></li>`
+            )
+            .join("");
+    };
+
+    reactionButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            const key = button.dataset.reaction;
+            const isActive = button.classList.contains("active");
+
+            reactionButtons.forEach((btn) => btn.classList.remove("active"));
+
+            if (isActive) {
+                reactionList.classList.remove("is-open");
+                return;
+            }
+
+            button.classList.add("active");
+            renderReactionNames(key);
+            reactionList.classList.add("is-open");
+        });
+    });
+
+    const exploreMoreBtn = document.getElementById("exploreMoreBtn");
+    const exploreMoreList = document.getElementById("exploreMoreList");
+
+    if (exploreMoreBtn && exploreMoreList) {
+        exploreMoreBtn.addEventListener("click", () => {
+            const isOpen = exploreMoreList.classList.toggle("is-open");
+            exploreMoreBtn.textContent = isOpen ? "Hide" : "Explore more";
+        });
+    }
 </script>
 
 </body>
