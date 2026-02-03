@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory-of-Others</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&family=Special+Elite&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-void: #000000;
+            --text-primary: #FFFFFF;
+            --text-secondary: #9CA3AF;
+            --accent-orange: #F97316;
+            --accent-blue: #06B6D4;
+            
+            --glass-panel: rgba(20, 20, 20, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --surface-hover: rgba(255, 255, 255, 0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+
+        body {
+            background-color: #111;
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* --- THE MONOLITH (Device Frame) --- */
+        .device-frame {
+            width: 430px;
+            height: 932px;
+            background: var(--bg-void);
+            border-radius: 54px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 0 14px #080808, 0 0 100px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- 1. HERO LAYER (Manga) --- */
+        .hero-layer {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+        }
+
+        .manga-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Aesthetic grading: slightly raised blacks */
+            filter: contrast(1.05) brightness(0.9);
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        /* The Deep Fade */
+        .gradient-overlay {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 70%;
+            background: linear-gradient(
+                to bottom,
+                transparent 0%,
+                rgba(0,0,0,0.4) 30%,
+                rgba(0,0,0,0.9) 60%,
+                #000000 100%
+            );
+            pointer-events: none;
+        }
+
+        /* Fullscreen image viewer */
+        .image-viewer {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.92);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 999;
+        }
+
+        .image-viewer.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .image-viewer img {
+            max-width: 94vw;
+            max-height: 94vh;
+            object-fit: contain;
+            box-shadow: 0 20px 80px rgba(0,0,0,0.6);
+        }
+
+        .image-viewer .close-btn {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(20,20,20,0.6);
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .image-viewer .save-btn {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            height: 44px;
+            padding: 0 16px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(20,20,20,0.6);
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            backdrop-filter: blur(8px);
+        }
+
+        .image-viewer .save-btn svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+        }
+
+        /* --- 2. HEADER UI --- */
+        .header-ui {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            padding: calc(env(safe-area-inset-top) + 48px) 24px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 20;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+        }
+
+        .memory-tags {
+            position: absolute;
+            top: calc(env(safe-area-inset-top) + 28px);
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            z-index: 25;
+        }
+
+        .memory-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: rgba(20,20,20,0.75);
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 999px;
+            color: rgba(245,246,247,0.9);
+            font-family: 'Special Elite', 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 400;
+            letter-spacing: 0.6px;
+            backdrop-filter: blur(10px);
+            white-space: nowrap;
+        }
+
+        .memory-label {
+            font-family: 'Caveat', 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(245,246,247,0.8);
+            text-shadow:
+                0 0 6px rgba(255,255,255,0.18),
+                0 0 14px rgba(255,255,255,0.12);
+            filter: blur(0.2px);
+        }
+
+        .memory-chip.time {
+            background: rgba(20,20,20,0.65);
+            border-style: dashed;
+            letter-spacing: 1px;
+        }
+
+        .memory-chip.source b { color: #FFFFFF; font-weight: 700; }
+
+        .memory-chip.user img {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .btn-icon {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: rgba(30,30,30,0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            color: white;
+            cursor: pointer;
+        }
+
+        .source-pill {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 16px;
+            background: rgba(20,20,20,0.8);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 100px;
+            backdrop-filter: blur(12px);
+        }
+        
+        .source-icon {
+            width: 10px; height: 14px; background: white; border-radius: 2px;
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+        
+        .source-text { font-size: 11px; color: #ccc; }
+        .source-text b { color: white; font-weight: 600; }
+
+        /* --- 3. CONTENT CORE --- */
+        .content-core {
+            position: absolute;
+            bottom: 220px; /* Space for the dock */
+            left: 0; right: 0;
+            padding: 0 24px;
+            z-index: 10;
+            transform: translateY(0);
+            transition: transform 0.4s ease;
+        }
+
+        .content-core::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: -80px;
+            bottom: -180px;
+            background: linear-gradient(
+                to bottom,
+                rgba(0,0,0,0.45) 0%,
+                rgba(0,0,0,0.6) 30%,
+                rgba(0,0,0,0.78) 60%,
+                rgba(0,0,0,0.98) 100%
+            );
+            filter: blur(8px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .content-core > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* The User Chip (Floating above text) */
+        .user-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #000;
+            border: 1px solid #333;
+            padding: 6px 16px 6px 6px;
+            border-radius: 100px;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .user-avi {
+            width: 28px; height: 28px; border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            color: white; font-weight: 700; font-size: 13px;
+        }
+
+        /* Metadata */
+        .meta-row {
+            display: flex; align-items: center; gap: 8px;
+            margin-bottom: 8px;
+        }
+        .dot { width: 6px; height: 6px; background: var(--accent-orange); border-radius: 50%; box-shadow: 0 0 8px var(--accent-orange); }
+        .meta-text { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--accent-orange); font-weight: 600; letter-spacing: 0.5px; }
+        .time-ago {
+            color: #C9CDD3;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 32px; font-weight: 800; line-height: 1.1;
+            color: white; margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+
+        p {
+            font-size: 15px; line-height: 1.5; color: #B0B0B0;
+            display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;
+            line-clamp: 4; overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        /* Social Pile */
+        .social-row {
+            display: flex; align-items: center; gap: 12px;
+        }
+        .avatars { display: flex; }
+        .av-sm {
+            width: 24px; height: 24px; border-radius: 50%; border: 2px solid #000;
+            margin-left: -8px; display: flex; align-items: center; justify-content: center;
+            font-size: 9px; font-weight: 700; color: #000;
+        }
+        .av-sm:first-child { margin-left: 0; }
+        .social-text { font-size: 12px; color: #777; }
+        .social-text b { color: #ddd; }
+
+        /* --- 4. INTERACTIVE DOCK (The Slider) --- */
+        .dock-area {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            padding: 20px 24px 40px;
+            background: #000;
+            z-index: 50;
+        }
+
+        /* The Slider Component */
+        .slider-container {
+            position: relative;
+            width: 100%;
+            height: 56px;
+            background: #1A1A1A;
+            border-radius: 100px;
+            margin-bottom: 24px;
+            border: 1px solid #333;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .slider-container.active {
+            background: #000;
+            border-color: #555;
+        }
+
+        /* Text underneath the slider handle */
+        .slider-label {
+            position: absolute;
+            width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: 600; color: #666;
+            letter-spacing: 0.5px;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        /* The Draggable Handle */
+        .slider-handle {
+            position: absolute;
+            top: 4px; left: 4px;
+            width: 48px; height: 48px;
+            background: #FFFFFF;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 20px rgba(255,255,255,0.2);
+            transition: transform 0.1s linear, width 0.3s ease, border-radius 0.3s ease;
+            z-index: 2;
+        }
+
+        .slider-handle svg { width: 20px; height: 20px; color: #000; }
+
+        /* The Input Field (Hidden initially) */
+        .msg-input {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: transparent;
+            border: none;
+            padding: 0 60px 0 24px;
+            color: white;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .msg-input:focus { outline: none; }
+
+        /* Stats & Reactions Row */
+        .engagement-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .reactions {
+            display: flex; gap: 12px;
+        }
+
+        .emoji-btn {
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            border: 1px dashed #333;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            transition: transform 0.2s;
+            cursor: pointer;
+            background: rgba(255,255,255,0.02);
+        }
+        
+        .emoji-btn:hover { transform: scale(1.15); background: rgba(255,255,255,0.05); border-style: solid; }
+        
+        .emoji-btn.active {
+            border: 1px solid var(--accent-orange);
+            background: rgba(249, 115, 22, 0.1);
+            box-shadow: 0 0 15px rgba(249, 115, 22, 0.2);
+        }
+
+        .stats-block {
+            text-align: right;
+        }
+
+        .stat-main {
+            font-size: 12px; font-weight: 700; color: white;
+            margin-bottom: 4px;
+        }
+
+        .stat-sub {
+            font-size: 10px; color: #555;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Echo context hint */
+        .echo-hint {
+            position: absolute;
+            bottom: 130px; /* Above slider */
+            left: 24px;
+            font-size: 12px;
+            color: var(--accent-blue);
+            font-weight: 600;
+            display: flex; align-items: center; gap: 6px;
+            opacity: 0; /* Hidden until interacted or scroll */
+            animation: fadeIn 1s 1s forwards;
+        }
+
+        @keyframes fadeIn { to { opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+<div class="device-frame">
+
+    <div class="memory-tags">
+        <span class="memory-label">Memory</span>
+        <div class="memory-chip source">Extracted from <b>this moment</b></div>
+        <div class="memory-chip user">
+            <img src="https://i.pravatar.cc/150?u=will" alt="Will">
+            Will McKelvey
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <div class="header-ui">
+        <div class="btn-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </div>
+        <div class="btn-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        </div>
+    </div>
+
+    <!-- BACKGROUND -->
+    <div class="hero-layer">
+        <img src="../../image/manga.png" class="manga-image" alt="Manga Panel">
+        <div class="gradient-overlay"></div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="content-core" id="contentCore">
+        
+        <!-- User Badge moved to top tags -->
+
+        <div class="meta-row">
+            <div class="dot"></div>
+            <span class="meta-text">15.01.20, 6:30 PM</span>
+            <span class="meta-text time-ago">• by Will</span>
+        </div>
+
+        <h1>The Constraints of Creativity</h1>
+        <p>The panel illustrates a profound disconnection. It feels like cognition isn't one's own—much like the neutrinos passing through us. This connects to our discussion on agency in digital spaces.</p>
+
+    </div>
+
+    <!-- ECHO HINT -->
+    <div class="echo-hint">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10H12V2z"></path></svg>
+        Talk to Will's Echo to unlock context...
+    </div>
+
+    <!-- INTERACTIVE DOCK -->
+    <div class="dock-area">
+        
+        <!-- THE SLIDER COMPONENT -->
+        <div class="slider-container" id="slider">
+            <div class="slider-label" id="sliderLabel">Slide to Message</div>
+            
+            <!-- When active, this becomes the send button -->
+            <div class="slider-handle" id="handle">
+                <svg id="arrowIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </div>
+            
+            <input type="text" class="msg-input" id="msgInput" placeholder="Reply to Will...">
+        </div>
+
+        <div class="social-row">
+            <div class="avatars">
+                <div class="av-sm" style="background:#FCD34D;">A</div>
+                <div class="av-sm" style="background:#FCA5A5;">M</div>
+                <div class="av-sm" style="background:#93C5FD;">K</div>
+            </div>
+            <span class="social-text">Liked by <b>Alex</b>, <b>Maria</b> and 24 others</span>
+        </div>
+
+        <!-- STATS & REACTIONS -->
+        <div class="engagement-row">
+            <div class="reactions">
+                <div class="emoji-btn" onclick="toggleReact(this)">🔥</div>
+                <div class="emoji-btn" onclick="toggleReact(this)">😭</div>
+                <div class="emoji-btn" onclick="toggleReact(this)">😂</div>
+                <div class="emoji-btn" onclick="toggleReact(this)">🎉</div>
+            </div>
+            
+            <div class="stats-block">
+                <div class="stat-main">Response rate 90%</div>
+                <div class="stat-sub">Last drop: 15h ago</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- FULLSCREEN IMAGE VIEWER -->
+<div class="image-viewer" id="imageViewer" aria-hidden="true">
+    <button class="close-btn" id="closeViewer" aria-label="Close">✕</button>
+    <a class="save-btn" id="saveViewer" href="../../image/manga.png" download="manga.png">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        Save to album
+    </a>
+    <img src="../../image/manga.png" alt="Manga Panel Full" id="viewerImage">
+</div>
+
+<script>
+    const slider = document.getElementById('slider');
+    const handle = document.getElementById('handle');
+    const label = document.getElementById('sliderLabel');
+    const input = document.getElementById('msgInput');
+    const arrow = document.getElementById('arrowIcon');
+    const mangaImage = document.querySelector('.manga-image');
+    const imageViewer = document.getElementById('imageViewer');
+    const closeViewer = document.getElementById('closeViewer');
+    const viewerImage = document.getElementById('viewerImage');
+    const saveViewer = document.getElementById('saveViewer');
+    
+    let isDragging = false;
+    let startX, currentX;
+    let isUnlocked = false;
+
+    // Simulation of the Drag
+    handle.addEventListener('mousedown', startDrag);
+    
+    function startDrag(e) {
+        if(isUnlocked) return; // If already unlocked, handle acts as send button
+        isDragging = true;
+        startX = e.clientX;
+    }
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        
+        const sliderWidth = slider.offsetWidth;
+        let moveX = e.clientX - startX;
+        
+        // Bounds
+        if (moveX < 0) moveX = 0;
+        if (moveX > sliderWidth - 56) moveX = sliderWidth - 56;
+        
+        handle.style.left = moveX + 4 + 'px';
+        
+        // Opacity of text fades as you drag
+        label.style.opacity = 1 - (moveX / (sliderWidth/2));
+
+        // Unlock Threshold
+        if (moveX > sliderWidth - 80) {
+            unlockSlider();
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        
+        if (!isUnlocked) {
+            // Snap back
+            handle.style.left = '4px';
+            label.style.opacity = '1';
+        }
+    });
+    
+    // Also allow simple click to unlock for prototype ease
+    slider.addEventListener('click', () => {
+        if(!isUnlocked) unlockSlider();
+    });
+
+    function unlockSlider() {
+        isUnlocked = true;
+        isDragging = false;
+        
+        slider.classList.add('active');
+        
+        // Morph Handle to Send Button position
+        handle.style.left = 'auto';
+        handle.style.right = '4px';
+        handle.style.width = '40px';
+        handle.style.height = '40px';
+        handle.style.top = '7px';
+        
+        // Change Arrow to Send Icon
+        arrow.innerHTML = '<line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>';
+        
+        // Hide Label, Show Input
+        label.style.opacity = '0';
+        input.style.opacity = '1';
+        input.style.pointerEvents = 'auto';
+        input.focus();
+    }
+
+    function toggleReact(btn) {
+        btn.classList.toggle('active');
+    }
+
+    function openViewer() {
+        viewerImage.src = mangaImage.src;
+        saveViewer.href = mangaImage.src;
+        imageViewer.classList.add('active');
+        imageViewer.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeViewerFn() {
+        imageViewer.classList.remove('active');
+        imageViewer.setAttribute('aria-hidden', 'true');
+    }
+
+    mangaImage.addEventListener('click', openViewer);
+    closeViewer.addEventListener('click', closeViewerFn);
+    imageViewer.addEventListener('click', closeViewerFn);
+    viewerImage.addEventListener('click', (e) => e.stopPropagation());
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeViewerFn();
+    });
+
+</script>
+
+</body>
+</html>

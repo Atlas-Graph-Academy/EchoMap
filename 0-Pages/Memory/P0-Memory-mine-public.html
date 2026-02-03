@@ -59,6 +59,25 @@
             background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
         }
 
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .edit-memory-top {
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(12, 12, 12, 0.35);
+            color: rgba(229, 231, 235, 0.7);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
         .memory-tags {
             position: absolute;
             top: calc(env(safe-area-inset-top) + 28px);
@@ -155,42 +174,13 @@
             z-index: 10;
             transform: translateY(0);
             transition: transform 0.4s ease, top 0.35s ease;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
-            scrollbar-color: transparent transparent;
-            -webkit-mask-image: linear-gradient(
-                to bottom,
-                rgba(0, 0, 0, 1) 0%,
-                rgba(0, 0, 0, 1) 72%,
-                rgba(0, 0, 0, 0.8) 84%,
-                rgba(0, 0, 0, 0.45) 92%,
-                rgba(0, 0, 0, 0) 100%
-            );
-            mask-image: linear-gradient(
-                to bottom,
-                rgba(0, 0, 0, 1) 0%,
-                rgba(0, 0, 0, 1) 72%,
-                rgba(0, 0, 0, 0.8) 84%,
-                rgba(0, 0, 0, 0.45) 92%,
-                rgba(0, 0, 0, 0) 100%
-            );
         }
 
         .content-core.is-scrolled {
             top: clamp(140px, 20vh, 320px);
-        }
-
-        .content-core::-webkit-scrollbar {
-            width: 0;
-            height: 0;
-            background: transparent;
-        }
-
-        .content-core::-webkit-scrollbar-thumb {
-            background: transparent;
         }
 
         .content-core::before {
@@ -198,16 +188,34 @@
             position: absolute;
             left: 0;
             right: 0;
-            top: -80px;
-            bottom: -180px;
+            top: -120px;
+            bottom: -260px;
             background: linear-gradient(
                 to bottom,
-                rgba(0,0,0,0.45) 0%,
-                rgba(0,0,0,0.6) 30%,
-                rgba(0,0,0,0.78) 60%,
+                rgba(0,0,0,0.15) 0%,
+                rgba(0,0,0,0.45) 35%,
+                rgba(0,0,0,0.7) 65%,
                 rgba(0,0,0,0.98) 100%
             );
-            filter: blur(8px);
+            filter: blur(12px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .content-core::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -40px;
+            height: 120px;
+            background: linear-gradient(
+                to bottom,
+                rgba(0,0,0,0) 0%,
+                rgba(0,0,0,0.65) 60%,
+                rgba(0,0,0,0.95) 100%
+            );
+            filter: blur(10px);
             pointer-events: none;
             z-index: 0;
         }
@@ -217,22 +225,43 @@
             z-index: 1;
         }
 
-        .content-header {
-            position: sticky;
-            top: 0;
-            padding: 8px 0 12px;
-            background: linear-gradient(
-                to bottom,
-                rgba(0, 0, 0, 0.95) 0%,
-                rgba(0, 0, 0, 0.65) 55%,
-                rgba(0, 0, 0, 0) 100%
-            );
-            z-index: 2;
+        .memory-title-block {
+            position: relative;
+            padding: 4px 0 8px;
         }
 
-        .content-body {
-            margin-top: auto;
-            padding-bottom: 8px;
+        .memory-title-block::after {
+            content: "";
+            position: absolute;
+            left: -24px;
+            right: -24px;
+            bottom: -8px;
+            height: 28px;
+            background: linear-gradient(
+                to bottom,
+                rgba(0,0,0,0.2) 0%,
+                rgba(0,0,0,0.45) 45%,
+                rgba(0,0,0,0.7) 100%
+            );
+            filter: blur(6px);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .content-scroll {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding-bottom: 40px;
+            padding-top: 6px;
+        }
+
+        .content-scroll::-webkit-scrollbar {
+            width: 0;
+        }
+
+        .content-scroll::-webkit-scrollbar-thumb {
+            background: transparent;
         }
 
         /* The User Chip (Floating above text) */
@@ -294,6 +323,7 @@
 
         .reactions-panel {
             margin-top: 18px;
+            margin-bottom: 10px;
             padding: 0;
             background: transparent;
             border: none;
@@ -409,6 +439,28 @@
             background: #000;
             z-index: 50;
         }
+
+        .dock-area::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: -90px;
+            height: 90px;
+            background: linear-gradient(
+                to top,
+                rgba(0,0,0,0.98) 0%,
+                rgba(0,0,0,0.55) 55%,
+                rgba(0,0,0,0) 100%
+            );
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .dock-area > * {
+            position: relative;
+            z-index: 1;
+        }
         .dock-note {
             color: #7DD3FC;
             font-size: 12px;
@@ -423,6 +475,8 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
+            position: relative;
+            min-height: 80px;
         }
 
         .action-btn {
@@ -484,6 +538,19 @@
             text-transform: uppercase;
         }
 
+        .action-btn.floating {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 15, 15, 0.9);
+            border-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(16px);
+            box-shadow:
+                0 16px 30px rgba(0, 0, 0, 0.55),
+                0 6px 16px rgba(6, 182, 212, 0.18);
+        }
+
         .privacy-status {
             padding: 4px 10px;
             border-radius: 999px;
@@ -516,6 +583,7 @@
             border-radius: 0;
             padding: 0;
             filter: brightness(1) saturate(1.05);
+            margin-top: 6px;
         }
 
         .match-header-row {
@@ -561,9 +629,10 @@
         .match-list {
             display: flex;
             gap: 10px;
-            overflow: hidden;
-            white-space: nowrap;
-            animation: matchScroll 28s linear infinite;
+            flex-wrap: wrap;
+            overflow: visible;
+            white-space: normal;
+            animation: none;
         }
 
         .match-item {
@@ -767,127 +836,69 @@
         <div class="btn-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </div>
-        <div class="btn-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        <div class="header-actions">
+            <button class="btn-icon edit-memory-top" type="button" aria-label="Edit memory">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 20h9"></path>
+                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+                </svg>
+            </button>
         </div>
     </div>
 
     <!-- MAIN CONTENT -->
     <div class="content-core" id="contentCore">
-        
-        <!-- User Badge moved to top tags -->
-
-        <div class="content-header">
-            <div class="meta-row dim">
-                <div class="dot"></div>
-                <span class="meta-text">15.01.20, 6:30 PM</span>
-                <span class="meta-text time-ago">• by you</span>
-                <span class="privacy-status private dim">Private</span>
-            </div>
-            <div class="meta-row timeline-row">
-                <div class="dot"></div>
-                <span class="meta-text">15.02.20, 7:30 PM</span>
-                <span class="meta-text">• by you</span>
-                <span class="privacy-status public">Public</span>
-            </div>
-
+        <div class="meta-row dim">
+            <div class="dot"></div>
+            <span class="meta-text">15.01.20, 6:30 PM</span>
+            <span class="meta-text time-ago">• by you</span>
+            <span class="privacy-status private dim">Private</span>
+        </div>
+        <div class="meta-row timeline-row">
+            <div class="dot"></div>
+            <span class="meta-text">15.02.20, 7:30 PM</span>
+            <span class="meta-text">• by you</span>
+            <span class="privacy-status public">Public</span>
+        </div>
+        <div class="memory-title-block">
             <h1>The Constraints of Creativity</h1>
         </div>
-
-        <div class="content-body">
+        <div class="content-scroll">
+            <!-- User Badge moved to top tags -->
             <p>The panel illustrates a profound disconnection. It feels like cognition isn't one's own—much like the neutrinos passing through us. This connects to our discussion on agency in digital spaces.</p>
+            <p>We started with a simple prompt: what happens when the interface becomes a witness? The image held tension between light and absence, like the moment just before a message arrives. I tried to trace the edges of that feeling instead of summarizing it.</p>
+            <p>In the sketchbook the notes were shorter, but the memory kept unfolding. It wasn't about the panel anymore; it was about the room it implied, the hum outside the frame, and the way time felt granular that night.</p>
+            <p>There was an urge to edit the story into a clean line, but the constraint was the point. I kept the fragments intact—half sentences, recorded distances, a list of tiny sounds that made the scene feel inhabited.</p>
+            <p>By the end, I could see why the constraint mattered: it stopped me from turning a real experience into a headline. The interface asks for clarity, yet the memory asks for texture. That tension is what I want to preserve.</p>
+            <p>Later, when I re-read it, I noticed the quiet recurrence of "we" and "you." It wasn't a solo memory; it was co-authored by everyone who stayed and looked a little longer.</p>
 
-            <div class="reactions-panel" id="reactionsPanel">
-                <div class="echo-count">Echoed 18 times</div>
-                <div class="echo-subtext">Each view or match counts as an Echo.</div>
-                <div class="reactions-row" aria-label="Emoji reactions">
-                    <button class="reaction-pill" data-reaction="fire" type="button">🔥 12</button>
-                    <button class="reaction-pill" data-reaction="sad" type="button">😢 8</button>
-                    <button class="reaction-pill" data-reaction="heart" type="button">💜 23</button>
-                    <button class="reaction-pill" data-reaction="agree" type="button">👍 14</button>
-                    <button class="reaction-pill" data-reaction="careful" type="button">⚠️ 6</button>
-                </div>
-                <div class="reaction-list" id="reactionList" aria-live="polite">
-                    <ul id="reactionNames"></ul>
-                </div>
-            </div>
         </div>
-
     </div>
 
     <!-- OWNER ACTION DOCK -->
     <div class="dock-area">
-        <div class="match-panel">
-            <div class="match-header-row">
-                <div class="match-header">3 people have similar memories.</div>
-                <button class="match-explore" type="button" id="exploreMoreBtn">Explore more</button>
+        <div class="reactions-panel" id="reactionsPanel">
+            <div class="echo-count">Echoed 18 times</div>
+            <div class="echo-subtext">Each view or match counts as an Echo.</div>
+            <div class="reactions-row" aria-label="Emoji reactions">
+                <button class="reaction-pill" data-reaction="fire" type="button">🔥 12</button>
+                <button class="reaction-pill" data-reaction="sad" type="button">😢 8</button>
+                <button class="reaction-pill" data-reaction="heart" type="button">💜 23</button>
+                <button class="reaction-pill" data-reaction="agree" type="button">👍 14</button>
+                <button class="reaction-pill" data-reaction="careful" type="button">⚠️ 6</button>
             </div>
-            <div class="match-list" aria-label="Memory matching carousel">
-                <div class="match-item cyan">
-                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-aurora" alt="Memory match 1">
-                    <span class="match-name">Aurora Hush</span>
-                </div>
-                <div class="match-item yellow">
-                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-signal" alt="Memory match 2">
-                    <span class="match-name">Signal in the Snow</span>
-                </div>
-                <div class="match-item purple">
-                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-ember" alt="Memory match 3">
-                    <span class="match-name">Ember Corridor</span>
-                </div>
-                <div class="match-item cyan" aria-hidden="true">
-                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-aurora" alt="">
-                    <span class="match-name">Aurora Hush</span>
-                </div>
-                <div class="match-item yellow" aria-hidden="true">
-                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-signal" alt="">
-                    <span class="match-name">Signal in the Snow</span>
-                </div>
-                <div class="match-item purple" aria-hidden="true">
-                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-ember" alt="">
-                    <span class="match-name">Ember Corridor</span>
-                </div>
-            </div>
-            <div class="match-extra" id="exploreMoreList" aria-label="More similar memories">
-                <div class="match-item cyan">
-                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-aurora" alt="Memory match 1">
-                    <span class="match-name">Aurora Hush</span>
-                </div>
-                <div class="match-item yellow">
-                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-signal" alt="Memory match 2">
-                    <span class="match-name">Signal in the Snow</span>
-                </div>
-                <div class="match-item purple">
-                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-ember" alt="Memory match 3">
-                    <span class="match-name">Ember Corridor</span>
-                </div>
-                <div class="match-item cyan">
-                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-river" alt="Memory match 4">
-                    <span class="match-name">River Without Sound</span>
-                </div>
-                <div class="match-item yellow">
-                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-glow" alt="Memory match 5">
-                    <span class="match-name">Glasslight</span>
-                </div>
-                <div class="match-item purple">
-                    <img class="match-avi" src="https://i.pravatar.cc/150?u=match-bloom" alt="Memory match 6">
-                    <span class="match-name">Quiet Bloom</span>
-                </div>
+            <div class="reaction-list" id="reactionList" aria-live="polite">
+                <ul id="reactionNames"></ul>
             </div>
         </div>
 
-        <div class="dock-actions">
-            <button class="action-btn secondary edit-memory-btn">
-                <span class="btn-main">
-                    <span class="btn-icon-small" aria-hidden="true">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 20h9"></path>
-                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
-                        </svg>
-                    </span>
-                    <span>Edit Memory</span>
-                </span>
-            </button>
+        <div class="match-panel">
+            <div class="match-header-row">
+                <div class="match-header">3 people have similar memories.</div>
+            </div>
+            <div class="match-list" aria-label="Memory matching list">
+                <button class="match-explore" type="button" id="exploreMoreBtn">Explore more</button>
+            </div>
         </div>
     </div>
 
@@ -918,6 +929,7 @@
     const makeVisibleBtn = document.getElementById("makeVisibleBtn");
     const dismissModalBtn = document.getElementById("dismissModalBtn");
     const contentCore = document.getElementById("contentCore");
+    const contentScroll = document.querySelector(".content-scroll");
 
     const openMatchGate = () => {
         matchGateModal.classList.add("is-open");
@@ -936,18 +948,16 @@
     dismissModalBtn.addEventListener("click", closeMatchGate);
 
     const updateCoreScrollState = () => {
-        if (!contentCore) return;
-        const styles = window.getComputedStyle(contentCore);
-        const paddingBottom = parseFloat(styles.paddingBottom) || 0;
-        const scrollSlack = contentCore.scrollHeight - contentCore.clientHeight - paddingBottom;
+        if (!contentCore || !contentScroll) return;
+        const scrollSlack = contentScroll.scrollHeight - contentScroll.clientHeight;
         const canScroll = scrollSlack > 2;
-        const shouldLift = canScroll && contentCore.scrollTop > 12;
+        const shouldLift = canScroll && contentScroll.scrollTop > 12;
         contentCore.classList.toggle("is-scrolled", shouldLift);
-        contentCore.style.overflowY = canScroll ? "auto" : "hidden";
+        contentScroll.style.overflowY = canScroll ? "auto" : "hidden";
     };
 
-    if (contentCore) {
-        contentCore.addEventListener("scroll", updateCoreScrollState);
+    if (contentScroll) {
+        contentScroll.addEventListener("scroll", updateCoreScrollState);
         window.addEventListener("resize", updateCoreScrollState);
         updateCoreScrollState();
     }
@@ -1026,13 +1036,48 @@
     });
 
     const exploreMoreBtn = document.getElementById("exploreMoreBtn");
-    const exploreMoreList = document.getElementById("exploreMoreList");
+    const matchList = document.querySelector(".match-list");
 
-    if (exploreMoreBtn && exploreMoreList) {
-        exploreMoreBtn.addEventListener("click", () => {
-            const isOpen = exploreMoreList.classList.toggle("is-open");
-            exploreMoreBtn.textContent = isOpen ? "Hide" : "Explore more";
+    const matchData = [
+        { name: "Aurora Hush", avatar: "https://i.pravatar.cc/150?u=match-aurora", tone: "cyan" },
+        { name: "Signal in the Snow", avatar: "https://i.pravatar.cc/150?u=match-signal", tone: "yellow" },
+        { name: "Ember Corridor", avatar: "https://i.pravatar.cc/150?u=match-ember", tone: "purple" },
+        { name: "River Without Sound", avatar: "https://i.pravatar.cc/150?u=match-river", tone: "cyan" },
+        { name: "Glasslight", avatar: "https://i.pravatar.cc/150?u=match-glow", tone: "yellow" },
+        { name: "Quiet Bloom", avatar: "https://i.pravatar.cc/150?u=match-bloom", tone: "purple" },
+        { name: "Soft Static", avatar: "https://i.pravatar.cc/150?u=match-soft", tone: "cyan" },
+        { name: "Echo Vale", avatar: "https://i.pravatar.cc/150?u=match-echo", tone: "yellow" },
+        { name: "Blue Archive", avatar: "https://i.pravatar.cc/150?u=match-blue", tone: "purple" }
+    ];
+
+    const shuffle = (list) => {
+        const copy = [...list];
+        for (let i = copy.length - 1; i > 0; i -= 1) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [copy[i], copy[j]] = [copy[j], copy[i]];
+        }
+        return copy;
+    };
+
+    const renderMatchItems = () => {
+        if (!matchList || !exploreMoreBtn) return;
+        const existing = matchList.querySelectorAll(".match-item");
+        existing.forEach((node) => node.remove());
+        const picks = shuffle(matchData).slice(0, 3);
+        picks.forEach((entry, index) => {
+            const item = document.createElement("div");
+            item.className = `match-item ${entry.tone}`;
+            item.innerHTML = `
+                <img class="match-avi" src="${entry.avatar}" alt="Memory match ${index + 1}">
+                <span class="match-name">${entry.name}</span>
+            `;
+            matchList.insertBefore(item, exploreMoreBtn);
         });
+    };
+
+    if (exploreMoreBtn && matchList) {
+        renderMatchItems();
+        exploreMoreBtn.addEventListener("click", renderMatchItems);
     }
 </script>
 
