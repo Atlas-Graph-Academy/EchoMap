@@ -153,6 +153,7 @@
             z-index: 10;
             transform: translateY(0);
             transition: transform 0.4s ease;
+            overflow: hidden;
         }
 
         .content-core::before {
@@ -177,6 +178,21 @@
         .content-core > * {
             position: relative;
             z-index: 1;
+        }
+
+        .content-scroll {
+            max-height: 100%;
+            overflow-y: auto;
+            padding-bottom: 24px;
+        }
+
+        .content-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .content-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.18);
+            border-radius: 999px;
         }
 
         /* The User Chip (Floating above text) */
@@ -304,6 +320,15 @@
             border-color: #2A2A2A;
         }
 
+        .action-btn.floating {
+            position: absolute;
+            bottom: 120px;
+            left: 24px;
+            right: 24px;
+            z-index: 60;
+            box-shadow: 0 12px 26px rgba(0, 0, 0, 0.45);
+        }
+
         .privacy-status {
             padding: 4px 10px;
             border-radius: 999px;
@@ -324,6 +349,7 @@
             border: none;
             border-radius: 0;
             padding: 0;
+            margin-top: 18px;
         }
 
         .match-header {
@@ -338,9 +364,11 @@
         .match-list {
             display: flex;
             gap: 12px;
-            overflow: hidden;
+            overflow-x: auto;
             white-space: nowrap;
-            animation: matchScroll 14s linear infinite;
+            padding-bottom: 6px;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
         }
 
         .match-item {
@@ -355,6 +383,7 @@
             min-width: 190px;
             cursor: pointer;
             text-align: center;
+            scroll-snap-align: start;
         }
 
         .match-avi {
@@ -374,14 +403,13 @@
                 0 0 14px rgba(6, 182, 212, 0.35);
         }
 
-
-        @keyframes matchScroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
+        .match-list::-webkit-scrollbar {
+            height: 6px;
         }
 
-        .match-panel + .dock-actions {
-            margin-top: 0;
+        .match-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.16);
+            border-radius: 999px;
         }
 
     </style>
