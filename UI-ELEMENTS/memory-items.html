@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Items</title>
+    <style>
+        :root {
+            --item-bg: rgba(18, 18, 18, 0.9);
+            --item-border: rgba(255,255,255,0.18);
+        }
+
+        body {
+            background: #0a0a0a;
+            font-family: "Inter", sans-serif;
+            color: #e5e7eb;
+            padding: 24px;
+        }
+
+        .memory-items {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .match-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px 4px 6px;
+            border-radius: 999px;
+            border: 1px solid var(--item-border);
+            width: fit-content;
+            max-width: 220px;
+            height: 34px;
+            cursor: pointer;
+            text-align: left;
+            background: var(--item-bg);
+            box-shadow:
+                inset 0 0 10px rgba(255,255,255,0.04),
+                0 4px 12px rgba(0, 0, 0, 0.45);
+        }
+
+        .match-item.no-avi {
+            padding-left: 12px;
+        }
+
+        .match-item.cyan {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(8, 8, 8, 0.95));
+            border-color: rgba(6, 182, 212, 0.22);
+            box-shadow:
+                inset 0 0 8px rgba(6, 182, 212, 0.12),
+                0 4px 10px rgba(6, 182, 212, 0.08);
+        }
+
+        .match-item.yellow {
+            background: linear-gradient(135deg, rgba(250, 204, 21, 0.1), rgba(8, 8, 8, 0.95));
+            border-color: rgba(250, 204, 21, 0.22);
+            box-shadow:
+                inset 0 0 8px rgba(250, 204, 21, 0.12),
+                0 4px 10px rgba(250, 204, 21, 0.08);
+        }
+
+        .match-item.purple {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(8, 8, 8, 0.95));
+            border-color: rgba(168, 85, 247, 0.22);
+            box-shadow:
+                inset 0 0 8px rgba(168, 85, 247, 0.12),
+                0 4px 10px rgba(168, 85, 247, 0.08);
+        }
+
+        .match-avi {
+            width: 1.75rem;
+            height: 1.75rem;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid rgba(255,255,255,0.28);
+            box-shadow: 0 0 8px rgba(255,255,255,0.18);
+            margin-left: -2px;
+        }
+
+        .match-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: #eafbff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            letter-spacing: 0.2px;
+            text-shadow:
+                0 0 6px rgba(255, 255, 255, 0.35),
+                0 0 12px rgba(255, 255, 255, 0.2);
+        }
+
+        .match-item.cyan .match-name {
+            color: #7ed3e0;
+            text-shadow:
+                0 0 4px rgba(6, 182, 212, 0.25),
+                0 0 8px rgba(6, 182, 212, 0.18);
+        }
+
+        .match-item.yellow .match-name {
+            color: #e8c158;
+            text-shadow:
+                0 0 4px rgba(250, 204, 21, 0.25),
+                0 0 8px rgba(250, 204, 21, 0.18);
+        }
+
+        .match-item.purple .match-name {
+            color: #cdb2f0;
+            text-shadow:
+                0 0 4px rgba(168, 85, 247, 0.25),
+                0 0 8px rgba(168, 85, 247, 0.18);
+        }
+    </style>
+</head>
+<body>
+    <div class="memory-items" aria-label="Memory match items">
+        <button class="match-item cyan" type="button">
+            <img class="match-avi" src="https://i.pravatar.cc/150?u=match-aurora" alt="Memory match Aurora Hush">
+            <span class="match-name">Aurora Hush</span>
+        </button>
+        <button class="match-item yellow" type="button">
+            <img class="match-avi" src="https://i.pravatar.cc/150?u=match-signal" alt="Memory match Signal in the Snow">
+            <span class="match-name">Signal in the Snow</span>
+        </button>
+        <button class="match-item purple" type="button">
+            <img class="match-avi" src="https://i.pravatar.cc/150?u=match-ember" alt="Memory match Ember Corridor">
+            <span class="match-name">Ember Corridor</span>
+        </button>
+    </div>
+
+    <div class="memory-items" aria-label="Memory match items without avatars">
+        <button class="match-item no-avi cyan" type="button">
+            <span class="match-name">Aurora Hush</span>
+        </button>
+        <button class="match-item no-avi yellow" type="button">
+            <span class="match-name">Signal in the Snow</span>
+        </button>
+        <button class="match-item no-avi purple" type="button">
+            <span class="match-name">Ember Corridor</span>
+        </button>
+    </div>
+</body>
+</html>
