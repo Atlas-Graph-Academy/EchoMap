@@ -59,6 +59,45 @@
             z-index: 0;
         }
 
+        .manga-detail-btn {
+            position: absolute;
+            top: clamp(180px, 24vh, 260px);
+            right: 24px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(14, 14, 14, 0.7);
+            color: #E5E7EB;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+            cursor: pointer;
+            z-index: 15;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+
+        .manga-detail-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .manga-detail-btn:hover {
+            background: rgba(20, 20, 20, 0.85);
+            border-color: rgba(255, 255, 255, 0.28);
+        }
+
+        .content-core.is-scrolled ~ .manga-detail-btn {
+            opacity: 0;
+            transform: translateY(-6px);
+            pointer-events: none;
+        }
+
         /* --- 2. HEADER UI --- */
         .header-ui {
             position: absolute;
@@ -597,13 +636,13 @@
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </div>
         <div class="menu-wrap">
-            <div class="btn-icon" id="menuButton" aria-label="More options">
+            <button class="btn-icon" id="menuButton" type="button" aria-label="More options">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                     <circle cx="12" cy="5" r="2"></circle>
                     <circle cx="12" cy="12" r="2"></circle>
                     <circle cx="12" cy="19" r="2"></circle>
                 </svg>
-            </div>
+            </button>
             <div class="menu-dropdown" id="menuDropdown">
                 <button class="menu-item" type="button">Report</button>
                 <button class="menu-item" type="button">Block</button>
@@ -630,6 +669,16 @@
         </div>
 
     </div>
+
+    <button class="manga-detail-btn" type="button" aria-label="View manga details">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="4" y="4" width="7" height="7"></rect>
+            <rect x="13" y="4" width="7" height="7"></rect>
+            <rect x="4" y="13" width="7" height="7"></rect>
+            <rect x="13" y="13" width="7" height="7"></rect>
+        </svg>
+        View Manga
+    </button>
 
     <!-- ECHO HINT -->
     <div class="echo-hint">
