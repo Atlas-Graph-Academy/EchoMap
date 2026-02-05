@@ -8,6 +8,11 @@
         :root {
             --bg-void: #000000;
             --screen-inset: 22px;
+            --island-top: calc(var(--screen-inset) - 8px);
+            --island-height: 38px;
+            --image-height: 45%;
+            --content-box-bottom: var(--image-height);
+    --status-bar-height: 24px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -37,6 +42,7 @@
             top: calc(var(--screen-inset) + 2px);
             left: calc(var(--screen-inset) + 2px);
             right: calc(var(--screen-inset) + 6px);
+    height: var(--status-bar-height);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -121,11 +127,11 @@
 
         .dynamic-island {
             position: absolute;
-            top: calc(var(--screen-inset) - 8px);
+            top: var(--island-top);
             left: 50%;
             transform: translateX(-50%);
             width: 142px;
-            height: 38px;
+            height: var(--island-height);
             border-radius: 999px;
             background: #000000;
             box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
@@ -138,11 +144,21 @@
             left: 0;
             right: 0;
             width: 100%;
-            height: auto;
-            max-height: 45%;
+            height: var(--image-height);
             object-fit: contain;
             object-position: bottom center;
             display: block;
+        }
+
+        .content-box {
+            position: absolute;
+    top: calc(var(--screen-inset) + 2px + var(--status-bar-height));
+            left: 0;
+            right: 0;
+            bottom: var(--content-box-bottom);
+            border: 1px solid rgba(255, 255, 255, 0.65);
+            pointer-events: none;
+            z-index: 4;
         }
 
         .capture-btn {
@@ -191,6 +207,7 @@
             src="0-Pages/Landing Page-Search/images/bg-1.png"
             alt="Journey background"
         >
+        <div class="content-box" aria-label="ContentBox"></div>
     </div>
     <button class="capture-btn" id="captureBtn" type="button">Save Screenshot</button>
 
