@@ -181,106 +181,135 @@
         }
 
         /* ========================================
-           OTHERS' MEMORY
-           Muted, introverted neon — avatar + username
+           OTHERS' MEMORY — Dynamic Color via JS
+           Colors driven by CSS custom properties
            ======================================== */
 
         .tag-other {
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.06);
             padding: 8px 18px 8px 8px;
-        }
-
-        /* — Muted Gold — */
-        .tag-other.gold {
-            color: rgba(255, 210, 120, 0.6);
+            font-weight: 700;
+            /* Color driven by --r, --g, --b set by JS */
+            color: rgba(var(--r), var(--g), var(--b), 0.85);
             box-shadow:
-                0 0 14px rgba(255, 200, 60, 0.06),
-                0 0 35px rgba(255, 180, 40, 0.025);
-            text-shadow: 0 0 12px rgba(255, 200, 60, 0.18);
-            border-color: rgba(255, 200, 60, 0.07);
+                0 0 18px rgba(var(--r), var(--g), var(--b), 0.1),
+                0 0 45px rgba(var(--r), var(--g), var(--b), 0.04);
+            text-shadow: 0 0 14px rgba(var(--r), var(--g), var(--b), 0.3);
+            border-color: rgba(var(--r), var(--g), var(--b), 0.1);
         }
 
-        .tag-other.gold .avatar {
-            box-shadow: 0 0 10px rgba(255, 200, 60, 0.15);
+        .tag-other .avatar {
+            box-shadow: 0 0 12px rgba(var(--r), var(--g), var(--b), 0.25);
         }
 
-        .tag-other.gold:hover {
-            background: rgba(255, 200, 60, 0.05);
-            color: rgba(255, 210, 120, 0.75);
+        .tag-other:hover {
+            background: rgba(var(--r), var(--g), var(--b), 0.06);
+            color: rgba(var(--r), var(--g), var(--b), 0.95);
             box-shadow:
-                0 0 22px rgba(255, 200, 60, 0.1),
-                0 0 45px rgba(255, 180, 40, 0.04);
+                0 0 26px rgba(var(--r), var(--g), var(--b), 0.16),
+                0 0 55px rgba(var(--r), var(--g), var(--b), 0.06);
             transform: translateY(-1px);
         }
 
-        /* — Muted Purple — */
-        .tag-other.purple {
-            color: rgba(180, 150, 230, 0.6);
-            box-shadow:
-                0 0 14px rgba(160, 120, 220, 0.06),
-                0 0 35px rgba(140, 100, 200, 0.025);
-            text-shadow: 0 0 12px rgba(160, 120, 220, 0.18);
-            border-color: rgba(160, 120, 220, 0.07);
+        .tag-other .tag-content > span:first-child {
+            font-weight: 700;
         }
 
-        .tag-other.purple .avatar {
-            box-shadow: 0 0 10px rgba(160, 120, 220, 0.15);
+        /* ========================================
+           OTHERS' MEMORY — BRIGHT (Dynamic)
+           ======================================== */
+
+        .tag-other-bright {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 8px 18px 8px 8px;
+            font-weight: 700;
+            color: rgb(var(--r), var(--g), var(--b));
+            box-shadow:
+                0 0 22px rgba(var(--r), var(--g), var(--b), 0.14),
+                0 0 55px rgba(var(--r), var(--g), var(--b), 0.07);
+            text-shadow: 0 0 20px rgba(var(--r), var(--g), var(--b), 0.45);
+            border-color: rgba(var(--r), var(--g), var(--b), 0.14);
         }
 
-        .tag-other.purple:hover {
-            background: rgba(160, 120, 220, 0.05);
-            color: rgba(180, 150, 230, 0.75);
+        .tag-other-bright .avatar {
             box-shadow:
-                0 0 22px rgba(160, 120, 220, 0.1),
-                0 0 45px rgba(140, 100, 200, 0.04);
+                0 0 14px rgba(var(--r), var(--g), var(--b), 0.35),
+                0 0 28px rgba(var(--r), var(--g), var(--b), 0.18);
+        }
+
+        .tag-other-bright:hover {
+            background: rgba(var(--r), var(--g), var(--b), 0.09);
+            box-shadow:
+                0 0 34px rgba(var(--r), var(--g), var(--b), 0.22),
+                0 0 65px rgba(var(--r), var(--g), var(--b), 0.1);
             transform: translateY(-1px);
         }
 
-        /* — Muted Cyan — */
-        .tag-other.cyan {
-            color: rgba(130, 200, 220, 0.6);
-            box-shadow:
-                0 0 14px rgba(80, 180, 210, 0.06),
-                0 0 35px rgba(60, 160, 190, 0.025);
-            text-shadow: 0 0 12px rgba(80, 180, 210, 0.18);
-            border-color: rgba(80, 180, 210, 0.07);
+        .tag-other-bright .tag-content > span:first-child {
+            font-weight: 700;
         }
 
-        .tag-other.cyan .avatar {
-            box-shadow: 0 0 10px rgba(80, 180, 210, 0.15);
+        /* ========================================
+           COLOR PALETTE STRIP
+           ======================================== */
+
+        .palette-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 40px;
         }
 
-        .tag-other.cyan:hover {
-            background: rgba(80, 180, 210, 0.05);
-            color: rgba(130, 200, 220, 0.75);
-            box-shadow:
-                0 0 22px rgba(80, 180, 210, 0.1),
-                0 0 45px rgba(60, 160, 190, 0.04);
-            transform: translateY(-1px);
+        .palette-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.35);
+            text-transform: uppercase;
+            white-space: nowrap;
         }
 
-        /* — Muted Rose — */
-        .tag-other.rose {
-            color: rgba(220, 150, 175, 0.6);
-            box-shadow:
-                0 0 14px rgba(200, 110, 150, 0.06),
-                0 0 35px rgba(180, 90, 130, 0.025);
-            text-shadow: 0 0 12px rgba(200, 110, 150, 0.18);
-            border-color: rgba(200, 110, 150, 0.07);
+        .palette-swatches {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
-        .tag-other.rose .avatar {
-            box-shadow: 0 0 10px rgba(200, 110, 150, 0.15);
+        .swatch {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            cursor: default;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .tag-other.rose:hover {
-            background: rgba(200, 110, 150, 0.05);
-            color: rgba(220, 150, 175, 0.75);
-            box-shadow:
-                0 0 22px rgba(200, 110, 150, 0.1),
-                0 0 45px rgba(180, 90, 130, 0.04);
-            transform: translateY(-1px);
+        .swatch:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
+        }
+
+        .shuffle-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+        }
+
+        .shuffle-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.75);
+            border-color: rgba(255, 255, 255, 0.2);
         }
 
         /* ========================================
@@ -358,32 +387,76 @@
 
         <div class="divider"></div>
 
-        <!-- OTHERS' MEMORY -->
+        <!-- COLOR PALETTE -->
+        <div class="palette-bar">
+            <span class="palette-label">Palette</span>
+            <div class="palette-swatches" id="paletteSwatches"></div>
+            <button class="shuffle-btn" id="shuffleBtn">Shuffle</button>
+        </div>
+
+        <!-- OTHERS' MEMORY (Muted) -->
         <div class="section">
             <div class="section-label">Others' Memory</div>
-            <div class="tags-col">
-                <span class="tag tag-other gold">
+            <div class="tags-col" id="othersMuted">
+                <span class="tag tag-other">
                     <img src="https://i.pravatar.cc/100?img=12" alt="" class="avatar">
                     <span class="tag-content">
                         <span>Freedom</span>
                         <span class="tag-username">@ms.milaryscore</span>
                     </span>
                 </span>
-                <span class="tag tag-other purple">
+                <span class="tag tag-other">
                     <img src="https://i.pravatar.cc/100?img=8" alt="" class="avatar">
                     <span class="tag-content">
                         <span>Higher-level thinking</span>
                         <span class="tag-username">@noahvale</span>
                     </span>
                 </span>
-                <span class="tag tag-other cyan">
+                <span class="tag tag-other">
                     <img src="https://i.pravatar.cc/100?img=15" alt="" class="avatar">
                     <span class="tag-content">
                         <span>Philosophy</span>
                         <span class="tag-username">@aurora.k</span>
                     </span>
                 </span>
-                <span class="tag tag-other rose">
+                <span class="tag tag-other">
+                    <img src="https://i.pravatar.cc/100?img=9" alt="" class="avatar">
+                    <span class="tag-content">
+                        <span>Nostalgia</span>
+                        <span class="tag-username">@reiko</span>
+                    </span>
+                </span>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- OTHERS' MEMORY — BRIGHT -->
+        <div class="section">
+            <div class="section-label">Others' Memory · Bright</div>
+            <div class="tags-col" id="othersBright">
+                <span class="tag tag-other-bright">
+                    <img src="https://i.pravatar.cc/100?img=12" alt="" class="avatar">
+                    <span class="tag-content">
+                        <span>Freedom</span>
+                        <span class="tag-username">@ms.milaryscore</span>
+                    </span>
+                </span>
+                <span class="tag tag-other-bright">
+                    <img src="https://i.pravatar.cc/100?img=8" alt="" class="avatar">
+                    <span class="tag-content">
+                        <span>Higher-level thinking</span>
+                        <span class="tag-username">@noahvale</span>
+                    </span>
+                </span>
+                <span class="tag tag-other-bright">
+                    <img src="https://i.pravatar.cc/100?img=15" alt="" class="avatar">
+                    <span class="tag-content">
+                        <span>Philosophy</span>
+                        <span class="tag-username">@aurora.k</span>
+                    </span>
+                </span>
+                <span class="tag tag-other-bright">
                     <img src="https://i.pravatar.cc/100?img=9" alt="" class="avatar">
                     <span class="tag-content">
                         <span>Nostalgia</span>
@@ -394,5 +467,80 @@
         </div>
 
     </div>
+
+    <script>
+        // ==========================================
+        // COLOR PALETTE — inspired by Flowwow botanical
+        // Lush greens, warm oranges, sky blues,
+        // golden amber, soft corals, earthy olive
+        // ==========================================
+
+        const PALETTE = [
+            { name: 'Forest',      r: 75,  g: 158, b: 107 },  // deep green
+            { name: 'Leaf',        r: 122, g: 174, b: 94  },  // bright leaf
+            { name: 'Olive',       r: 142, g: 162, b: 88  },  // earthy olive
+            { name: 'Amber',       r: 224, g: 170, b: 62  },  // warm gold
+            { name: 'Marigold',    r: 240, g: 148, b: 54  },  // deep orange
+            { name: 'Coral',       r: 228, g: 120, b: 90  },  // warm coral
+            { name: 'Terracotta',  r: 200, g: 107, b: 74  },  // earthy red
+            { name: 'Salmon',      r: 232, g: 145, b: 122 },  // soft pink
+            { name: 'Sky',         r: 108, g: 176, b: 210 },  // calm blue
+            { name: 'Cornflower',  r: 100, g: 140, b: 200 },  // deeper blue
+            { name: 'Lavender',    r: 155, g: 135, b: 195 },  // soft violet
+            { name: 'Buttercup',   r: 240, g: 200, b: 80  },  // bright yellow
+        ];
+
+        // Render palette swatches
+        function renderSwatches() {
+            const container = document.getElementById('paletteSwatches');
+            container.innerHTML = '';
+            PALETTE.forEach(c => {
+                const el = document.createElement('div');
+                el.className = 'swatch';
+                el.style.background = `rgb(${c.r}, ${c.g}, ${c.b})`;
+                el.title = c.name;
+                container.appendChild(el);
+            });
+        }
+
+        // Fisher-Yates shuffle (non-mutating)
+        function shuffled(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        // Assign random palette colors to all .tag-other and .tag-other-bright
+        function assignColors() {
+            const mutedTags = document.querySelectorAll('#othersMuted .tag-other');
+            const brightTags = document.querySelectorAll('#othersBright .tag-other-bright');
+            const pool = shuffled(PALETTE);
+
+            mutedTags.forEach((tag, i) => {
+                const c = pool[i % pool.length];
+                tag.style.setProperty('--r', c.r);
+                tag.style.setProperty('--g', c.g);
+                tag.style.setProperty('--b', c.b);
+            });
+
+            // Bright gets a different shuffle so they don't match 1:1
+            const pool2 = shuffled(PALETTE);
+            brightTags.forEach((tag, i) => {
+                const c = pool2[i % pool2.length];
+                tag.style.setProperty('--r', c.r);
+                tag.style.setProperty('--g', c.g);
+                tag.style.setProperty('--b', c.b);
+            });
+        }
+
+        // Init
+        renderSwatches();
+        assignColors();
+
+        document.getElementById('shuffleBtn').addEventListener('click', assignColors);
+    </script>
 </body>
 </html>
