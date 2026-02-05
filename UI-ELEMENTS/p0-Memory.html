@@ -64,6 +64,11 @@
             -webkit-backdrop-filter: blur(8px);
         }
 
+        /* Press-in feel — borrowed from luminous-bubble :active */
+        .tag:active {
+            transform: scale(0.98);
+        }
+
         .tag .avatar {
             width: 36px;
             height: 36px;
@@ -108,21 +113,42 @@
            ======================================== */
 
         .tag-my-public {
-            background: rgba(255, 255, 255, 0.07);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            color: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            color: rgba(255, 255, 255, 0.9);
             box-shadow:
-                0 0 16px rgba(255, 255, 255, 0.04),
-                0 0 40px rgba(255, 255, 255, 0.02);
-            text-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
+                /* Top rim light — sharp highlight */
+                inset 0px 3px 5px -1px rgba(200, 210, 240, 0.35),
+                /* Top soft glow — scattered light */
+                inset 0px 10px 18px -4px rgba(180, 190, 230, 0.18),
+                /* Bottom bounce — cool reflected light */
+                inset 0px -10px 20px -6px rgba(120, 130, 180, 0.15),
+                /* Outer glow — ambient presence */
+                0 0 20px rgba(255, 255, 255, 0.06),
+                0 0 50px rgba(255, 255, 255, 0.03),
+                /* Drop shadow — lift from surface */
+                0px 14px 30px -8px rgba(0, 0, 0, 0.5);
+            text-shadow: 0 0 14px rgba(255, 255, 255, 0.2);
         }
 
         .tag-my-public:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.09);
             box-shadow:
-                0 0 24px rgba(255, 255, 255, 0.08),
-                0 0 50px rgba(255, 255, 255, 0.03);
+                inset 0px 3px 6px -1px rgba(200, 210, 240, 0.45),
+                inset 0px 12px 22px -4px rgba(180, 190, 230, 0.25),
+                inset 0px -12px 24px -6px rgba(120, 130, 180, 0.2),
+                0 0 30px rgba(255, 255, 255, 0.1),
+                0 0 60px rgba(255, 255, 255, 0.04),
+                0px 18px 36px -8px rgba(0, 0, 0, 0.55);
             transform: translateY(-1px);
+        }
+
+        .tag-my-public:active {
+            box-shadow:
+                inset 0px 2px 4px -1px rgba(200, 210, 240, 0.28),
+                inset 0px 7px 14px -4px rgba(180, 190, 230, 0.12),
+                inset 0px -7px 14px -6px rgba(120, 130, 180, 0.1),
+                0px 8px 16px -4px rgba(0, 0, 0, 0.6);
         }
 
         /* ========================================
@@ -131,22 +157,43 @@
            ======================================== */
 
         .tag-my-private {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px dashed rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px dashed rgba(255, 255, 255, 0.12);
             color: rgba(255, 255, 255, 0.7);
             box-shadow:
-                0 0 12px rgba(255, 255, 255, 0.03),
-                0 0 30px rgba(255, 255, 255, 0.015);
+                /* Top rim — dimmer for private */
+                inset 0px 2px 4px -1px rgba(180, 190, 220, 0.25),
+                /* Soft inner glow */
+                inset 0px 8px 14px -4px rgba(150, 160, 210, 0.12),
+                /* Bottom bounce */
+                inset 0px -8px 16px -6px rgba(80, 80, 130, 0.12),
+                /* Ambient */
+                0 0 14px rgba(255, 255, 255, 0.03),
+                0 0 35px rgba(255, 255, 255, 0.015),
+                /* Drop shadow */
+                0px 10px 24px -6px rgba(0, 0, 0, 0.45);
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
         }
 
         .tag-my-private:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.22);
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(255, 255, 255, 0.2);
             box-shadow:
-                0 0 20px rgba(255, 255, 255, 0.06),
-                0 0 40px rgba(255, 255, 255, 0.025);
+                inset 0px 3px 5px -1px rgba(180, 190, 220, 0.35),
+                inset 0px 10px 18px -4px rgba(150, 160, 210, 0.18),
+                inset 0px -10px 20px -6px rgba(80, 80, 130, 0.16),
+                0 0 22px rgba(255, 255, 255, 0.06),
+                0 0 45px rgba(255, 255, 255, 0.025),
+                0px 14px 28px -6px rgba(0, 0, 0, 0.5);
             transform: translateY(-1px);
+        }
+
+        .tag-my-private:active {
+            box-shadow:
+                inset 0px 1px 3px -1px rgba(180, 190, 220, 0.18),
+                inset 0px 6px 10px -4px rgba(150, 160, 210, 0.08),
+                inset 0px -6px 10px -6px rgba(80, 80, 130, 0.08),
+                0px 6px 12px -4px rgba(0, 0, 0, 0.55);
         }
 
         .tag-my-private .lock-icon {
@@ -159,21 +206,38 @@
            ======================================== */
 
         .tag-my-old {
-            background: rgba(255, 255, 255, 0.025);
-            border: 1px dashed rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px dashed rgba(255, 255, 255, 0.06);
             color: rgba(255, 255, 255, 0.35);
             box-shadow:
-                0 0 8px rgba(255, 255, 255, 0.015);
+                /* Ghost-level luminous — barely there, like fading light */
+                inset 0px 1px 3px -1px rgba(160, 170, 200, 0.12),
+                inset 0px 5px 10px -4px rgba(140, 150, 190, 0.06),
+                inset 0px -5px 10px -6px rgba(60, 60, 100, 0.06),
+                0 0 8px rgba(255, 255, 255, 0.01),
+                0px 6px 16px -6px rgba(0, 0, 0, 0.3);
             text-shadow: 0 0 6px rgba(255, 255, 255, 0.05);
         }
 
         .tag-my-old:hover {
             background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.1);
             color: rgba(255, 255, 255, 0.5);
             box-shadow:
-                0 0 14px rgba(255, 255, 255, 0.03);
+                inset 0px 2px 4px -1px rgba(160, 170, 200, 0.2),
+                inset 0px 7px 14px -4px rgba(140, 150, 190, 0.1),
+                inset 0px -7px 14px -6px rgba(60, 60, 100, 0.1),
+                0 0 16px rgba(255, 255, 255, 0.03),
+                0px 10px 20px -6px rgba(0, 0, 0, 0.4);
             transform: translateY(-1px);
+        }
+
+        .tag-my-old:active {
+            box-shadow:
+                inset 0px 1px 2px -1px rgba(160, 170, 200, 0.08),
+                inset 0px 4px 8px -4px rgba(140, 150, 190, 0.04),
+                inset 0px -4px 8px -6px rgba(60, 60, 100, 0.04),
+                0px 4px 8px -4px rgba(0, 0, 0, 0.35);
         }
 
         .tag-my-old .lock-icon {
@@ -186,17 +250,24 @@
            ======================================== */
 
         .tag-other {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(var(--r), var(--g), var(--b), 0.04);
+            border: 1px solid rgba(var(--r), var(--g), var(--b), 0.1);
             padding: 8px 18px 8px 8px;
             font-weight: 700;
-            /* Color driven by --r, --g, --b set by JS */
             color: rgba(var(--r), var(--g), var(--b), 0.85);
             box-shadow:
-                0 0 18px rgba(var(--r), var(--g), var(--b), 0.1),
-                0 0 45px rgba(var(--r), var(--g), var(--b), 0.04);
+                /* Top rim — colored light source */
+                inset 0px 3px 5px -1px rgba(var(--r), var(--g), var(--b), 0.3),
+                /* Inner soft glow */
+                inset 0px 10px 18px -4px rgba(var(--r), var(--g), var(--b), 0.12),
+                /* Bottom bounce */
+                inset 0px -10px 18px -6px rgba(var(--r), var(--g), var(--b), 0.1),
+                /* Outer colored glow */
+                0 0 20px rgba(var(--r), var(--g), var(--b), 0.08),
+                0 0 50px rgba(var(--r), var(--g), var(--b), 0.04),
+                /* Drop shadow */
+                0px 12px 28px -8px rgba(0, 0, 0, 0.45);
             text-shadow: 0 0 14px rgba(var(--r), var(--g), var(--b), 0.3);
-            border-color: rgba(var(--r), var(--g), var(--b), 0.1);
         }
 
         .tag-other .avatar {
@@ -204,12 +275,24 @@
         }
 
         .tag-other:hover {
-            background: rgba(var(--r), var(--g), var(--b), 0.06);
+            background: rgba(var(--r), var(--g), var(--b), 0.07);
             color: rgba(var(--r), var(--g), var(--b), 0.95);
             box-shadow:
-                0 0 26px rgba(var(--r), var(--g), var(--b), 0.16),
-                0 0 55px rgba(var(--r), var(--g), var(--b), 0.06);
+                inset 0px 3px 6px -1px rgba(var(--r), var(--g), var(--b), 0.4),
+                inset 0px 12px 22px -4px rgba(var(--r), var(--g), var(--b), 0.18),
+                inset 0px -12px 22px -6px rgba(var(--r), var(--g), var(--b), 0.14),
+                0 0 30px rgba(var(--r), var(--g), var(--b), 0.14),
+                0 0 60px rgba(var(--r), var(--g), var(--b), 0.06),
+                0px 16px 32px -8px rgba(0, 0, 0, 0.5);
             transform: translateY(-1px);
+        }
+
+        .tag-other:active {
+            box-shadow:
+                inset 0px 2px 4px -1px rgba(var(--r), var(--g), var(--b), 0.22),
+                inset 0px 7px 12px -4px rgba(var(--r), var(--g), var(--b), 0.08),
+                inset 0px -7px 12px -6px rgba(var(--r), var(--g), var(--b), 0.06),
+                0px 6px 14px -4px rgba(0, 0, 0, 0.55);
         }
 
         .tag-other .tag-content > span:first-child {
@@ -221,16 +304,24 @@
            ======================================== */
 
         .tag-other-bright {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(var(--r), var(--g), var(--b), 0.06);
+            border: 1px solid rgba(var(--r), var(--g), var(--b), 0.14);
             padding: 8px 18px 8px 8px;
             font-weight: 700;
             color: rgb(var(--r), var(--g), var(--b));
             box-shadow:
-                0 0 22px rgba(var(--r), var(--g), var(--b), 0.14),
-                0 0 55px rgba(var(--r), var(--g), var(--b), 0.07);
+                /* Top rim — vivid highlight, bright variant */
+                inset 0px 4px 6px -1px rgba(var(--r), var(--g), var(--b), 0.45),
+                /* Top soft radiance */
+                inset 0px 12px 22px -4px rgba(var(--r), var(--g), var(--b), 0.2),
+                /* Bottom bounce — warm reflected light */
+                inset 0px -12px 22px -6px rgba(var(--r), var(--g), var(--b), 0.16),
+                /* Outer bright glow */
+                0 0 24px rgba(var(--r), var(--g), var(--b), 0.14),
+                0 0 60px rgba(var(--r), var(--g), var(--b), 0.07),
+                /* Drop shadow */
+                0px 16px 34px -8px rgba(0, 0, 0, 0.5);
             text-shadow: 0 0 20px rgba(var(--r), var(--g), var(--b), 0.45);
-            border-color: rgba(var(--r), var(--g), var(--b), 0.14);
         }
 
         .tag-other-bright .avatar {
@@ -240,11 +331,23 @@
         }
 
         .tag-other-bright:hover {
-            background: rgba(var(--r), var(--g), var(--b), 0.09);
+            background: rgba(var(--r), var(--g), var(--b), 0.1);
             box-shadow:
-                0 0 34px rgba(var(--r), var(--g), var(--b), 0.22),
-                0 0 65px rgba(var(--r), var(--g), var(--b), 0.1);
+                inset 0px 4px 7px -1px rgba(var(--r), var(--g), var(--b), 0.55),
+                inset 0px 14px 26px -4px rgba(var(--r), var(--g), var(--b), 0.28),
+                inset 0px -14px 26px -6px rgba(var(--r), var(--g), var(--b), 0.22),
+                0 0 36px rgba(var(--r), var(--g), var(--b), 0.22),
+                0 0 70px rgba(var(--r), var(--g), var(--b), 0.1),
+                0px 20px 40px -8px rgba(0, 0, 0, 0.55);
             transform: translateY(-1px);
+        }
+
+        .tag-other-bright:active {
+            box-shadow:
+                inset 0px 2px 4px -1px rgba(var(--r), var(--g), var(--b), 0.35),
+                inset 0px 8px 16px -4px rgba(var(--r), var(--g), var(--b), 0.14),
+                inset 0px -8px 16px -6px rgba(var(--r), var(--g), var(--b), 0.1),
+                0px 8px 18px -4px rgba(0, 0, 0, 0.6);
         }
 
         .tag-other-bright .tag-content > span:first-child {
