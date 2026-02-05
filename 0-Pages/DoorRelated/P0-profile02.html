@@ -26,9 +26,10 @@
 
       .page {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
-        gap: 0;
+        justify-content: center;
+        gap: 36px;
       }
 
       .content-box {
@@ -36,12 +37,50 @@
         height: 574px;
         background: #000;
         border-radius: 28px;
+        position: relative;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: flex-start;
         padding: 28px 0 32px;
         box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+      }
+
+      .content-wrapper {
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+      }
+
+      .content-slider {
+        position: absolute;
+        top: 56px;
+        right: -34px;
+        height: calc(100% - 120px);
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        accent-color: #fff;
+        background: transparent;
+      }
+
+      .content-slider-label {
+        position: absolute;
+        right: -30px;
+        top: 26px;
+        font-size: 10px;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .card-name {
+        position: absolute;
+        top: 14px;
+        left: 18px;
+        font-size: 11px;
+        letter-spacing: 1.6px;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.65);
       }
 
       .content-scale {
@@ -90,6 +129,7 @@
         overflow: hidden;
         background: #111;
         box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45);
+        isolation: isolate;
       }
 
       .profile-card img {
@@ -100,6 +140,7 @@
         object-fit: cover;
         object-position: center 65%;
         filter: saturate(0.9) contrast(1.05);
+        z-index: 0;
       }
 
       .card-overlay {
@@ -113,6 +154,166 @@
         padding: 34px 34px 20px;
         gap: 8px;
         text-align: center;
+      }
+
+      [data-card="one"] .card-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 4;
+        align-items: stretch;
+        padding: 24px 24px 20px;
+        gap: 0;
+        text-align: left;
+      }
+
+      [data-card="one"] .diary-top {
+        display: flex;
+        flex-direction: column;
+        flex: 0 0 auto;
+      }
+
+      [data-card="one"] .diary-bottom {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+
+      [data-card="one"] .text-container {
+        margin-top: 24px;
+        flex: 0 0 auto;
+      }
+
+      .text-container {
+        margin-top: 32px;
+        margin-bottom: 20px;
+        background: none;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        border-radius: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+      }
+
+      [data-card="one"] .time-anchor {
+        margin-top: 40px;
+        margin-bottom: 28px;
+      }
+
+      [data-card="one"] .date-title {
+        font-size: 26px;
+        font-weight: 500;
+        letter-spacing: 0.4px;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 6px;
+      }
+
+      [data-card="one"] .time-subtitle {
+        font-size: 14px;
+        font-weight: 400;
+        letter-spacing: 0.5px;
+        color: rgba(255, 255, 255, 0.45);
+      }
+
+      [data-card="one"] .diary-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        flex: 0 0 auto;
+      }
+
+      [data-card="one"] .timeline-indicator {
+        width: 2px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 6px;
+        flex-shrink: 0;
+      }
+
+      [data-card="one"] .timeline-glow {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 0 18px rgba(255, 255, 255, 0.5);
+        margin-bottom: 8px;
+      }
+
+      [data-card="one"] .timeline-fade {
+        width: 1px;
+        flex: 1;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.4) 0%,
+          rgba(255, 255, 255, 0.12) 50%,
+          transparent 100%
+        );
+      }
+
+      .scroll-container {
+        flex: 0 0 auto;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+
+      .scroll-container::-webkit-scrollbar {
+        display: none;
+      }
+
+      .diary-content {
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+        font-size: 17px;
+        font-weight: 400;
+        line-height: 28px;
+        letter-spacing: 0.3px;
+        text-align: left;
+        color: rgba(255, 255, 255, 0.88);
+        max-width: 382px;
+        padding-left: 0;
+      }
+
+      .diary-content p {
+        margin-bottom: 20px;
+      }
+
+      .diary-content p:last-child {
+        margin-bottom: 0;
+      }
+
+      [data-card="one"] .memories-block {
+        margin-top: 32px;
+        align-items: flex-start;
+        text-align: left;
+        width: 100%;
+        padding-left: 20px;
+        max-width: 382px;
+      }
+
+      [data-card="one"] .memories-divider {
+        width: 100%;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.12);
+        margin-bottom: 20px;
+      }
+
+      [data-card="one"] .memories-title {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        color: rgba(255, 255, 255, 0.35);
+        margin-bottom: 12px;
+      }
+
+      [data-card="one"] .memories-items {
+        justify-content: flex-start;
+        width: 100%;
+        flex-wrap: wrap;
+        gap: 8px;
       }
 
       .scene-text {
@@ -181,90 +382,70 @@
       }
 
       .memory-item {
+        position: relative;
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        padding: 4px 12px;
+        gap: 8px;
+        padding: 0 14px;
+        height: 32px;
         border-radius: 999px;
-        border: 1px solid rgba(255, 255, 255, 0.28);
-        width: fit-content;
-        max-width: 220px;
-        height: 34px;
-        background: rgba(12, 12, 12, 0.92);
-        box-shadow:
-          inset 0 0 12px rgba(255, 255, 255, 0.05),
-          0 8px 18px rgba(0, 0, 0, 0.6);
-        backdrop-filter: blur(10px) saturate(1.2);
-        color: #f5f5f5;
+        border: none;
+        background: rgba(255, 255, 255, 0.78);
+        color: #0f0f0f;
         font-size: 12px;
-        font-weight: 700;
+        font-weight: 800;
         letter-spacing: 0.2px;
-        text-shadow:
-          0 1px 2px rgba(0, 0, 0, 0.65),
-          0 0 8px rgba(255, 255, 255, 0.45),
-          0 0 14px rgba(255, 255, 255, 0.25);
+        line-height: 1;
+        white-space: nowrap;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
       }
 
       .memory-item .match-avi {
-        width: 1.75rem;
-        height: 1.75rem;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 1px solid rgba(255, 255, 255, 0.28);
-        box-shadow: 0 0 8px rgba(255, 255, 255, 0.18);
-        margin-left: -2px;
+        display: none;
       }
 
-      .memory-item.cyan {
-        background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(6, 6, 6, 0.96));
-        border-color: rgba(6, 182, 212, 0.3);
-        box-shadow:
-          inset 0 0 10px rgba(6, 182, 212, 0.14),
-          0 8px 16px rgba(0, 0, 0, 0.6);
-        color: #7ed3e0;
-        text-shadow:
-          0 1px 2px rgba(0, 0, 0, 0.6),
-          0 0 5px rgba(6, 182, 212, 0.3),
-          0 0 10px rgba(6, 182, 212, 0.22);
+      .memory-item::before {
+        content: "";
+        position: absolute;
+        inset: -14px;
+        border-radius: 999px;
+        background: radial-gradient(
+          closest-side,
+          rgba(255, 255, 255, 0.32),
+          rgba(255, 255, 255, 0) 90%
+        );
+        filter: blur(16px);
+        z-index: -1;
+        pointer-events: none;
       }
 
-      .memory-item.yellow {
-        background: linear-gradient(135deg, rgba(250, 204, 21, 0.2), rgba(6, 6, 6, 0.96));
-        border-color: rgba(250, 204, 21, 0.3);
-        box-shadow:
-          inset 0 0 10px rgba(250, 204, 21, 0.14),
-          0 8px 16px rgba(0, 0, 0, 0.6);
-        color: #e8c158;
-        text-shadow:
-          0 1px 2px rgba(0, 0, 0, 0.6),
-          0 0 5px rgba(250, 204, 21, 0.3),
-          0 0 10px rgba(250, 204, 21, 0.22);
+      .memory-item:hover {
+        transform: translate(-1px, -2px);
+        box-shadow: 6px 8px 0 rgba(0, 0, 0, 0.2);
       }
 
-      .memory-item.purple {
-        background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(6, 6, 6, 0.96));
-        border-color: rgba(168, 85, 247, 0.3);
-        box-shadow:
-          inset 0 0 10px rgba(168, 85, 247, 0.14),
-          0 8px 16px rgba(0, 0, 0, 0.6);
-        color: #cdb2f0;
-        text-shadow:
-          0 1px 2px rgba(0, 0, 0, 0.6),
-          0 0 5px rgba(168, 85, 247, 0.3),
-          0 0 10px rgba(168, 85, 247, 0.22);
+      .memory-item.public.secondary {
+        color: #2563eb;
       }
 
-      .memory-item.muted {
-        background: linear-gradient(135deg, rgba(148, 163, 184, 0.18), rgba(6, 6, 6, 0.96));
-        border-color: rgba(203, 213, 225, 0.32);
-        box-shadow:
-          inset 0 0 10px rgba(148, 163, 184, 0.12),
-          0 8px 16px rgba(0, 0, 0, 0.6);
-        color: #cbd5e1;
-        text-shadow:
-          0 1px 2px rgba(0, 0, 0, 0.6),
-          0 0 6px rgba(226, 232, 240, 0.22),
-          0 0 10px rgba(148, 163, 184, 0.18);
+      .memory-item.private {
+        background: #fff;
+        color: #555;
+        border: 2px dashed currentColor;
+        padding-left: 10px;
+        gap: 6px;
+      }
+
+      .memory-item .lock-icon {
+        width: 12px;
+        height: 12px;
+        background: currentColor;
+        mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='2' ry='2'%3E%3C/rect%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'%3E%3C/path%3E%3C/svg%3E");
+        -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='2' ry='2'%3E%3C/rect%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'%3E%3C/path%3E%3C/svg%3E");
+        mask-repeat: no-repeat;
+        mask-position: center;
       }
 
       .profile-card::before,
@@ -273,7 +454,7 @@
         content: "";
         position: absolute;
         pointer-events: none;
-        z-index: 2;
+        z-index: 1;
       }
 
       .profile-card::before {
@@ -303,6 +484,7 @@
         top: 0;
         bottom: 0;
         width: 35%;
+        z-index: 1;
       }
 
       .side-shade.left {
@@ -338,24 +520,21 @@
       }
 
       .screenshot-btn {
-        position: fixed;
-        right: 24px;
-        top: 50%;
-        transform: translateY(-50%);
-        padding: 12px 18px;
+        margin-top: 16px;
+        padding: 10px 16px;
         border-radius: 999px;
-        border: 1px solid rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(0, 0, 0, 0.25);
         background: #111;
         color: #fff;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 600;
-        letter-spacing: 0.8px;
+        letter-spacing: 1px;
         cursor: pointer;
         box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
       }
 
       .screenshot-btn:active {
-        transform: translateY(-50%) scale(0.98);
+        transform: scale(0.98);
       }
 
       .quote-block {
@@ -387,7 +566,7 @@
   </head>
   <body>
     <div class="page">
-      <div class="content-box" id="capture-area">
+      <div class="content-box">
         <div class="content-scale">
           <div class="top-bar">
             <button class="icon-btn" aria-label="返回">
@@ -465,31 +644,178 @@
             <span class="side-shade right" aria-hidden="true"></span>
           </div>
         </div>
+        <button class="screenshot-btn" type="button" aria-label="一键生成截图">
+          Screenshot
+        </button>
+      </div>
+      <div class="content-wrapper" data-card="one">
+        <div class="content-box">
+          <div class="card-name">One</div>
+          <div class="content-scale">
+            <div class="top-bar">
+              <button class="icon-btn" aria-label="返回">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M15 6l-6 6 6 6" />
+                </svg>
+              </button>
+              <div class="avatar" aria-label="头像">
+                <img
+                  src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=facearea&w=200&h=200&q=80"
+                  alt="头像"
+                />
+              </div>
+              <button class="icon-btn" aria-label="设置" style="justify-self: end;">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 3l1.2 2.4 2.7.4-1.9 1.9.4 2.7L12 9.8l-2.4 1.3.4-2.7-1.9-1.9 2.7-.4L12 3z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              </button>
+            </div>
+            <div class="profile-card">
+              <img
+                src="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1200&q=80"
+                alt="背景图片"
+              />
+              <div class="card-overlay">
+              <div class="time-anchor">
+                <div class="date-title">February 5, 2026</div>
+                <div class="time-subtitle">6:42 PM · Friday</div>
+              </div>
+              <div class="diary-top">
+                <div class="text-container">
+                  <div class="diary-row">
+                    <div class="timeline-indicator">
+                      <div class="timeline-glow"></div>
+                      <div class="timeline-fade"></div>
+                    </div>
+                    <div class="scroll-container">
+                      <div class="diary-content" data-scene-text="one">
+                        <p>
+                          Soft fog settles across the river as lanterns lift one by one. She pauses on the
+                          bridge, tracing the names carved into the railing, and smiles at the distant glow.
+                        </p>
+                        <p>
+                          The music fades, the water brightens, and she makes a quiet promise to return
+                          when the city is awake.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="diary-bottom">
+                <div class="memories-block" aria-label="Memories from this moment">
+                  <div class="memories-divider" aria-hidden="true"></div>
+                  <div class="memories-title">MEMORIES</div>
+                  <div class="memories-items">
+                    <button class="memory-item public" type="button">
+                      <span class="match-name">Noah Vale</span>
+                    </button>
+                    <button class="memory-item public secondary" type="button">
+                      <span class="match-name">Harbor Echo</span>
+                    </button>
+                    <button class="memory-item private" type="button" aria-label="Private memory">
+                      <span class="lock-icon" aria-hidden="true"></span>
+                      <span class="match-name">Private</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+              <span class="side-shade left" aria-hidden="true"></span>
+              <span class="side-shade right" aria-hidden="true"></span>
+            </div>
+          </div>
+          <button class="screenshot-btn" type="button" aria-label="一键生成截图">
+            Screenshot
+          </button>
+        </div>
+        <div class="content-slider-label">Length</div>
+        <input
+          class="content-slider"
+          type="range"
+          min="1"
+          max="5"
+          step="1"
+          value="3"
+          aria-label="内容长度调节"
+        />
       </div>
     </div>
-    <button class="screenshot-btn" type="button" aria-label="一键生成截图">
-      Screenshot
-    </button>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script>
-      const screenshotBtn = document.querySelector(".screenshot-btn");
-      const captureArea = document.getElementById("capture-area");
+      const screenshotButtons = document.querySelectorAll(".screenshot-btn");
 
-      screenshotBtn.addEventListener("click", async () => {
-        if (!captureArea || !window.html2canvas) {
-          return;
-        }
-        const canvas = await window.html2canvas(captureArea, {
-          backgroundColor: null,
-          scale: 2,
-          useCORS: true,
+      screenshotButtons.forEach((button, index) => {
+        button.addEventListener("click", async () => {
+          if (!window.html2canvas) {
+            return;
+          }
+          const captureArea = button.closest(".content-box");
+          if (!captureArea) {
+            return;
+          }
+          const canvas = await window.html2canvas(captureArea, {
+            backgroundColor: null,
+            scale: 2,
+            useCORS: true,
+          });
+          const imageUrl = canvas.toDataURL("image/png");
+          const downloadLink = document.createElement("a");
+          downloadLink.href = imageUrl;
+          downloadLink.download = `profile-screenshot-${index + 1}.png`;
+          downloadLink.click();
         });
-        const imageUrl = canvas.toDataURL("image/png");
-        const downloadLink = document.createElement("a");
-        downloadLink.href = imageUrl;
-        downloadLink.download = "profile-screenshot.png";
-        downloadLink.click();
       });
+
+      const sliderCard = document.querySelector('[data-card="one"]');
+      if (sliderCard) {
+        const slider = sliderCard.querySelector(".content-slider");
+        const sceneText = sliderCard.querySelector('[data-scene-text="one"]');
+        const baseText = {
+          1: [
+            "Soft fog settles across the river as lanterns lift one by one.",
+          ],
+          2: [
+            "Soft fog settles across the river as lanterns lift one by one.",
+            "She pauses on the bridge, tracing the names carved into the railing.",
+          ],
+          3: [
+            "Soft fog settles across the river as lanterns lift one by one. She pauses on the bridge, tracing the names carved into the railing, and smiles at the distant glow.",
+            "The music fades, the water brightens, and she makes a quiet promise to return when the city is awake.",
+          ],
+          4: [
+            "Soft fog settles across the river as lanterns lift one by one. She pauses on the bridge, tracing the names carved into the railing, and smiles at the distant glow.",
+            "The music fades, the water brightens, and she makes a quiet promise to return when the city is awake.",
+            "Ahead, the promenade opens into a quiet plaza where footsteps echo against stone.",
+          ],
+          5: [
+            "Soft fog settles across the river as lanterns lift one by one. She pauses on the bridge, tracing the names carved into the railing, and smiles at the distant glow.",
+            "The music fades, the water brightens, and she makes a quiet promise to return when the city is awake.",
+            "Ahead, the promenade opens into a quiet plaza where footsteps echo against stone.",
+            "She lingers, letting the wind pull the last notes of the night across the water.",
+            "Streetlights flicker on, casting long paths across the waterline.",
+            "A distant bell marks the hour, then fades into the haze.",
+            "She exhales, letting the quiet settle into the seams of the evening.",
+            "The last ferry slips away, and the city holds its breath for dawn.",
+          ],
+        };
+
+        const renderScene = (level) => {
+          if (!sceneText) {
+            return;
+          }
+          const fragments = baseText[level] || baseText[3];
+          sceneText.innerHTML = fragments.map((line) => `<p>${line}</p>`).join("");
+        };
+
+        if (slider) {
+          renderScene(slider.value);
+          slider.addEventListener("input", (event) => {
+            renderScene(event.target.value);
+          });
+        }
+      }
     </script>
   </body>
 </html>
