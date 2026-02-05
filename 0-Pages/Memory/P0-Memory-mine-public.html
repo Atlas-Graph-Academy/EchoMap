@@ -360,11 +360,59 @@
             box-shadow: 0 0 4px rgba(249, 115, 22, 0.35);
         }
 
-        /* Typography */
-        h1 {
-            font-size: 32px; font-weight: 800; line-height: 1.1;
-            color: white; margin-bottom: 16px;
-            letter-spacing: -0.02em;
+        /* Title — My Public Memory · Light Pulse */
+        .memory-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 20px;
+            border-radius: 28px;
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.085);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            color: rgba(255, 255, 255, 0.92);
+            box-shadow:
+                inset 0px 2px 4px -1px rgba(210, 220, 245, 0.35),
+                inset 0px 8px 14px -6px rgba(190, 200, 240, 0.18),
+                inset 0px -8px 16px -8px rgba(140, 150, 200, 0.14),
+                0 0 18px rgba(255, 255, 255, 0.1),
+                0px 12px 26px -8px rgba(0, 0, 0, 0.52);
+            text-shadow: 0 0 14px rgba(255, 255, 255, 0.26);
+            animation: memory-title-pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes memory-title-pulse {
+            0%, 100% {
+                opacity: 0.95;
+                box-shadow:
+                    inset 0px 3px 5px -1px rgba(220, 232, 255, 0.3),
+                    inset 0px 10px 18px -6px rgba(200, 210, 250, 0.16),
+                    inset 0px -10px 18px -8px rgba(150, 160, 210, 0.12),
+                    0 0 18px rgba(255, 255, 255, 0.1),
+                    0px 14px 28px -10px rgba(0, 0, 0, 0.48);
+            }
+            45% {
+                opacity: 0.98;
+                box-shadow:
+                    inset 0px 4px 6px -1px rgba(230, 242, 255, 0.38),
+                    inset 0px 12px 20px -6px rgba(210, 222, 255, 0.22),
+                    inset 0px -12px 20px -8px rgba(165, 175, 225, 0.16),
+                    0 0 26px rgba(255, 255, 255, 0.14),
+                    0px 18px 34px -10px rgba(0, 0, 0, 0.52);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .memory-title {
+                animation: none;
+            }
         }
 
         p {
@@ -914,7 +962,7 @@
             <span class="privacy-status public">Public</span>
         </div>
         <div class="memory-title-block">
-            <h1>The Constraints of Creativity</h1>
+            <div class="memory-title">The Constraints of Creativity</div>
         </div>
         <div class="content-scroll">
             <!-- User Badge moved to top tags -->

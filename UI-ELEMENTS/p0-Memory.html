@@ -113,8 +113,8 @@
            ======================================== */
 
         .tag-my-public {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.10);
+            background: rgba(255, 255, 255, 0.09);
+            border: 1px solid rgba(255, 255, 255, 0.16);
             color: rgba(255, 255, 255, 0.9);
             box-shadow:
                 /* Top rim light — sharp highlight */
@@ -124,21 +124,23 @@
                 /* Bottom bounce — cool reflected light */
                 inset 0px -10px 20px -6px rgba(120, 130, 180, 0.15),
                 /* Outer glow — ambient presence */
-                0 0 20px rgba(255, 255, 255, 0.06),
-                0 0 50px rgba(255, 255, 255, 0.03),
+                0 0 28px rgba(255, 255, 255, 0.12),
+                0 0 70px rgba(255, 255, 255, 0.06),
                 /* Drop shadow — lift from surface */
                 0px 14px 30px -8px rgba(0, 0, 0, 0.5);
-            text-shadow: 0 0 14px rgba(255, 255, 255, 0.2);
+            text-shadow: 0 0 18px rgba(255, 255, 255, 0.3);
+            animation: public-breathe 3.8s ease-in-out infinite;
+            overflow: hidden;
         }
 
         .tag-my-public:hover {
-            background: rgba(255, 255, 255, 0.09);
+            background: rgba(255, 255, 255, 0.14);
             box-shadow:
                 inset 0px 3px 6px -1px rgba(200, 210, 240, 0.45),
                 inset 0px 12px 22px -4px rgba(180, 190, 230, 0.25),
                 inset 0px -12px 24px -6px rgba(120, 130, 180, 0.2),
-                0 0 30px rgba(255, 255, 255, 0.1),
-                0 0 60px rgba(255, 255, 255, 0.04),
+                0 0 40px rgba(255, 255, 255, 0.18),
+                0 0 80px rgba(255, 255, 255, 0.08),
                 0px 18px 36px -8px rgba(0, 0, 0, 0.55);
             transform: translateY(-1px);
         }
@@ -149,6 +151,136 @@
                 inset 0px 7px 14px -4px rgba(180, 190, 230, 0.12),
                 inset 0px -7px 14px -6px rgba(120, 130, 180, 0.1),
                 0px 8px 16px -4px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Public shimmer + breath */
+        .tag-my-public::before {
+            content: '';
+            position: absolute;
+            inset: -40% -30%;
+            background: radial-gradient(
+                circle at 30% 30%,
+                rgba(255, 255, 255, 0.35),
+                rgba(255, 255, 255, 0.05) 45%,
+                rgba(255, 255, 255, 0) 70%
+            );
+            opacity: 0.55;
+            transform: translateX(-30%);
+            animation: public-flow 6.5s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes public-breathe {
+            0%, 100% {
+                box-shadow:
+                    inset 0px 3px 5px -1px rgba(200, 210, 240, 0.35),
+                    inset 0px 10px 18px -4px rgba(180, 190, 230, 0.18),
+                    inset 0px -10px 20px -6px rgba(120, 130, 180, 0.15),
+                    0 0 24px rgba(255, 255, 255, 0.1),
+                    0 0 60px rgba(255, 255, 255, 0.05),
+                    0px 14px 30px -8px rgba(0, 0, 0, 0.5);
+            }
+            50% {
+                box-shadow:
+                    inset 0px 4px 6px -1px rgba(210, 220, 245, 0.5),
+                    inset 0px 14px 24px -4px rgba(190, 200, 240, 0.32),
+                    inset 0px -14px 24px -6px rgba(140, 150, 200, 0.22),
+                    0 0 38px rgba(255, 255, 255, 0.2),
+                    0 0 90px rgba(255, 255, 255, 0.1),
+                    0px 18px 36px -8px rgba(0, 0, 0, 0.55);
+            }
+        }
+
+        @keyframes public-flow {
+            0% { transform: translateX(-35%) translateY(0%); opacity: 0.4; }
+            50% { transform: translateX(10%) translateY(-4%); opacity: 0.75; }
+            100% { transform: translateX(35%) translateY(0%); opacity: 0.45; }
+        }
+
+        /* ========================================
+           MY PUBLIC MEMORY — LIGHT PULSE
+           Light flicker / glow pulse
+           ======================================== */
+
+        .tag-my-public-pulse {
+            background: rgba(255, 255, 255, 0.085);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            color: rgba(255, 255, 255, 0.92);
+            box-shadow:
+                inset 0px 2px 4px -1px rgba(210, 220, 245, 0.35),
+                inset 0px 8px 14px -6px rgba(190, 200, 240, 0.18),
+                inset 0px -8px 16px -8px rgba(140, 150, 200, 0.14),
+                0 0 18px rgba(255, 255, 255, 0.1),
+                0px 12px 26px -8px rgba(0, 0, 0, 0.52);
+            text-shadow: 0 0 14px rgba(255, 255, 255, 0.26);
+            animation: public-light-pulse 3s ease-in-out infinite;
+            overflow: hidden;
+        }
+
+        .tag-my-public-pulse:hover {
+            background: rgba(255, 255, 255, 0.13);
+            box-shadow:
+                inset 0px 3px 5px -1px rgba(220, 230, 250, 0.45),
+                inset 0px 10px 20px -6px rgba(200, 210, 250, 0.26),
+                inset 0px -10px 20px -8px rgba(150, 160, 210, 0.2),
+                0 0 28px rgba(255, 255, 255, 0.18),
+                0px 16px 32px -10px rgba(0, 0, 0, 0.55);
+            transform: translateY(-1px);
+        }
+
+        @keyframes public-light-pulse {
+            0%, 100% {
+                opacity: 0.95;
+                box-shadow:
+                    inset 0px 3px 5px -1px rgba(220, 232, 255, 0.3),
+                    inset 0px 10px 18px -6px rgba(200, 210, 250, 0.16),
+                    inset 0px -10px 18px -8px rgba(150, 160, 210, 0.12),
+                    0 0 18px rgba(255, 255, 255, 0.1),
+                    0px 14px 28px -10px rgba(0, 0, 0, 0.48);
+            }
+            45% {
+                opacity: 0.98;
+                box-shadow:
+                    inset 0px 4px 6px -1px rgba(230, 242, 255, 0.38),
+                    inset 0px 12px 20px -6px rgba(210, 222, 255, 0.22),
+                    inset 0px -12px 20px -8px rgba(165, 175, 225, 0.16),
+                    0 0 26px rgba(255, 255, 255, 0.14),
+                    0px 18px 34px -10px rgba(0, 0, 0, 0.52);
+            }
+        }
+
+        .tag-my-public-pulse::before {
+            content: '';
+            position: absolute;
+            inset: -35% 0;
+            background: linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0.22),
+                rgba(255, 255, 255, 0.1) 38%,
+                rgba(255, 255, 255, 0) 70%
+            );
+            opacity: 0;
+            transform: translateY(0);
+            animation: none;
+            pointer-events: none;
+        }
+
+        @keyframes public-light-sweep {
+            0% { transform: translateY(-40%); opacity: 0.4; }
+            60% { transform: translateY(12%); opacity: 0.46; }
+            100% { transform: translateY(40%); opacity: 0.4; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .tag-my-public-pulse {
+                animation: none;
+            }
+
+            .tag-my-public-pulse::before {
+                animation: none;
+                opacity: 0.28;
+                transform: translateY(-20%);
+            }
         }
 
         /* ========================================
@@ -449,12 +581,12 @@
         <h1 class="demo-title">Memory Now</h1>
         <p class="demo-subtitle">Quiet glow tag variants</p>
 
-        <!-- MY PUBLIC MEMORY -->
+        <!-- MY PUBLIC MEMORY — LIGHT PULSE -->
         <div class="section">
-            <div class="section-label">My Public Memory</div>
+            <div class="section-label">My Public Memory · Light Pulse</div>
             <div class="tags-col">
-                <span class="tag tag-my-public">Tokyo Sunrise</span>
-                <span class="tag tag-my-public">The Bridge at Dawn</span>
+                <span class="tag tag-my-public-pulse">Open Field</span>
+                <span class="tag tag-my-public-pulse">City Rains</span>
             </div>
         </div>
 
@@ -566,6 +698,15 @@
                         <span class="tag-username">@reiko</span>
                     </span>
                 </span>
+            </div>
+        </div>
+
+        <!-- MY PUBLIC MEMORY (Backup) -->
+        <div class="section">
+            <div class="section-label">My Public Memory</div>
+            <div class="tags-col">
+                <span class="tag tag-my-public">Tokyo Sunrise</span>
+                <span class="tag tag-my-public">The Bridge at Dawn</span>
             </div>
         </div>
 
