@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Now – Tag Variants</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+            background: #000000;
+            min-height: 100vh;
+            padding: 60px 40px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .section {
+            margin-bottom: 48px;
+        }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.35);
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .tags-col {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 14px;
+        }
+
+        /* ========================================
+           BASE TAG
+           ======================================== */
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 20px;
+            border-radius: 28px;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .tag .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .tag .tag-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .tag .tag-username {
+            font-size: 11px;
+            font-weight: 400;
+            opacity: 0.45;
+            letter-spacing: 0.2px;
+        }
+
+        /* Lock icon (SVG mask, same approach as White-tags) */
+        .lock-icon {
+            width: 14px;
+            height: 14px;
+            background: currentColor;
+            opacity: 0.6;
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='2' ry='2'%3E%3C/rect%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'%3E%3C/path%3E%3C/svg%3E");
+            -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='2' ry='2'%3E%3C/rect%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'%3E%3C/path%3E%3C/svg%3E");
+            mask-repeat: no-repeat;
+            -webkit-mask-repeat: no-repeat;
+            mask-position: center;
+            -webkit-mask-position: center;
+            mask-size: contain;
+            -webkit-mask-size: contain;
+            flex-shrink: 0;
+        }
+
+        /* ========================================
+           MY PUBLIC MEMORY
+           Quiet white/gray — no avatar, no lock
+           ======================================== */
+
+        .tag-my-public {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.85);
+            box-shadow:
+                0 0 16px rgba(255, 255, 255, 0.04),
+                0 0 40px rgba(255, 255, 255, 0.02);
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
+        }
+
+        .tag-my-public:hover {
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow:
+                0 0 24px rgba(255, 255, 255, 0.08),
+                0 0 50px rgba(255, 255, 255, 0.03);
+            transform: translateY(-1px);
+        }
+
+        /* ========================================
+           MY PRIVATE MEMORY
+           Quiet white/gray — lock, no avatar
+           ======================================== */
+
+        .tag-my-private {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.7);
+            box-shadow:
+                0 0 12px rgba(255, 255, 255, 0.03),
+                0 0 30px rgba(255, 255, 255, 0.015);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+
+        .tag-my-private:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.22);
+            box-shadow:
+                0 0 20px rgba(255, 255, 255, 0.06),
+                0 0 40px rgba(255, 255, 255, 0.025);
+            transform: translateY(-1px);
+        }
+
+        .tag-my-private .lock-icon {
+            opacity: 0.5;
+        }
+
+        /* ========================================
+           MY PRIVATE MEMORY — LONG TIME AGO
+           Faded, ghostly, barely there
+           ======================================== */
+
+        .tag-my-old {
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px dashed rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.35);
+            box-shadow:
+                0 0 8px rgba(255, 255, 255, 0.015);
+            text-shadow: 0 0 6px rgba(255, 255, 255, 0.05);
+        }
+
+        .tag-my-old:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.5);
+            box-shadow:
+                0 0 14px rgba(255, 255, 255, 0.03);
+            transform: translateY(-1px);
+        }
+
+        .tag-my-old .lock-icon {
+            opacity: 0.3;
+        }
+
+        /* ========================================
+           OTHERS' MEMORY
+           Muted, introverted neon — avatar + username
+           ======================================== */
+
+        .tag-other {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 8px 18px 8px 8px;
+        }
+
+        /* — Muted Gold — */
+        .tag-other.gold {
+            color: rgba(255, 210, 120, 0.6);
+            box-shadow:
+                0 0 14px rgba(255, 200, 60, 0.06),
+                0 0 35px rgba(255, 180, 40, 0.025);
+            text-shadow: 0 0 12px rgba(255, 200, 60, 0.18);
+            border-color: rgba(255, 200, 60, 0.07);
+        }
+
+        .tag-other.gold .avatar {
+            box-shadow: 0 0 10px rgba(255, 200, 60, 0.15);
+        }
+
+        .tag-other.gold:hover {
+            background: rgba(255, 200, 60, 0.05);
+            color: rgba(255, 210, 120, 0.75);
+            box-shadow:
+                0 0 22px rgba(255, 200, 60, 0.1),
+                0 0 45px rgba(255, 180, 40, 0.04);
+            transform: translateY(-1px);
+        }
+
+        /* — Muted Purple — */
+        .tag-other.purple {
+            color: rgba(180, 150, 230, 0.6);
+            box-shadow:
+                0 0 14px rgba(160, 120, 220, 0.06),
+                0 0 35px rgba(140, 100, 200, 0.025);
+            text-shadow: 0 0 12px rgba(160, 120, 220, 0.18);
+            border-color: rgba(160, 120, 220, 0.07);
+        }
+
+        .tag-other.purple .avatar {
+            box-shadow: 0 0 10px rgba(160, 120, 220, 0.15);
+        }
+
+        .tag-other.purple:hover {
+            background: rgba(160, 120, 220, 0.05);
+            color: rgba(180, 150, 230, 0.75);
+            box-shadow:
+                0 0 22px rgba(160, 120, 220, 0.1),
+                0 0 45px rgba(140, 100, 200, 0.04);
+            transform: translateY(-1px);
+        }
+
+        /* — Muted Cyan — */
+        .tag-other.cyan {
+            color: rgba(130, 200, 220, 0.6);
+            box-shadow:
+                0 0 14px rgba(80, 180, 210, 0.06),
+                0 0 35px rgba(60, 160, 190, 0.025);
+            text-shadow: 0 0 12px rgba(80, 180, 210, 0.18);
+            border-color: rgba(80, 180, 210, 0.07);
+        }
+
+        .tag-other.cyan .avatar {
+            box-shadow: 0 0 10px rgba(80, 180, 210, 0.15);
+        }
+
+        .tag-other.cyan:hover {
+            background: rgba(80, 180, 210, 0.05);
+            color: rgba(130, 200, 220, 0.75);
+            box-shadow:
+                0 0 22px rgba(80, 180, 210, 0.1),
+                0 0 45px rgba(60, 160, 190, 0.04);
+            transform: translateY(-1px);
+        }
+
+        /* — Muted Rose — */
+        .tag-other.rose {
+            color: rgba(220, 150, 175, 0.6);
+            box-shadow:
+                0 0 14px rgba(200, 110, 150, 0.06),
+                0 0 35px rgba(180, 90, 130, 0.025);
+            text-shadow: 0 0 12px rgba(200, 110, 150, 0.18);
+            border-color: rgba(200, 110, 150, 0.07);
+        }
+
+        .tag-other.rose .avatar {
+            box-shadow: 0 0 10px rgba(200, 110, 150, 0.15);
+        }
+
+        .tag-other.rose:hover {
+            background: rgba(200, 110, 150, 0.05);
+            color: rgba(220, 150, 175, 0.75);
+            box-shadow:
+                0 0 22px rgba(200, 110, 150, 0.1),
+                0 0 45px rgba(180, 90, 130, 0.04);
+            transform: translateY(-1px);
+        }
+
+        /* ========================================
+           DIVIDER & DEMO CHROME
+           ======================================== */
+
+        .divider {
+            height: 1px;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.08) 50%,
+                transparent 100%
+            );
+            margin: 48px 0;
+        }
+
+        .demo-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 12px;
+        }
+
+        .demo-subtitle {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="demo-title">Memory Now</h1>
+        <p class="demo-subtitle">Quiet glow tag variants</p>
+
+        <!-- MY PUBLIC MEMORY -->
+        <div class="section">
+            <div class="section-label">My Public Memory</div>
+            <div class="tags-col">
+                <span class="tag tag-my-public">Tokyo Sunrise</span>
+                <span class="tag tag-my-public">The Bridge at Dawn</span>
+            </div>
+        </div>
+
+        <!-- MY PRIVATE MEMORY -->
+        <div class="section">
+            <div class="section-label">My Private Memory</div>
+            <div class="tags-col">
+                <span class="tag tag-my-private">
+                    <span class="lock-icon"></span>
+                    Letter I Never Sent
+                </span>
+                <span class="tag tag-my-private">
+                    <span class="lock-icon"></span>
+                    That Conversation
+                </span>
+            </div>
+        </div>
+
+        <!-- MY PRIVATE MEMORY — LONG TIME AGO -->
+        <div class="section">
+            <div class="section-label">My Private Memory · Long Time Ago</div>
+            <div class="tags-col">
+                <span class="tag tag-my-old">
+                    <span class="lock-icon"></span>
+                    Childhood Room
+                </span>
+                <span class="tag tag-my-old">
+                    <span class="lock-icon"></span>
+                    First Promise
+                </span>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- OTHERS' MEMORY -->
+        <div class="section">
+            <div class="section-label">Others' Memory</div>
+            <div class="tags-col">
+                <span class="tag tag-other gold">
+                    <img src="https://i.pravatar.cc/100?img=12" alt="" class="avatar">
+                    <span class="tag-content">
+                        <span>Freedom</span>
+                        <span class="tag-username">@ms.milaryscore</span>
+                    </span>
+                </span>
+                <span class="tag tag-other purple">
+                    <img src="https://i.pravatar.cc/100?img=8" alt="" class="avatar">
+                    <span class="tag-content">
+                        <span>Higher-level thinking</span>
+                        <span class="tag-username">@noahvale</span>
+                    </span>
+                </span>
+                <span class="tag tag-other cyan">
+                    <img src="https://i.pravatar.cc/100?img=15" alt="" class="avatar">
+                    <span class="tag-content">
+                        <span>Philosophy</span>
+                        <span class="tag-username">@aurora.k</span>
+                    </span>
+                </span>
+                <span class="tag tag-other rose">
+                    <img src="https://i.pravatar.cc/100?img=9" alt="" class="avatar">
+                    <span class="tag-content">
+                        <span>Nostalgia</span>
+                        <span class="tag-username">@reiko</span>
+                    </span>
+                </span>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

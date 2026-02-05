@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Tags System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+            background: #000000;
+            min-height: 100vh;
+            padding: 60px 40px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .section {
+            margin-bottom: 48px;
+        }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.35);
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .tags-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        /* ========================================
+           BASE TAG STYLES
+           ======================================== */
+        
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 24px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        /* ========================================
+           WT-001: ANCHOR / MY MEMORY (WHITE)
+           ======================================== */
+        
+        .tag-anchor {
+            background: rgba(255, 255, 255, 0.95);
+            color: #1a1a1a;
+            box-shadow: 
+                0 0 20px rgba(255, 255, 255, 0.15),
+                0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .tag-anchor:hover {
+            background: #ffffff;
+            box-shadow: 
+                0 0 30px rgba(255, 255, 255, 0.25),
+                0 4px 12px rgba(0, 0, 0, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* ========================================
+           WT-002: OTHER'S MEMORY WITH AVATAR
+           ======================================== */
+        
+        .tag-avatar {
+            background: rgba(255, 255, 255, 0.95);
+            color: #1a1a1a;
+            padding-left: 6px;
+            box-shadow: 
+                0 0 20px rgba(255, 255, 255, 0.15),
+                0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .tag-avatar:hover {
+            background: #ffffff;
+            box-shadow: 
+                0 0 30px rgba(255, 255, 255, 0.25),
+                0 4px 12px rgba(0, 0, 0, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .tag-avatar .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* ========================================
+           WT-003: OTHER'S USERNAME TAG
+           ======================================== */
+        
+        .tag-username {
+            background: transparent;
+            border: 1.5px solid rgba(255, 255, 255, 0.25);
+            color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+        }
+
+        .tag-username:hover {
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.1);
+        }
+
+        .tag-username .at-symbol {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* ========================================
+           WT-004: PUBLIC MEMORY
+           ======================================== */
+        
+        .tag-public {
+            background: rgba(255, 255, 255, 0.95);
+            color: #1a1a1a;
+            box-shadow: 
+                0 0 20px rgba(255, 255, 255, 0.15),
+                0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .tag-public:hover {
+            background: #ffffff;
+            box-shadow: 
+                0 0 30px rgba(255, 255, 255, 0.25),
+                0 4px 12px rgba(0, 0, 0, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* ========================================
+           WT-005: PRIVATE MEMORY
+           ======================================== */
+        
+        .tag-private {
+            background: transparent;
+            border: 1.5px dashed rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.75);
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.03);
+        }
+
+        .tag-private:hover {
+            border-color: rgba(255, 255, 255, 0.45);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.08);
+        }
+
+        .tag-private .lock-icon {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        /* ========================================
+           WT-006: MY MEMORY (WARM GLOW) ✨
+           ======================================== */
+        
+        .tag-my-memory {
+            background: linear-gradient(
+                135deg,
+                rgba(255, 200, 140, 0.2) 0%,
+                rgba(255, 160, 100, 0.12) 100%
+            );
+            border: 1px solid rgba(255, 180, 120, 0.35);
+            color: rgba(255, 225, 190, 0.95);
+            box-shadow: 
+                0 0 25px rgba(255, 170, 100, 0.15),
+                0 0 50px rgba(255, 150, 80, 0.08),
+                inset 0 0 20px rgba(255, 180, 120, 0.1);
+            text-shadow: 0 0 20px rgba(255, 180, 120, 0.3);
+        }
+
+        .tag-my-memory:hover {
+            background: linear-gradient(
+                135deg,
+                rgba(255, 200, 140, 0.28) 0%,
+                rgba(255, 160, 100, 0.18) 100%
+            );
+            border-color: rgba(255, 180, 120, 0.5);
+            box-shadow: 
+                0 0 35px rgba(255, 170, 100, 0.25),
+                0 0 60px rgba(255, 150, 80, 0.12),
+                inset 0 0 25px rgba(255, 180, 120, 0.15);
+            transform: translateY(-1px);
+        }
+
+        /* ========================================
+           WT-007: MY PRIVATE MEMORY (WARM + LOCK) ✨
+           ======================================== */
+        
+        .tag-my-private {
+            background: linear-gradient(
+                135deg,
+                rgba(255, 180, 120, 0.15) 0%,
+                rgba(220, 140, 90, 0.1) 100%
+            );
+            border: 1px solid rgba(255, 170, 110, 0.3);
+            color: rgba(255, 215, 175, 0.9);
+            box-shadow: 
+                0 0 20px rgba(255, 160, 100, 0.12),
+                0 0 40px rgba(255, 140, 80, 0.06),
+                inset 0 0 15px rgba(255, 170, 110, 0.08);
+            text-shadow: 0 0 15px rgba(255, 170, 110, 0.25);
+        }
+
+        .tag-my-private:hover {
+            background: linear-gradient(
+                135deg,
+                rgba(255, 180, 120, 0.22) 0%,
+                rgba(220, 140, 90, 0.15) 100%
+            );
+            border-color: rgba(255, 170, 110, 0.45);
+            box-shadow: 
+                0 0 30px rgba(255, 160, 100, 0.2),
+                0 0 50px rgba(255, 140, 80, 0.1),
+                inset 0 0 20px rgba(255, 170, 110, 0.12);
+            transform: translateY(-1px);
+        }
+
+        .tag-my-private .lock-icon {
+            font-size: 14px;
+            opacity: 0.8;
+            filter: drop-shadow(0 0 8px rgba(255, 180, 120, 0.4));
+        }
+
+        /* ========================================
+           WT-008: NEON AMBIENT GLOW (DARK)
+           ======================================== */
+
+        .tag-neon {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 8px 18px 8px 8px;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            letter-spacing: 0.3px;
+            border-radius: 28px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .tag-neon .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .tag-neon .tag-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .tag-neon .match-pct {
+            font-size: 11px;
+            font-weight: 400;
+            opacity: 0.5;
+            letter-spacing: 0.2px;
+        }
+
+        /* Neon Gold */
+        .tag-neon-gold {
+            color: #ffd666;
+            box-shadow:
+                0 0 20px rgba(255, 200, 60, 0.12),
+                0 0 50px rgba(255, 180, 40, 0.06);
+            text-shadow: 0 0 18px rgba(255, 200, 60, 0.4);
+            border-color: rgba(255, 200, 60, 0.12);
+        }
+
+        .tag-neon-gold .avatar {
+            box-shadow:
+                0 0 12px rgba(255, 200, 60, 0.3),
+                0 0 24px rgba(255, 180, 40, 0.15);
+        }
+
+        .tag-neon-gold:hover {
+            background: rgba(255, 200, 60, 0.08);
+            box-shadow:
+                0 0 30px rgba(255, 200, 60, 0.2),
+                0 0 60px rgba(255, 180, 40, 0.1);
+            transform: translateY(-1px);
+        }
+
+        /* Neon Purple */
+        .tag-neon-purple {
+            color: #c896ff;
+            box-shadow:
+                0 0 20px rgba(180, 120, 255, 0.12),
+                0 0 50px rgba(160, 100, 255, 0.06);
+            text-shadow: 0 0 18px rgba(180, 120, 255, 0.4);
+            border-color: rgba(180, 120, 255, 0.12);
+        }
+
+        .tag-neon-purple .avatar {
+            box-shadow:
+                0 0 12px rgba(180, 120, 255, 0.3),
+                0 0 24px rgba(160, 100, 255, 0.15);
+        }
+
+        .tag-neon-purple:hover {
+            background: rgba(180, 120, 255, 0.08);
+            box-shadow:
+                0 0 30px rgba(180, 120, 255, 0.2),
+                0 0 60px rgba(160, 100, 255, 0.1);
+            transform: translateY(-1px);
+        }
+
+        /* Neon Cyan */
+        .tag-neon-cyan {
+            color: #66e0ff;
+            box-shadow:
+                0 0 20px rgba(80, 210, 255, 0.12),
+                0 0 50px rgba(60, 190, 255, 0.06);
+            text-shadow: 0 0 18px rgba(80, 210, 255, 0.4);
+            border-color: rgba(80, 210, 255, 0.12);
+        }
+
+        .tag-neon-cyan .avatar {
+            box-shadow:
+                0 0 12px rgba(80, 210, 255, 0.3),
+                0 0 24px rgba(60, 190, 255, 0.15);
+        }
+
+        .tag-neon-cyan:hover {
+            background: rgba(80, 210, 255, 0.08);
+            box-shadow:
+                0 0 30px rgba(80, 210, 255, 0.2),
+                0 0 60px rgba(60, 190, 255, 0.1);
+            transform: translateY(-1px);
+        }
+
+        /* Neon Rose */
+        .tag-neon-rose {
+            color: #ff7eb3;
+            box-shadow:
+                0 0 20px rgba(255, 120, 170, 0.12),
+                0 0 50px rgba(255, 100, 150, 0.06);
+            text-shadow: 0 0 18px rgba(255, 120, 170, 0.4);
+            border-color: rgba(255, 120, 170, 0.12);
+        }
+
+        .tag-neon-rose .avatar {
+            box-shadow:
+                0 0 12px rgba(255, 120, 170, 0.3),
+                0 0 24px rgba(255, 100, 150, 0.15);
+        }
+
+        .tag-neon-rose:hover {
+            background: rgba(255, 120, 170, 0.08);
+            box-shadow:
+                0 0 30px rgba(255, 120, 170, 0.2),
+                0 0 60px rgba(255, 100, 150, 0.1);
+            transform: translateY(-1px);
+        }
+
+        /* Neon Green */
+        .tag-neon-green {
+            color: #7dffb3;
+            box-shadow:
+                0 0 20px rgba(100, 255, 170, 0.12),
+                0 0 50px rgba(80, 235, 150, 0.06);
+            text-shadow: 0 0 18px rgba(100, 255, 170, 0.4);
+            border-color: rgba(100, 255, 170, 0.12);
+        }
+
+        .tag-neon-green .avatar {
+            box-shadow:
+                0 0 12px rgba(100, 255, 170, 0.3),
+                0 0 24px rgba(80, 235, 150, 0.15);
+        }
+
+        .tag-neon-green:hover {
+            background: rgba(100, 255, 170, 0.08);
+            box-shadow:
+                0 0 30px rgba(100, 255, 170, 0.2),
+                0 0 60px rgba(80, 235, 150, 0.1);
+            transform: translateY(-1px);
+        }
+
+        /* ========================================
+           SPECIAL VARIANTS
+           ======================================== */
+
+        /* Blue accent for @mentions */
+        .tag-mention {
+            background: linear-gradient(
+                135deg,
+                rgba(100, 180, 255, 0.15) 0%,
+                rgba(80, 150, 255, 0.1) 100%
+            );
+            border: 1px solid rgba(120, 180, 255, 0.3);
+            color: rgba(180, 220, 255, 0.95);
+            box-shadow: 
+                0 0 20px rgba(100, 170, 255, 0.12),
+                inset 0 0 15px rgba(100, 180, 255, 0.08);
+            text-shadow: 0 0 15px rgba(100, 180, 255, 0.3);
+        }
+
+        .tag-mention:hover {
+            box-shadow: 
+                0 0 30px rgba(100, 170, 255, 0.2),
+                inset 0 0 20px rgba(100, 180, 255, 0.12);
+        }
+
+        /* Green accent for location/place */
+        .tag-location {
+            background: linear-gradient(
+                135deg,
+                rgba(120, 220, 180, 0.15) 0%,
+                rgba(80, 200, 150, 0.1) 100%
+            );
+            border: 1px solid rgba(120, 220, 180, 0.3);
+            color: rgba(180, 240, 210, 0.95);
+            box-shadow: 
+                0 0 20px rgba(100, 210, 170, 0.12),
+                inset 0 0 15px rgba(120, 220, 180, 0.08);
+            text-shadow: 0 0 15px rgba(120, 220, 180, 0.3);
+        }
+
+        .tag-location:hover {
+            box-shadow: 
+                0 0 30px rgba(100, 210, 170, 0.2),
+                inset 0 0 20px rgba(120, 220, 180, 0.12);
+        }
+
+        .tag-location .pin-icon {
+            font-size: 14px;
+        }
+
+        /* Purple accent for concepts/ideas */
+        .tag-concept {
+            background: linear-gradient(
+                135deg,
+                rgba(180, 140, 255, 0.15) 0%,
+                rgba(150, 100, 255, 0.1) 100%
+            );
+            border: 1px solid rgba(170, 140, 255, 0.3);
+            color: rgba(210, 190, 255, 0.95);
+            box-shadow: 
+                0 0 20px rgba(170, 130, 255, 0.12),
+                inset 0 0 15px rgba(180, 140, 255, 0.08);
+            text-shadow: 0 0 15px rgba(180, 140, 255, 0.3);
+        }
+
+        .tag-concept:hover {
+            box-shadow: 
+                0 0 30px rgba(170, 130, 255, 0.2),
+                inset 0 0 20px rgba(180, 140, 255, 0.12);
+        }
+
+        /* ========================================
+           DEMO LAYOUT
+           ======================================== */
+
+        .divider {
+            height: 1px;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.1) 50%,
+                transparent 100%
+            );
+            margin: 48px 0;
+        }
+
+        .demo-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 12px;
+        }
+
+        .demo-subtitle {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 40px;
+        }
+
+        /* Simulated diary context */
+        .diary-context {
+            background: linear-gradient(
+                180deg,
+                rgba(30, 40, 50, 0.5) 0%,
+                rgba(20, 30, 40, 0.3) 100%
+            );
+            border-radius: 24px;
+            padding: 32px;
+            margin-top: 48px;
+        }
+
+        .diary-context .date {
+            font-size: 22px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 4px;
+        }
+
+        .diary-context .time {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.45);
+            margin-bottom: 24px;
+        }
+
+        .diary-context .body {
+            font-size: 16px;
+            line-height: 26px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 32px;
+        }
+
+        .diary-context .separator {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .diary-context .memories-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.35);
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="demo-title">Memory Tag System</h1>
+        <p class="demo-subtitle">Glowing tags for dark backgrounds</p>
+
+        <!-- WT-001: Anchor -->
+        <div class="section">
+            <div class="section-label">WT-001 • Anchor / My Memory</div>
+            <div class="tags-row">
+                <span class="tag tag-anchor">Tokyo</span>
+                <span class="tag tag-anchor">Morning Coffee</span>
+            </div>
+        </div>
+
+        <!-- WT-002: Avatar -->
+        <div class="section">
+            <div class="section-label">WT-002 • Other's Memory / Avatar</div>
+            <div class="tags-row">
+                <span class="tag tag-avatar">
+                    <img src="https://i.pravatar.cc/100?img=1" alt="" class="avatar">
+                    Aurora
+                </span>
+                <span class="tag tag-avatar">
+                    <img src="https://i.pravatar.cc/100?img=3" alt="" class="avatar">
+                    Marcus
+                </span>
+            </div>
+        </div>
+
+        <!-- WT-003: Username -->
+        <div class="section">
+            <div class="section-label">WT-003 • Other's Username Tag</div>
+            <div class="tags-row">
+                <span class="tag tag-username">Aurora <span class="at-symbol">@kobi</span></span>
+                <span class="tag tag-username">Reflection <span class="at-symbol">@maya</span></span>
+            </div>
+        </div>
+
+        <!-- WT-004: Public -->
+        <div class="section">
+            <div class="section-label">WT-004 • Public Memory</div>
+            <div class="tags-row">
+                <span class="tag tag-public">Shibuya Crossing</span>
+                <span class="tag tag-public">First Snow</span>
+            </div>
+        </div>
+
+        <!-- WT-005: Private -->
+        <div class="section">
+            <div class="section-label">WT-005 • Private Memory</div>
+            <div class="tags-row">
+                <span class="tag tag-private">
+                    <span class="lock-icon">🔒</span>
+                    Secret
+                </span>
+                <span class="tag tag-private">
+                    <span class="lock-icon">🔒</span>
+                    Hidden Note
+                </span>
+            </div>
+        </div>
+
+        <!-- WT-006: My Memory (Warm Glow) -->
+        <div class="section">
+            <div class="section-label">WT-006 • My Memory (Warm Glow) ✨</div>
+            <div class="tags-row">
+                <span class="tag tag-my-memory">My Tokyo</span>
+                <span class="tag tag-my-memory">My Sunrise</span>
+                <span class="tag tag-my-memory">My Promise</span>
+            </div>
+        </div>
+
+        <!-- WT-007: My Private Memory -->
+        <div class="section">
+            <div class="section-label">WT-007 • My Private Memory ✨</div>
+            <div class="tags-row">
+                <span class="tag tag-my-private">
+                    <span class="lock-icon">🔒</span>
+                    My Secret
+                </span>
+                <span class="tag tag-my-private">
+                    <span class="lock-icon">🔒</span>
+                    My Diary
+                </span>
+            </div>
+        </div>
+
+        <!-- WT-008: Neon Ambient Glow -->
+        <div class="section">
+            <div class="section-label">WT-008 • Neon Ambient Glow (Dark Transparent) ✨</div>
+            <div class="tags-row" style="flex-direction: column; align-items: flex-start; gap: 14px;">
+                <span class="tag tag-neon tag-neon-gold">
+                    <img src="https://i.pravatar.cc/100?img=12" alt="" class="avatar">
+                    <span class="tag-content">
+                        <span>freedom</span>
+                        <span class="match-pct">60% match</span>
+                    </span>
+                </span>
+                <span class="tag tag-neon tag-neon-purple">
+                    <img src="https://i.pravatar.cc/100?img=8" alt="" class="avatar">
+                    <span class="tag-content">
+                        <span>Higher-level thinking</span>
+                        <span class="match-pct">56% match</span>
+                    </span>
+                </span>
+                <span class="tag tag-neon tag-neon-cyan">
+                    <img src="https://i.pravatar.cc/100?img=15" alt="" class="avatar">
+                    <span class="tag-content">
+                        <span>Philosophy</span>
+                        <span class="match-pct">56% match</span>
+                    </span>
+                </span>
+                <span class="tag tag-neon tag-neon-rose">
+                    <img src="https://i.pravatar.cc/100?img=9" alt="" class="avatar">
+                    <span class="tag-content">
+                        <span>Nostalgia</span>
+                        <span class="match-pct">48% match</span>
+                    </span>
+                </span>
+                <span class="tag tag-neon tag-neon-green">
+                    <img src="https://i.pravatar.cc/100?img=11" alt="" class="avatar">
+                    <span class="tag-content">
+                        <span>Growth</span>
+                        <span class="match-pct">42% match</span>
+                    </span>
+                </span>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Special Variants -->
+        <div class="section">
+            <div class="section-label">Special • Color Variants</div>
+            <div class="tags-row">
+                <span class="tag tag-mention">@Signal</span>
+                <span class="tag tag-location">
+                    <span class="pin-icon">📍</span>
+                    San Francisco
+                </span>
+                <span class="tag tag-concept">Philosophy</span>
+            </div>
+        </div>
+
+        <!-- Diary Context Demo -->
+        <div class="diary-context">
+            <div class="date">February 5, 2026</div>
+            <div class="time">6:42 PM · Friday</div>
+            <div class="body">
+                Soft fog settles across the river as lanterns lift one by one. She pauses on the bridge, tracing the names carved into the railing, and smiles at the distant glow.
+            </div>
+            <div class="separator"></div>
+            <div class="memories-label">Memories</div>
+            <div class="tags-row">
+                <span class="tag tag-my-memory">My Bridge</span>
+                <span class="tag tag-avatar">
+                    <img src="https://i.pravatar.cc/100?img=5" alt="" class="avatar">
+                    Noah Vale
+                </span>
+                <span class="tag tag-my-private">
+                    <span class="lock-icon">🔒</span>
+                    My Promise
+                </span>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

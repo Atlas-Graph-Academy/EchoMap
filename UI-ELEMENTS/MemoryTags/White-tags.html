@@ -191,6 +191,31 @@
             border-width: 3px; /* Heavier border */
         }
 
+        /* ----------------------------------------------------
+           VARIANT 6: MY MEMORY (White Tag - Warm Accent)
+           Style: Amber tone for ownership, solid edge.
+           ---------------------------------------------------- */
+        .sticker.my-memory {
+            z-index: 5;
+            transform: rotate(-1deg);
+            color: #F59E0B;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid currentColor;
+        }
+
+        /* ----------------------------------------------------
+           VARIANT 7: MY PRIVATE MEMORY (White Tag - Private)
+           Style: Amber tone + dashed privacy edge.
+           ---------------------------------------------------- */
+        .sticker.my-private {
+            z-index: 5;
+            transform: rotate(2deg);
+            color: #F59E0B;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px dashed currentColor;
+            gap: 6px;
+        }
+
     </style>
 </head>
 <body>
@@ -233,6 +258,21 @@
             <div class="sticker private">
                 <div class="lock-icon"></div>
                 Secret
+            </div>
+        </div>
+
+        <!-- 6. My Memory (White Tag - Warm Accent) -->
+        <div class="tag-item">
+            <div class="tag-desc">WT-006 • My Memory (White Tag)</div>
+            <div class="sticker my-memory">My Tokyo</div>
+        </div>
+
+        <!-- 7. My Private Memory (White Tag - Private) -->
+        <div class="tag-item">
+            <div class="tag-desc">WT-007 • My Private Memory</div>
+            <div class="sticker my-private">
+                <div class="lock-icon"></div>
+                My Secret
             </div>
         </div>
 
