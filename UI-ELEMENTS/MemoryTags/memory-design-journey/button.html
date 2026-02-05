@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <style>
+        /* 
+         * 0. 环境设置 (Atmosphere)
+         * 设置深邃的背景，类似于 Turrell 的暗房装置
+         */
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #030305; /* 极深的午夜蓝黑 */
+            /* 这种径向渐变模拟了环境中的微弱光晕，避免纯黑死板 */
+            background-image: radial-gradient(circle at 50% 30%, #121220 0%, #030305 60%);
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        /* 
+         * 1. 容器与变量 (The Vessel)
+         * 这是光线的容器。你可以自由改变 width。
+         */
+        .luminous-bubble {
+            /* === 尺寸控制 (你可以自由修改这里) === */
+            width: 200px;  /* 自由改变宽度：300px, 50%, etc. */
+            height: 200px; /* 高度建议固定或与内容自适应，但作为方体建议保持一定比例 */
+            
+            /* === 基础材质 (Base Material) === */
+            border-radius: 50px; /* 这种大圆角是形成“充气感”的关键 */
+            background-color: #0b0b14; /* 物体本身的固有色，略亮于背景 */
+            position: relative;
+            
+            /* 
+             * === 光照系统 (Lighting System) === 
+             * 关键在于多层 inset shadow 的叠加
+             */
+            box-shadow: 
+                /* Layer 1: 顶部锐利高光 (Top Rim Light) - 模拟光源直射 */
+                inset 0px 4px 6px -1px rgba(180, 190, 220, 0.4),
+                
+                /* Layer 2: 顶部柔和辉光 (Top Soft Glow) - 模拟光线散射 */
+                inset 0px 12px 20px -4px rgba(150, 160, 210, 0.2),
+                
+                /* Layer 3: 底部环境反光 (Bottom Bounce) - 模拟地面的漫反射，冷紫色调 */
+                inset 0px -12px 24px -6px rgba(50, 50, 90, 0.3),
+                
+                /* Layer 4: 外部投影 (Drop Shadow) - 让物体与背景分离 */
+                0px 20px 40px -10px rgba(0, 0, 0, 0.8);
+
+            /* 增加一点微妙的平滑过渡 */
+            transition: all 0.3s ease;
+        }
+
+        /* 
+         * [可选] 交互态：按下时有一种被“按入”光线的感觉
+         */
+        .luminous-bubble:active {
+            transform: scale(0.98);
+            box-shadow: 
+                inset 0px 2px 4px -1px rgba(180, 190, 220, 0.3),
+                inset 0px 8px 15px -4px rgba(150, 160, 210, 0.15),
+                inset 0px -8px 15px -6px rgba(50, 50, 90, 0.2),
+                0px 10px 20px -5px rgba(0, 0, 0, 0.9);
+        }
+        
+        /* 
+         * 为了演示宽度变化，我加了一个简单的滑动条 
+         */
+        .controls {
+            position: absolute;
+            bottom: 50px;
+            color: #666;
+            text-align: center;
+        }
+        input[type="range"] {
+            width: 200px;
+            accent-color: #6d6dff;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 我们的核心元素 -->
+    <div class="luminous-bubble" id="bubble"></div>
+
+    <!-- 演示用控制器 -->
+    <div class="controls">
+        <label>调整宽度 / Adjust Width</label><br><br>
+        <input type="range" min="100" max="500" value="200" oninput="document.getElementById('bubble').style.width = this.value + 'px'">
+    </div>
+
+</body>
+</html>
