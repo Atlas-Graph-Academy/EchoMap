@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Optimizations</title>
+    <style>
+        /* --- GLOBAL ATMOSPHERE --- */
+        body {
+            background-color: #050507;
+            /* A subtle, noise-textured background to prevent banding */
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(60, 70, 90, 0.15), transparent 70%),
+                url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            color: #ffffff;
+            font-family: "SF Pro Text", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+            padding: 40px;
+            min-height: 100vh;
+        }
+
+        h2 {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            opacity: 0.4;
+            margin: 40px 0 16px 0;
+            font-weight: 400;
+        }
+
+        .roll-container {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        /* UTILITY: AVATARS */
+        .avi {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* UTILITY: STATUS DOT (For Privacy) */
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            box-shadow: 0 0 6px currentColor;
+        }
+
+        /* 
+           ================================================================
+           ROLL 1: THE PHOTONIC SHARD (Glass & Edge Light)
+           Concept: A piece of optical glass. Clean, sharp, almost invisible.
+           ================================================================ 
+        */
+        .shard-item {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            height: 32px;
+            padding: 0 12px 0 8px; /* Less padding left for avatar balance */
+            
+            /* The Shape */
+            border-radius: 6px; /* Squarcle, not pill. Feels more modern/tech-precise */
+            
+            /* The Material */
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            
+            /* Typography */
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+            color: rgba(255, 255, 255, 0.7);
+            
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .shard-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(255,255,255,0.05);
+        }
+
+        /* Variant: With Avatar */
+        .shard-item.has-avi {
+            padding-left: 6px;
+        }
+
+        /* Variant: Private (The Gold Lock) */
+        .shard-item.private {
+            border-color: rgba(212, 175, 55, 0.15);
+            background: linear-gradient(90deg, rgba(212, 175, 55, 0.05), transparent);
+        }
+        .shard-item.private .status-dot { color: #D4AF37; }
+        
+        /* Variant: Public (The Cyan Signal) */
+        .shard-item.public .status-dot { color: #32D74B; }
+
+
+        /* 
+           ================================================================
+           ROLL 2: THE NEBULA FLOW (Borderless Luminance)
+           Concept: No container. Just a concentration of light.
+           ================================================================ 
+        */
+        .nebula-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 14px 6px 6px;
+            border-radius: 999px;
+            
+            /* No Border. Background is light density. */
+            background: radial-gradient(circle at 10px 50%, rgba(255,255,255,0.12), transparent 80%);
+            
+            font-size: 13px;
+            font-weight: 400;
+            color: #a1a1aa;
+            
+            transition: color 0.2s ease, text-shadow 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nebula-item:hover {
+            color: #fff;
+            text-shadow: 0 0 12px rgba(255,255,255,0.4);
+            background: radial-gradient(circle at 10px 50%, rgba(255,255,255,0.2), transparent 90%);
+        }
+
+        .nebula-item .avi {
+            box-shadow: 0 0 15px rgba(255,255,255,0.1);
+        }
+
+        /* Color Injection via Box Shadow/Glow, not background color */
+        .nebula-item.memory-blue {
+            background: radial-gradient(circle at 10px 50%, rgba(56, 189, 248, 0.15), transparent 70%);
+        }
+        .nebula-item.memory-blue:hover {
+            color: #bae6fd;
+            text-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+        }
+
+        .nebula-item.memory-purple {
+            background: radial-gradient(circle at 10px 50%, rgba(192, 132, 252, 0.15), transparent 70%);
+        }
+        .nebula-item.memory-purple:hover {
+            color: #e9d5ff;
+            text-shadow: 0 0 12px rgba(192, 132, 252, 0.5);
+        }
+
+
+        /* 
+           ================================================================
+           ROLL 3: THE DEEP ANCHOR (Recessed & Tactile)
+           Concept: Carved into the interface. Darker than the background.
+           ================================================================ 
+        */
+        .anchor-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 12px 4px 4px;
+            height: 28px;
+            
+            border-radius: 4px; /* Tight, mechanical radius */
+            
+            /* Darker than body */
+            background: #000000;
+            border: 1px solid #1a1a1a;
+            box-shadow: 0 1px 0 rgba(255,255,255,0.08); /* Top light catch */
+            
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            color: #666;
+            
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .anchor-item .avi {
+            width: 18px;
+            height: 18px;
+            border-radius: 3px; /* Match container language */
+            filter: grayscale(100%); /* Analog feel */
+            transition: filter 0.2s;
+        }
+
+        .anchor-item:hover {
+            border-color: #333;
+            color: #d4d4d4;
+        }
+        .anchor-item:hover .avi {
+            filter: grayscale(0%);
+        }
+
+        .anchor-item.active {
+            border-color: #444;
+            color: #fff;
+            background: #0f0f0f;
+            box-shadow: inset 0 0 8px rgba(255,255,255,0.05);
+        }
+
+        /* Specific text for privacy */
+        .privacy-tag {
+            font-size: 10px;
+            color: #444;
+            padding-left: 4px;
+        }
+        .anchor-item:hover .privacy-tag { color: #666; }
+
+
+        /* 
+           ================================================================
+           ROLL 7: PILL STACK (Floating / Soft-Edged)
+           Concept: Rounded label pills with luminous depth (no hard borders).
+           ================================================================ 
+        */
+        .pill-tag {
+            --tag-hue: 200;
+            --tag-sat: 70%;
+            --tag-light: 82%;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+            color: hsl(0 0% 8%);
+            background: hsl(var(--tag-hue) var(--tag-sat) var(--tag-light));
+            border-radius: 999px;
+            cursor: pointer;
+            position: relative;
+            box-shadow:
+                0 6px 14px hsl(0 0% 0% / 0.25),
+                0 0 18px hsl(var(--tag-hue) var(--tag-sat) 60% / 0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+        }
+        .pill-tag .avi {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            box-shadow: 0 0 10px hsl(var(--tag-hue) 60% 60% / 0.35);
+        }
+        .pill-tag.mine { --tag-hue: 40; }
+        .pill-tag.others { --tag-hue: 200; }
+        .pill-tag.public {
+            --tag-sat: 75%;
+            --tag-light: 84%;
+        }
+        .pill-tag.private {
+            --tag-hue: 0;
+            --tag-sat: 0%;
+            --tag-light: 78%;
+            opacity: 0.8;
+            filter: blur(0.4px);
+            font-weight: 400;
+            letter-spacing: 0.05em;
+        }
+        .pill-tag:hover {
+            opacity: 1;
+            transform: translateY(-1px);
+            box-shadow:
+                0 8px 18px hsl(0 0% 0% / 0.3),
+                0 0 22px hsl(var(--tag-hue) var(--tag-sat) 60% / 0.35);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- STYLE 1: PHOTONIC SHARD -->
+    <h2>Roll I: The Photonic Shard (Glass / Clean)</h2>
+    <div class="roll-container">
+        <!-- Other's Memory + Avi -->
+        <div class="shard-item has-avi">
+            <img class="avi" src="https://i.pravatar.cc/150?u=1" alt="User">
+            <span>Aurora Hush</span>
+        </div>
+
+        <!-- My Memory + Private -->
+        <div class="shard-item private">
+            <div class="status-dot"></div>
+            <span>Deep Reflection</span>
+        </div>
+
+        <!-- My Memory + Public -->
+        <div class="shard-item public">
+            <div class="status-dot"></div>
+            <span>Shared Echo</span>
+        </div>
+
+        <!-- Text Only -->
+        <div class="shard-item">
+            <span>System Core</span>
+        </div>
+    </div>
+
+    <!-- STYLE 2: NEBULA FLOW -->
+    <h2>Roll II: The Nebula Flow (Organic / Light)</h2>
+    <div class="roll-container">
+        <!-- Other's Memory + Avi -->
+        <div class="nebula-item memory-blue">
+            <img class="avi" src="https://i.pravatar.cc/150?u=4" alt="User">
+            <span>Signal in Snow</span>
+        </div>
+
+        <!-- Other's Memory + Avi -->
+        <div class="nebula-item memory-purple">
+            <img class="avi" src="https://i.pravatar.cc/150?u=8" alt="User">
+            <span>Ember Corridor</span>
+        </div>
+
+        <!-- Text Only -->
+        <div class="nebula-item">
+            <span>Static Void</span>
+        </div>
+    </div>
+
+    <!-- STYLE 3: DEEP ANCHOR -->
+    <h2>Roll III: The Deep Anchor (Tactile / Minimal)</h2>
+    <div class="roll-container">
+        <!-- Other's Memory -->
+        <div class="anchor-item">
+            <img class="avi" src="https://i.pravatar.cc/150?u=2" alt="User">
+            <span>Aris Design</span>
+        </div>
+
+        <!-- Private Memory -->
+        <div class="anchor-item active">
+            <span>Project Aura</span>
+            <span class="privacy-tag">PVT</span>
+        </div>
+
+        <!-- Public Memory -->
+        <div class="anchor-item">
+            <span>Public Archive</span>
+            <span class="privacy-tag">PUB</span>
+        </div>
+    </div>
+
+
+    <!-- STYLE 7: PILL STACK -->
+    <h2>Roll VII: Pill Stack (Floating / Soft-Edged)</h2>
+    <div class="roll-container">
+        <div class="pill-tag others public">
+            <img class="avi" src="https://i.pravatar.cc/150?u=21" alt="User">
+            <span>Open Signal</span>
+        </div>
+        <div class="pill-tag mine public">
+            <span>My Broadcast</span>
+        </div>
+        <div class="pill-tag mine private">
+            <span>Private Core</span>
+        </div>
+    </div>
+
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Rolls</title>
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --text-main: #ECECEC;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: "Inter", "Helvetica Neue", sans-serif;
+            padding: 40px;
+            min-height: 100vh;
+        }
+
+        h2 {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            opacity: 0.4;
+            margin: 50px 0 20px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+        }
+
+        .roll-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            max-width: 400px; /* Constrain width to force wrapping/overlap */
+        }
+
+        /* UTILITY: Avatar */
+        .avi-mini {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            object-fit: cover;
+            filter: grayscale(100%); /* Low-key by default */
+        }
+
+        /* 
+           ================================================================
+           ROLL 1: THE MEMORY STICKER (Collage / Pop)
+           Concept: High contrast "stickers" that overlap. Physical, tactile.
+           ================================================================ 
+        */
+        .sticker-group {
+            gap: 0; /* No gap, we manage spacing via margins */
+        }
+
+        .sticker-item {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            height: 28px;
+            
+            background: #EAEAEA;
+            color: #000;
+            
+            border-radius: 14px; /* Soft pill */
+            border: 1px solid #fff;
+            
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            
+            /* The Collage Effect */
+            margin-right: 6px;
+            margin-bottom: 8px;
+            box-shadow: 2px 3px 0px rgba(255,255,255,0.2); /* Hard shadow, pop art style */
+            
+            transform: rotate(-1deg); /* Slight organic chaos */
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        /* Randomize rotations slightly for organic feel */
+        .sticker-item:nth-child(even) { transform: rotate(1.5deg); }
+        .sticker-item:nth-child(3n) { transform: rotate(-2deg); }
+
+        .sticker-item:hover {
+            z-index: 10;
+            transform: scale(1.1) rotate(0deg);
+            background: #fff;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        /* Private Variant: Black on White inversion */
+        .sticker-item.private {
+            background: #111;
+            color: #fff;
+            border-color: #333;
+            box-shadow: 2px 3px 0px rgba(50,50,50,1);
+        }
+        
+        .sticker-item.private .lock-icon {
+            font-size: 10px;
+            color: #888;
+        }
+
+
+        /* 
+           ================================================================
+           ROLL 2: THE CINEMA TICKET (Raw / Temporal)
+           Concept: Monospaced, utilitarian. Like a receipt of time.
+           ================================================================ 
+        */
+        .ticket-group {
+            gap: 8px;
+        }
+
+        .ticket-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 2px 8px;
+            
+            /* The Ticket Look */
+            background: transparent;
+            border: 1px dashed rgba(255,255,255,0.3);
+            border-radius: 2px;
+            
+            font-family: "SF Mono", "Menlo", monospace;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #888;
+            
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .ticket-item:hover {
+            border-style: solid;
+            border-color: #fff;
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+        }
+
+        /* The "Headshot" becomes a stamp */
+        .ticket-item .avi-mini {
+            border-radius: 0px; /* Square for ticket feel */
+            width: 14px;
+            height: 14px;
+            opacity: 0.7;
+        }
+
+        .ticket-item.private {
+            border-color: rgba(255, 215, 0, 0.3);
+            color: rgba(255, 215, 0, 0.6);
+        }
+
+
+        /* 
+           ================================================================
+           ROLL 3: THE SOFT PHANTOM (Aris / Vivid)
+           Concept: No shape. Just light in the darkness. 
+           ================================================================ 
+        */
+        .phantom-group {
+            gap: 16px;
+        }
+
+        .phantom-item {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0; /* No horizontal padding */
+            
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.6);
+            
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        /* The Anchor: A subtle glowing dot instead of a border */
+        .phantom-item::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: currentColor;
+            border-radius: 50%;
+            box-shadow: 0 0 8px currentColor;
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+
+        .phantom-item:hover {
+            color: #fff;
+        }
+        .phantom-item:hover::before {
+            transform: scale(1.5);
+            opacity: 1;
+        }
+
+        /* Others' Memory: Cyan/Blue Hue */
+        .phantom-item.other { color: #8bbcebc2; }
+        .phantom-item.other::before { background: #64b5f6; box-shadow: 0 0 10px #64b5f6; }
+
+        /* My Private Memory: Amber Hue */
+        .phantom-item.private { color: #ebd48bc2; }
+        .phantom-item.private::before { background: #fdd835; box-shadow: 0 0 10px #fdd835; }
+
+        /* User Avi floating freely */
+        .phantom-item .avi-mini {
+            box-shadow: 0 0 10px rgba(255,255,255,0.2);
+        }
+
+        /* 
+           ================================================================
+           ROLL 4: RED BRACKET FRAME (Archive / Symbolic)
+           Concept: Red brackets frame the memory like a catalog marker.
+           ================================================================ 
+        */
+        .bracket-group {
+            gap: 14px;
+        }
+
+        .bracket-tag {
+            --bracket-red: #e11d2e;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 6px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: #efefef;
+            position: relative;
+            cursor: pointer;
+            transition: opacity 0.2s ease, text-shadow 0.2s ease;
+        }
+
+        .bracket-tag::before,
+        .bracket-tag::after {
+            content: "";
+            width: 14px;
+            height: 20px;
+            border: 3px solid var(--bracket-red);
+            border-radius: 2px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.25), rgba(0,0,0,0.15));
+            box-shadow:
+                inset 0 0 2px rgba(255,255,255,0.35),
+                0 2px 2px rgba(0,0,0,0.35);
+            opacity: 0.95;
+        }
+
+        .bracket-tag::before {
+            border-right: 0;
+        }
+        .bracket-tag::after {
+            border-left: 0;
+        }
+
+        .bracket-tag.private {
+            color: #bfbfbf;
+            opacity: 0.8;
+            filter: blur(0.4px);
+            font-weight: 400;
+            letter-spacing: 0.05em;
+        }
+
+        .bracket-tag.public {
+            color: #ffffff;
+        }
+
+        .bracket-tag .avi-mini {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            filter: grayscale(20%);
+            box-shadow: 0 0 8px rgba(255,255,255,0.2);
+        }
+
+        .bracket-tag .meta {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            opacity: 0.6;
+            margin-left: 4px;
+        }
+
+        .bracket-tag:hover {
+            opacity: 1;
+            text-shadow: 0 0 10px rgba(255,255,255,0.35);
+        }
+
+        /* 
+           ================================================================
+           ROLL 5: TOKYO STICKER ROW (Collage / Pop)
+           Concept: Heavy, outlined stickers with chaotic offsets.
+           ================================================================ 
+        */
+        .sticker-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 0;
+            flex-wrap: wrap;
+        }
+
+        .sticker {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 44px;
+            padding: 0 16px;
+            background: #ffffff;
+            color: #000000;
+            font-weight: 900;
+            font-size: 20px;
+            letter-spacing: -0.04em;
+            line-height: 1;
+            white-space: nowrap;
+            border: 2px solid #000000;
+            border-radius: 999px;
+            outline: 4px solid #ffffff;
+            box-shadow: 4px 4px 0px #000000;
+            cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1;
+        }
+
+        .sticker:hover {
+            transform: translate(-2px, -4px) rotate(0deg) !important;
+            z-index: 10;
+            box-shadow: 6px 8px 0px rgba(0,0,0,0.2);
+        }
+
+        .sticker.mine {
+            z-index: 4;
+            transform: rotate(-2deg);
+            padding: 0 20px;
+        }
+
+        .sticker.other-avi {
+            z-index: 3;
+            transform: rotate(1deg);
+            gap: 8px;
+            padding-left: 6px;
+            color: #2563eb;
+        }
+
+        .sticker.other-avi .avi {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #000;
+            background: #ddd;
+            object-fit: cover;
+        }
+
+        .sticker.other-user {
+            z-index: 2;
+            transform: rotate(-3deg);
+            color: #dc2626;
+            font-style: italic;
+        }
+
+        .sticker.private {
+            z-index: 1;
+            transform: rotate(2deg);
+            border-style: dashed;
+            color: #555;
+            background: #fff;
+            gap: 6px;
+        }
+
+        .lock-icon {
+            width: 14px;
+            height: 14px;
+            background: currentColor;
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='2' ry='2'%3E%3C/rect%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'%3E%3C/path%3E%3C/svg%3E");
+            -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='2' ry='2'%3E%3C/rect%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'%3E%3C/path%3E%3C/svg%3E");
+            mask-repeat: no-repeat;
+            mask-position: center;
+        }
+
+        .sticker.public {
+            z-index: 0;
+            transform: rotate(-1deg);
+            border-width: 3px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- STYLE 1: MEMORY STICKER (Recommended for "Collage/Vivid") -->
+    <h2 data-roll="01">Roll 01: The Memory Sticker (Physical)</h2>
+    <div class="roll-container sticker-group" data-roll="01">
+        
+        <!-- Private Memory -->
+        <div class="sticker-item private">
+            <span class="lock-icon">🔒</span>
+            <span>Secret Garden</span>
+        </div>
+
+        <!-- Shared Memory with Person -->
+        <div class="sticker-item">
+            <img class="avi-mini" src="https://i.pravatar.cc/150?u=a" alt="">
+            <span>Tokyo Trip</span>
+        </div>
+
+        <!-- Simple Memory -->
+        <div class="sticker-item">
+            <span>Red Bull Music</span>
+        </div>
+
+        <div class="sticker-item">
+            <span>Sep 08</span>
+        </div>
+
+        <div class="sticker-item">
+            <img class="avi-mini" src="https://i.pravatar.cc/150?u=b" alt="">
+            <span>With Sarah</span>
+        </div>
+    </div>
+
+
+    <!-- STYLE 2: CINEMA TICKET (Recommended for "Past Tense") -->
+    <h2 data-roll="02">Roll 02: The Cinema Ticket (Raw)</h2>
+    <div class="roll-container ticket-group" data-roll="02">
+        
+        <div class="ticket-item">
+            <img class="avi-mini" src="https://i.pravatar.cc/150?u=c" alt="">
+            <span>AURORA_HUSH</span>
+        </div>
+
+        <div class="ticket-item private">
+            <span>PVT_ARCHIVE_01</span>
+        </div>
+
+        <div class="ticket-item">
+            <span>2024.DEC.12</span>
+        </div>
+        
+        <div class="ticket-item">
+            <span>SIGNAL_LOST</span>
+        </div>
+    </div>
+
+
+    <!-- STYLE 3: SOFT PHANTOM (Recommended for "Not Lonely") -->
+    <h2 data-roll="03">Roll 03: The Soft Phantom (Luminous)</h2>
+    <div class="roll-container phantom-group" data-roll="03">
+        
+        <!-- Other -->
+        <div class="phantom-item other">
+            <img class="avi-mini" src="https://i.pravatar.cc/150?u=d" alt="">
+            <span>Ember Corridor</span>
+        </div>
+
+        <!-- Private -->
+        <div class="phantom-item private">
+            <span>Deep Reflection</span>
+        </div>
+
+        <!-- Public -->
+        <div class="phantom-item">
+            <span>Midnight Rain</span>
+        </div>
+    </div>
+
+    <!-- STYLE 4: RED BRACKET FRAME (Symbolic) -->
+    <h2 data-roll="04">Roll 04: Red Bracket Frame (Archive)</h2>
+    <div class="roll-container bracket-group" data-roll="04">
+        <!-- Avatar + Others' Public Memory -->
+        <div class="bracket-tag public">
+            <img class="avi-mini" src="https://i.pravatar.cc/150?u=e" alt="">
+            <span>Open Parade</span>
+        </div>
+
+        <!-- My Public Memory -->
+        <div class="bracket-tag public">
+            <span>My Signal</span>
+        </div>
+
+        <!-- My Private Memory -->
+        <div class="bracket-tag private">
+            <span>Quiet Archive</span>
+        </div>
+
+        <!-- With Username -->
+        <div class="bracket-tag public">
+            <span>Shared Thread</span>
+            <span class="meta">@kobe</span>
+        </div>
+
+        <!-- With Generated Time -->
+        <div class="bracket-tag public">
+            <span>Time Stamp</span>
+            <span class="meta">2026-02-04</span>
+        </div>
+    </div>
+
+    <!-- STYLE 5: TOKYO STICKER ROW -->
+    <h2 data-roll="05">Roll 05: Tokyo Sticker Row (Pop)</h2>
+    <div class="roll-container sticker-row" data-roll="05">
+        <div class="sticker mine">Tokyo</div>
+
+        <div class="sticker other-avi">
+            <img class="avi" src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="User">
+            <span>Aurora</span>
+        </div>
+
+        <div class="sticker other-user">@Signal</div>
+
+        <div class="sticker public">Shibuya Crossing</div>
+
+        <div class="sticker private">
+            <div class="lock-icon"></div>
+            Secret
+        </div>
+    </div>
+
+</body>
+</html>
+
