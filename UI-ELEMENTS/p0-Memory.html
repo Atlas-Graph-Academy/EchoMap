@@ -382,53 +382,46 @@
            ======================================== */
 
         .tag-other {
-            background: rgba(var(--r), var(--g), var(--b), 0.04);
-            border: 1px solid rgba(var(--r), var(--g), var(--b), 0.1);
-            padding: 8px 18px 8px 8px;
-            font-weight: 700;
-            color: rgba(var(--r), var(--g), var(--b), 0.85);
-            box-shadow:
-                /* Top rim — colored light source */
-                inset 0px 3px 5px -1px rgba(var(--r), var(--g), var(--b), 0.3),
-                /* Inner soft glow */
-                inset 0px 10px 18px -4px rgba(var(--r), var(--g), var(--b), 0.12),
-                /* Bottom bounce */
-                inset 0px -10px 18px -6px rgba(var(--r), var(--g), var(--b), 0.1),
-                /* Outer colored glow */
-                0 0 20px rgba(var(--r), var(--g), var(--b), 0.08),
-                0 0 50px rgba(var(--r), var(--g), var(--b), 0.04),
-                /* Drop shadow */
-                0px 12px 28px -8px rgba(0, 0, 0, 0.45);
-            text-shadow: 0 0 14px rgba(var(--r), var(--g), var(--b), 0.3);
+            gap: 8px;
+            padding: 0 12px 0 0;
+            border-radius: 999px;
+            font-size: 15px;
+            line-height: 1.25;
+            vertical-align: baseline;
+            font-weight: 560;
+            letter-spacing: 0.12px;
+            background: rgba(var(--r), var(--g), var(--b), 0.08);
+            border: 1px solid rgba(var(--r), var(--g), var(--b), 0.22);
+            color: rgba(var(--r), var(--g), var(--b), 0.96);
+            box-shadow: 0 0 14px rgba(var(--r), var(--g), var(--b), 0.16);
+            text-shadow: 0 0 10px rgba(var(--r), var(--g), var(--b), 0.28);
+            overflow: hidden;
+        }
+
+        .tag-other::before {
+            content: none;
         }
 
         .tag-other .avatar {
-            box-shadow: 0 0 12px rgba(var(--r), var(--g), var(--b), 0.25);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            margin-left: -1px;
+            border: 1px solid rgba(var(--r), var(--g), var(--b), 0.35);
+            box-shadow: 0 0 10px rgba(var(--r), var(--g), var(--b), 0.22);
         }
 
         .tag-other:hover {
-            background: rgba(var(--r), var(--g), var(--b), 0.07);
-            color: rgba(var(--r), var(--g), var(--b), 0.95);
-            box-shadow:
-                inset 0px 3px 6px -1px rgba(var(--r), var(--g), var(--b), 0.4),
-                inset 0px 12px 22px -4px rgba(var(--r), var(--g), var(--b), 0.18),
-                inset 0px -12px 22px -6px rgba(var(--r), var(--g), var(--b), 0.14),
-                0 0 30px rgba(var(--r), var(--g), var(--b), 0.14),
-                0 0 60px rgba(var(--r), var(--g), var(--b), 0.06),
-                0px 16px 32px -8px rgba(0, 0, 0, 0.5);
-            transform: translateY(-1px);
+            background: rgba(var(--r), var(--g), var(--b), 0.12);
+            border-color: rgba(var(--r), var(--g), var(--b), 0.3);
+            box-shadow: 0 0 18px rgba(var(--r), var(--g), var(--b), 0.2);
+            transform: none;
         }
 
         .tag-other:active {
-            box-shadow:
-                inset 0px 2px 4px -1px rgba(var(--r), var(--g), var(--b), 0.22),
-                inset 0px 7px 12px -4px rgba(var(--r), var(--g), var(--b), 0.08),
-                inset 0px -7px 12px -6px rgba(var(--r), var(--g), var(--b), 0.06),
-                0px 6px 14px -4px rgba(0, 0, 0, 0.55);
-        }
-
-        .tag-other .tag-content > span:first-child {
-            font-weight: 700;
+            box-shadow: 0 0 10px rgba(var(--r), var(--g), var(--b), 0.14);
         }
 
         /* ========================================
@@ -436,54 +429,45 @@
            ======================================== */
 
         .tag-other-bright {
-            background: rgba(var(--r), var(--g), var(--b), 0.06);
-            border: 1px solid rgba(var(--r), var(--g), var(--b), 0.14);
-            padding: 8px 18px 8px 8px;
-            font-weight: 700;
+            gap: 8px;
+            padding: 0 12px 0 0;
+            border-radius: 999px;
+            font-size: 15px;
+            line-height: 1.25;
+            vertical-align: baseline;
+            font-weight: 570;
+            letter-spacing: 0.14px;
+            background: rgba(var(--r), var(--g), var(--b), 0.12);
+            border: 1px solid rgba(var(--r), var(--g), var(--b), 0.34);
             color: rgb(var(--r), var(--g), var(--b));
-            box-shadow:
-                /* Top rim — vivid highlight, bright variant */
-                inset 0px 4px 6px -1px rgba(var(--r), var(--g), var(--b), 0.45),
-                /* Top soft radiance */
-                inset 0px 12px 22px -4px rgba(var(--r), var(--g), var(--b), 0.2),
-                /* Bottom bounce — warm reflected light */
-                inset 0px -12px 22px -6px rgba(var(--r), var(--g), var(--b), 0.16),
-                /* Outer bright glow */
-                0 0 24px rgba(var(--r), var(--g), var(--b), 0.14),
-                0 0 60px rgba(var(--r), var(--g), var(--b), 0.07),
-                /* Drop shadow */
-                0px 16px 34px -8px rgba(0, 0, 0, 0.5);
-            text-shadow: 0 0 20px rgba(var(--r), var(--g), var(--b), 0.45);
+            box-shadow: 0 0 18px rgba(var(--r), var(--g), var(--b), 0.26);
+            text-shadow: 0 0 14px rgba(var(--r), var(--g), var(--b), 0.5);
+            overflow: hidden;
+        }
+
+        .tag-other-bright::before {
+            content: none;
         }
 
         .tag-other-bright .avatar {
-            box-shadow:
-                0 0 14px rgba(var(--r), var(--g), var(--b), 0.35),
-                0 0 28px rgba(var(--r), var(--g), var(--b), 0.18);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            margin-left: -1px;
+            border: 1px solid rgba(var(--r), var(--g), var(--b), 0.45);
+            box-shadow: 0 0 12px rgba(var(--r), var(--g), var(--b), 0.32);
         }
 
         .tag-other-bright:hover {
-            background: rgba(var(--r), var(--g), var(--b), 0.1);
-            box-shadow:
-                inset 0px 4px 7px -1px rgba(var(--r), var(--g), var(--b), 0.55),
-                inset 0px 14px 26px -4px rgba(var(--r), var(--g), var(--b), 0.28),
-                inset 0px -14px 26px -6px rgba(var(--r), var(--g), var(--b), 0.22),
-                0 0 36px rgba(var(--r), var(--g), var(--b), 0.22),
-                0 0 70px rgba(var(--r), var(--g), var(--b), 0.1),
-                0px 20px 40px -8px rgba(0, 0, 0, 0.55);
-            transform: translateY(-1px);
+            background: rgba(var(--r), var(--g), var(--b), 0.16);
+            box-shadow: 0 0 22px rgba(var(--r), var(--g), var(--b), 0.32);
+            transform: none;
         }
 
         .tag-other-bright:active {
-            box-shadow:
-                inset 0px 2px 4px -1px rgba(var(--r), var(--g), var(--b), 0.35),
-                inset 0px 8px 16px -4px rgba(var(--r), var(--g), var(--b), 0.14),
-                inset 0px -8px 16px -6px rgba(var(--r), var(--g), var(--b), 0.1),
-                0px 8px 18px -4px rgba(0, 0, 0, 0.6);
-        }
-
-        .tag-other-bright .tag-content > span:first-child {
-            font-weight: 700;
+            box-shadow: 0 0 12px rgba(var(--r), var(--g), var(--b), 0.22);
         }
 
         /* ========================================
@@ -635,31 +619,19 @@
             <div class="tags-col" id="othersMuted">
                 <span class="tag tag-other">
                     <img src="https://i.pravatar.cc/100?img=12" alt="" class="avatar">
-                    <span class="tag-content">
-                        <span>Freedom</span>
-                        <span class="tag-username">@ms.milaryscore</span>
-                    </span>
+                    Freedom
                 </span>
                 <span class="tag tag-other">
                     <img src="https://i.pravatar.cc/100?img=8" alt="" class="avatar">
-                    <span class="tag-content">
-                        <span>Higher-level thinking</span>
-                        <span class="tag-username">@noahvale</span>
-                    </span>
+                    Higher-level thinking
                 </span>
                 <span class="tag tag-other">
                     <img src="https://i.pravatar.cc/100?img=15" alt="" class="avatar">
-                    <span class="tag-content">
-                        <span>Philosophy</span>
-                        <span class="tag-username">@aurora.k</span>
-                    </span>
+                    Philosophy
                 </span>
                 <span class="tag tag-other">
                     <img src="https://i.pravatar.cc/100?img=9" alt="" class="avatar">
-                    <span class="tag-content">
-                        <span>Nostalgia</span>
-                        <span class="tag-username">@reiko</span>
-                    </span>
+                    Nostalgia
                 </span>
             </div>
         </div>
@@ -672,31 +644,19 @@
             <div class="tags-col" id="othersBright">
                 <span class="tag tag-other-bright">
                     <img src="https://i.pravatar.cc/100?img=12" alt="" class="avatar">
-                    <span class="tag-content">
-                        <span>Freedom</span>
-                        <span class="tag-username">@ms.milaryscore</span>
-                    </span>
+                    Freedom
                 </span>
                 <span class="tag tag-other-bright">
                     <img src="https://i.pravatar.cc/100?img=8" alt="" class="avatar">
-                    <span class="tag-content">
-                        <span>Higher-level thinking</span>
-                        <span class="tag-username">@noahvale</span>
-                    </span>
+                    Higher-level thinking
                 </span>
                 <span class="tag tag-other-bright">
                     <img src="https://i.pravatar.cc/100?img=15" alt="" class="avatar">
-                    <span class="tag-content">
-                        <span>Philosophy</span>
-                        <span class="tag-username">@aurora.k</span>
-                    </span>
+                    Philosophy
                 </span>
                 <span class="tag tag-other-bright">
                     <img src="https://i.pravatar.cc/100?img=9" alt="" class="avatar">
-                    <span class="tag-content">
-                        <span>Nostalgia</span>
-                        <span class="tag-username">@reiko</span>
-                    </span>
+                    Nostalgia
                 </span>
             </div>
         </div>
