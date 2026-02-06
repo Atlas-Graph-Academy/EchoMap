@@ -506,6 +506,12 @@
             height: 4.5rem;
             overflow: visible;
         }
+        .pattern-name img {
+            width: 4.5rem;
+            height: 4.5rem;
+            object-fit: contain;
+            display: block;
+        }
         .pattern-name path,
         .pattern-name circle,
         .pattern-name rect,
@@ -821,16 +827,8 @@
                 <div class="cluster-header">
                     <div class="cluster-title">
                         <span class="pattern-left">
-                            <span class="pattern-name" aria-label="Spin-Lock">
-                                <svg viewBox="0 0 220 220" role="img" aria-hidden="true">
-                                    <path class="spin-lock-fluid" d="M60,110 C60,60 110,60 110,110 C110,160 160,160 160,110 C160,60 110,60 110,110 C110,160 60,160 60,110 Z" />
-                                    <g class="spin-lock-eyes" transform-origin="center">
-                                        <path d="M75,105 Q90,95 105,105" />
-                                        <circle cx="90" cy="115" r="5" />
-                                        <path d="M115,105 Q130,95 145,105" />
-                                        <circle cx="130" cy="115" r="5" />
-                                    </g>
-                                </svg>
+                            <span class="pattern-name" aria-label="Happy icon">
+                                <img src="../../image/happy.png" alt="Happy visualization">
                             </span>
                             <span class="pattern-signal signal-spin">脑子转不停，停不下来</span>
                             <span class="pattern-proof">219 people</span>
@@ -878,18 +876,8 @@
                 <div class="cluster-header">
                     <div class="cluster-title">
                         <span class="pattern-left">
-                            <span class="pattern-name" aria-label="Jitter">
-                                <svg viewBox="0 0 220 220" class="jitter-svg" role="img" aria-hidden="true">
-                                    <path class="jitter-fluid" d="M20,110 C40,30 40,190 60,110 C80,30 80,190 100,110 C120,30 120,190 140,110 C160,30 160,190 180,110" />
-                                    <g class="jitter-eyes" transform="translate(0, -10)">
-                                        <circle class="orbit" cx="80" cy="90" r="18" />
-                                        <circle class="pupil" cx="80" cy="90" r="4" />
-                                        <circle class="orbit" cx="140" cy="90" r="18" />
-                                        <circle class="pupil" cx="140" cy="90" r="4" />
-                                        <line x1="80" y1="65" x2="80" y2="50" />
-                                        <line x1="140" y1="65" x2="140" y2="50" />
-                                    </g>
-                                </svg>
+                            <span class="pattern-name" aria-label="Jittering icon">
+                                <img src="../../image/jittering.png" alt="Jittering visualization">
                             </span>
                             <span class="pattern-signal signal-jitter">一点点动静就被拉走</span>
                             <span class="pattern-proof">89 people</span>
@@ -927,14 +915,8 @@
                 <div class="cluster-header">
                     <div class="cluster-title">
                         <span class="pattern-left">
-                            <span class="pattern-name" aria-label="Overfit-Glow">
-                                <svg viewBox="0 0 240 240" role="img" aria-hidden="true">
-                                    <g class="overfit-group">
-                                        <rect class="overfit-sclera" x="30" y="70" width="180" height="100" rx="50" ry="50" />
-                                        <path class="overfit-pupil" d="M120,120 m-5,0 a5,5 0 1,1 10,0 a5,5 0 1,1 -10,0 M120,120 m-15,0 a15,15 0 1,1 30,0 a15,15 0 1,1 -30,0 M120,120 m-25,0 a25,25 0 1,1 50,0 a25,25 0 1,1 -50,0" />
-                                        <ellipse class="overfit-shine" cx="70" cy="95" rx="15" ry="8" transform="rotate(-20 70 95)" />
-                                    </g>
-                                </svg>
+                            <span class="pattern-name" aria-label="Angry icon">
+                                <img src="../../image/angry.png" alt="Angry visualization">
                             </span>
                             <span class="pattern-signal signal-overfit">像打了灯一样硬撑着亮</span>
                             <span class="pattern-proof">1.2k people</span>
