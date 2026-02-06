@@ -255,7 +255,7 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 50vh;
+            height: 55vh;
             background: var(--sheet-glass);
             border-top: 1px solid rgba(255, 255, 255, 0.08);
             border-top-left-radius: 24px;
@@ -742,6 +742,9 @@
             font-family: "SF Mono", "SF Pro Display", monospace;
             white-space: nowrap;
             margin-left: auto;
+            max-width: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .glyph {
@@ -1000,8 +1003,7 @@
             </div>
             <div class="terminal-label">Echo Analysis</div>
             <div class="terminal-line">
-                Scanning 1,402 memories in San Francisco...
-                Detected 2 dominant emotional patterns.
+                Scanning 1,402 memories in San Francisco... Detected 2 dominant emotional<br>patterns.
             </div>
 
             <div class="feed-container">
@@ -1228,8 +1230,8 @@
     const statusSecondary = statusHeader.querySelector(".status-secondary");
     const statusAction = statusHeader.querySelector(".status-action");
 
-    let locationEnabled = false;
-    bodyEl.classList.add("location-off");
+    let locationEnabled = true;
+    bodyEl.classList.add("location-on");
 
     function getTimeDescriptor() {
         const now = new Date();
