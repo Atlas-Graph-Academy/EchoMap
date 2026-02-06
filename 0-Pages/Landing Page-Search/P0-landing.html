@@ -432,6 +432,42 @@
                 0 0.1875rem 0.625rem rgba(0, 0, 0, 0.2),
                 inset 0 0.03125rem 0.1875rem rgba(255, 255, 255, 0.06);
         }
+        .search-zone.is-docked {
+            opacity: 0.08;
+            transform: translateY(4.6rem) scale(0.96);
+            pointer-events: none;
+            border-color: rgba(255, 255, 255, 0.02);
+            box-shadow:
+                0 0.125rem 0.4375rem rgba(0, 0, 0, 0.14),
+                inset 0 0.03125rem 0.125rem rgba(255, 255, 255, 0.04);
+        }
+        .search-recall {
+            position: absolute;
+            right: 1rem;
+            bottom: 0.625rem;
+            z-index: 14;
+            height: 2.0625rem;
+            padding: 0 0.875rem;
+            border-radius: 999rem;
+            border: 0.0625rem solid rgba(255, 255, 255, 0.16);
+            background: rgba(14, 16, 20, 0.9);
+            color: rgba(255, 255, 255, 0.88);
+            font-family: "SF Mono", "SF Pro Display", monospace;
+            font-size: 0.6875rem;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            box-shadow: 0 0.375rem 1rem rgba(0, 0, 0, 0.24);
+            opacity: 0;
+            transform: translateY(0.9375rem) scale(0.94);
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+            cursor: pointer;
+        }
+        .search-zone.is-docked + .search-recall {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
         .section-label {
             display: flex;
             align-items: center;
@@ -548,6 +584,10 @@
             padding: 0.375rem 0 9rem 0;
             scrollbar-width: none;
             -ms-overflow-style: none;
+            transition: padding-bottom 0.22s ease;
+        }
+        .resonance-sheet.search-docked .feed-container {
+            padding-bottom: 5.5rem;
         }
         .feed-container::-webkit-scrollbar { display: none; }
 
@@ -1041,6 +1081,7 @@
                 <button class="feeling-chip" type="button">hopeful</button>
             </div>
         </div>
+        <button class="search-recall" type="button" aria-label="Open search input">Search</button>
         </div>
     </div>
     </div>
@@ -1048,6 +1089,8 @@
 </body>
 <script>
     const searchZone = document.querySelector(".search-zone");
+    const searchRecall = document.querySelector(".search-recall");
+    const resonanceSheet = document.querySelector(".resonance-sheet");
     const feedContainer = document.querySelector(".feed-container");
     const promptInput = document.querySelector(".search-input");
     const feelingChips = document.querySelectorAll(".feeling-chip");
@@ -1101,6 +1144,8 @@
     });
     let recoverDelayTimer;
     let recoverEndTimer;
+    let lastFeedScrollTop = 0;
+    let touchStartY = null;
 
     function clearRecoveryTimers() {
         clearTimeout(recoverDelayTimer);
@@ -1109,6 +1154,7 @@
 
     function dimSearchZone() {
         if (!searchZone) return;
+        if (searchZone.classList.contains("is-docked")) return;
         searchZone.classList.remove("is-recovering");
         searchZone.classList.add("is-dim");
         clearRecoveryTimers();
@@ -1127,19 +1173,77 @@
         if (!searchZone) return;
         clearRecoveryTimers();
         searchZone.classList.add("is-instant");
-        searchZone.classList.remove("is-recovering", "is-dim");
+        searchZone.classList.remove("is-recovering", "is-dim", "is-docked");
+        resonanceSheet?.classList.remove("search-docked");
         setTimeout(() => {
             searchZone.classList.remove("is-instant");
         }, 120);
     }
 
+    function setSearchDocked(docked, instant = false) {
+        if (!searchZone) return;
+        if (instant) searchZone.classList.add("is-instant");
+        searchZone.classList.toggle("is-docked", docked);
+        resonanceSheet?.classList.toggle("search-docked", docked);
+        if (docked) {
+            clearRecoveryTimers();
+            searchZone.classList.remove("is-recovering");
+            searchZone.classList.add("is-dim");
+        } else {
+            searchZone.classList.remove("is-dim", "is-recovering");
+        }
+        if (instant) {
+            setTimeout(() => {
+                searchZone.classList.remove("is-instant");
+            }, 120);
+        }
+    }
+
     if (feedContainer && searchZone) {
         feedContainer.addEventListener("scroll", () => {
+            const currentTop = feedContainer.scrollTop;
+            const scrollDelta = currentTop - lastFeedScrollTop;
+            if (scrollDelta > 2) {
+                setSearchDocked(true);
+            } else if (scrollDelta < -2 && currentTop < 18) {
+                setSearchDocked(false);
+            }
+            lastFeedScrollTop = currentTop;
             dimSearchZone();
+        }, { passive: true });
+        feedContainer.addEventListener("touchstart", (event) => {
+            touchStartY = event.touches[0]?.clientY ?? null;
+        }, { passive: true });
+        feedContainer.addEventListener("touchmove", (event) => {
+            if (touchStartY === null) return;
+            const currentY = event.touches[0]?.clientY ?? touchStartY;
+            const deltaY = touchStartY - currentY;
+            if (deltaY > 24) {
+                setSearchDocked(true);
+            } else if (deltaY < -24 && feedContainer.scrollTop < 18) {
+                setSearchDocked(false);
+            }
+        }, { passive: true });
+        feedContainer.addEventListener("touchend", () => {
+            touchStartY = null;
+        }, { passive: true });
+        feedContainer.addEventListener("wheel", (event) => {
+            if (event.deltaY > 6) {
+                setSearchDocked(true);
+            } else if (event.deltaY < -6 && feedContainer.scrollTop < 18) {
+                setSearchDocked(false);
+            }
         }, { passive: true });
     }
     if (searchZone) {
         searchZone.addEventListener("pointerdown", brightenImmediately);
+    }
+    if (searchRecall) {
+        searchRecall.addEventListener("click", () => {
+            setSearchDocked(false, true);
+            brightenImmediately();
+            promptInput?.focus();
+        });
     }
     if (promptInput) {
         promptInput.addEventListener("focus", brightenImmediately);
