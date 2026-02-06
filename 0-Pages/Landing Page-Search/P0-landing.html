@@ -287,6 +287,61 @@
             flex-direction: column;
             z-index: 10;
         }
+        .moment-unit {
+            padding: 0.4rem 1.25rem 0.65rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            position: relative;
+            margin-top: -0.15rem;
+        }
+        .moment-unit::after {
+            content: "";
+            position: absolute;
+            left: 1.25rem;
+            right: 1.25rem;
+            bottom: 0;
+            height: 0.0625rem;
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .moment-card {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            align-items: center;
+            gap: 0.625rem;
+        }
+        .moment-thumb {
+            width: calc(68 * var(--u));
+            height: calc(51 * var(--u));
+            border-radius: calc(6 * var(--u));
+            overflow: hidden;
+            position: relative;
+            background: rgba(255, 255, 255, 0.06);
+            border: 0.125rem solid rgba(255, 255, 255, 0.95);
+            box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.35);
+        }
+        .moment-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: opacity 0.6s ease;
+        }
+        .moment-thumb img.is-fading {
+            opacity: 0;
+        }
+        .moment-date {
+            font-size: 0.6875rem;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 0.04em;
+            font-family: "SF Mono", "SF Pro Display", monospace;
+        }
+        .moment-title {
+            font-size: 1.1875rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: rgba(255, 255, 255, 0.95);
+        }
 
         /* 
            1. THE SEARCH (The Eye) 
@@ -711,6 +766,18 @@
         </header>
 
         <div class="resonance-sheet">
+
+        <div class="moment-unit" aria-label="moment">
+            <div class="moment-card">
+                <div class="moment-thumb">
+                    <img class="moment-image" src="../../image/Pictures For the time of the day/DeePnight.png" alt="Moment scene">
+                </div>
+                <div class="moment-meta">
+                    <div class="moment-date" id="moment-date">Feb,05</div>
+                    <div class="moment-title" id="moment-title">Tuesday Morning</div>
+                </div>
+            </div>
+        </div>
         
         <!-- Search: The Prompt -->
         <div class="search-zone">
@@ -1003,5 +1070,75 @@
     });
 
     renderLocationState();
+</script>
+<script>
+    const momentImage = document.querySelector(".moment-image");
+    const momentDate = document.getElementById("moment-date");
+    const momentTitle = document.getElementById("moment-title");
+
+    const momentImages = [
+        "AFTERNOON.png",
+        "DeePnight.png",
+        "Morning.png",
+        "Predawn.png",
+        "dask.png",
+        "daybreak.png",
+        "early afternoon.png",
+        "evening copy.png",
+        "evening.png",
+        "late afternoon.png",
+        "late morning.png",
+        "late night.png"
+    ];
+
+    function formatMomentDate(date) {
+        return date.toLocaleDateString("en-US", { month: "short", day: "2-digit" }).replace(" ", ",");
+    }
+
+    function formatMomentTitle(date) {
+        const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
+        const hours = date.getHours();
+        const period = hours < 5 ? "Predawn" : hours < 9 ? "Morning" : hours < 12 ? "Late Morning" : hours < 16 ? "Afternoon" : hours < 19 ? "Evening" : "Night";
+        return `${dayName} ${period}`;
+    }
+
+    function updateMomentText() {
+        const now = new Date();
+        momentDate.textContent = formatMomentDate(now);
+        momentTitle.textContent = formatMomentTitle(now);
+    }
+
+    function shuffle(array) {
+        const arr = array.slice();
+        for (let i = arr.length - 1; i > 0; i -= 1) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    let shuffledImages = shuffle(momentImages);
+    let momentIndex = 0;
+
+    function rotateMomentImage() {
+        if (!momentImage) return;
+        momentImage.classList.add("is-fading");
+        setTimeout(() => {
+            const filename = shuffledImages[momentIndex];
+            momentImage.src = `../../image/Pictures For the time of the day/${filename}`;
+            momentIndex += 1;
+            if (momentIndex >= shuffledImages.length) {
+                shuffledImages = shuffle(momentImages);
+                momentIndex = 0;
+            }
+            momentImage.classList.remove("is-fading");
+        }, 320);
+    }
+
+    updateMomentText();
+    rotateMomentImage();
+    setInterval(() => {
+        rotateMomentImage();
+    }, 4200);
 </script>
 </html>
