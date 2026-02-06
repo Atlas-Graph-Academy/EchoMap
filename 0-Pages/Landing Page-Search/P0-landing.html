@@ -286,14 +286,20 @@
             display: flex;
             flex-direction: column;
             z-index: 10;
+            padding-top: 0.75rem;
+            overflow: visible;
         }
         .moment-unit {
-            padding: 0.4rem 1.25rem 0.65rem;
+            padding: 0.5rem 1rem 0.45rem;
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
-            position: relative;
-            margin-top: -0.15rem;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            transform: translateY(calc(-100% + 0.5rem));
+            z-index: 12;
         }
         .moment-unit::after {
             content: "";
@@ -303,22 +309,31 @@
             bottom: 0;
             height: 0.0625rem;
             background: rgba(255, 255, 255, 0.08);
+            opacity: 0;
         }
         .moment-card {
             display: grid;
             grid-template-columns: auto 1fr;
-            align-items: center;
-            gap: 0.625rem;
+            align-items: end;
+            gap: 0.5rem;
+        }
+        .moment-meta {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 0.0625rem;
+            transform: translateY(0.0625rem);
         }
         .moment-thumb {
-            width: calc(68 * var(--u));
-            height: calc(51 * var(--u));
-            border-radius: calc(6 * var(--u));
+            width: calc(54 * var(--u));
+            height: calc(41 * var(--u));
+            border-radius: calc(5 * var(--u));
             overflow: hidden;
             position: relative;
-            background: rgba(255, 255, 255, 0.06);
-            border: 0.125rem solid rgba(255, 255, 255, 0.95);
-            box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.35);
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            transform: translateY(calc(-0.125rem * var(--u)));
         }
         .moment-thumb img {
             width: 100%;
@@ -331,16 +346,19 @@
             opacity: 0;
         }
         .moment-date {
-            font-size: 0.6875rem;
-            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.5625rem;
+            color: rgba(255, 255, 255, 0.52);
             letter-spacing: 0.04em;
             font-family: "SF Mono", "SF Pro Display", monospace;
+            line-height: 1.1;
         }
         .moment-title {
-            font-size: 1.1875rem;
+            font-size: 1.02rem;
             font-weight: 700;
-            letter-spacing: -0.02em;
+            letter-spacing: -0.015em;
             color: rgba(255, 255, 255, 0.95);
+            line-height: 1.02;
+            white-space: nowrap;
         }
 
         /* 
@@ -348,7 +366,7 @@
            Minimal. Suggestive.
         */
         .search-zone {
-            padding: 1.5rem 1.5rem 0.625rem;
+            padding: 0.625rem 1.5rem 0.625rem;
             flex-shrink: 0;
         }
         .section-label {
@@ -997,7 +1015,6 @@
         const hasText = promptInput.value.trim().length > 0;
         searchZone.classList.toggle("has-text", hasText);
     });
-
     typeLoop();
 </script>
 <script>
