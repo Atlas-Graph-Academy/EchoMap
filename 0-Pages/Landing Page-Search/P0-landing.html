@@ -16,15 +16,25 @@
         :root {
             --design-w: 430;
             --design-h: 932;
-            --u: min(calc(100vw / var(--design-w)), calc(100vh / var(--design-h)));
+            --viewport-pad: 3vh;
+            --shell-w-base: 462;
+            --shell-h-base: 964;
+            --u: min(
+                calc((100vw - (var(--viewport-pad) * 2)) / var(--shell-w-base)),
+                calc((100vh - (var(--viewport-pad) * 2)) / var(--shell-h-base))
+            );
+            --bezel: calc(16 * var(--u));
+            --bezel-soft: calc(10 * var(--u));
             --app-w: calc(var(--design-w) * var(--u));
             --app-h: calc(var(--design-h) * var(--u));
 
-            --bg-void: #000000;
+            --bg-void: transparent;
             --sheet-glass: rgba(10, 10, 12, 0.95); /* Darker, denser glass */
             --text-highlight: #FFFFFF;
             --text-mid: #A1A1AA;
             --text-dim: #52525B;
+            --safe-bottom: calc(34 * var(--u));
+            --bottom-gap: calc(28 * var(--u));
             
             /* The Resonance Colors */
             --color-burn: #FF2D55;   /* Intense/Pain */
@@ -40,7 +50,11 @@
         }
 
         body {
-            background-color: var(--bg-void);
+            background-color: #0f1114;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+            background-size: 1.25rem 1.25rem;
             font-family: "SF Mono", "SF Pro Display", monospace;
             height: 100%;
             overflow: hidden;
@@ -48,6 +62,40 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: var(--viewport-pad);
+        }
+
+        .phone-shell {
+            position: relative;
+            width: calc(var(--app-w) + (var(--bezel) * 2));
+            height: calc(var(--app-h) + (var(--bezel) * 2));
+            padding: var(--bezel);
+            border-radius: calc(2.75rem * var(--u));
+            background: linear-gradient(165deg, #1f232a, #0b0d10 60%, #0a0b0e);
+            box-shadow:
+                0 1.5rem 3rem rgba(0,0,0,0.45),
+                inset 0 0 0 0.0625rem rgba(255,255,255,0.06);
+        }
+        .phone-shell::before {
+            content: "";
+            position: absolute;
+            inset: var(--bezel-soft);
+            border-radius: calc(2.3rem * var(--u));
+            border: 0.0625rem solid rgba(255,255,255,0.08);
+            pointer-events: none;
+        }
+        .phone-shell::after {
+            content: "";
+            position: absolute;
+            top: calc(var(--bezel) * 0.55);
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(120 * var(--u));
+            height: calc(22 * var(--u));
+            border-radius: 999rem;
+            background: #0a0b0e;
+            box-shadow: inset 0 0 0 0.0625rem rgba(255,255,255,0.06);
+            pointer-events: none;
         }
 
         .app {
@@ -60,6 +108,8 @@
             background-size: contain;
             background-position: top center;
             background-repeat: no-repeat;
+            padding-bottom: calc(var(--safe-bottom) + var(--bottom-gap));
+            border-radius: calc(2.1rem * var(--u));
         }
         body.location-off .fog-layer {
             opacity: 1;
@@ -224,7 +274,7 @@
         */
         .resonance-sheet {
             position: absolute;
-            bottom: 0;
+            bottom: calc(var(--safe-bottom) + var(--bottom-gap));
             left: 0;
             width: 100%;
             height: 50%;
@@ -643,6 +693,7 @@
 </head>
 <body>
 
+    <div class="phone-shell">
     <div class="app">
         <div class="galaxy-bg"></div>
         <div class="fog-layer" aria-hidden="true"></div>
@@ -831,6 +882,7 @@
 
         </div>
         </div>
+    </div>
     </div>
 
 </body>
