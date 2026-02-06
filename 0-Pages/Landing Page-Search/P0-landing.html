@@ -14,6 +14,12 @@
            No Cards. No Borders. Pure Signal.
         */
         :root {
+            --design-w: 430;
+            --design-h: 932;
+            --u: min(calc(100vw / var(--design-w)), calc(100vh / var(--design-h)));
+            --app-w: calc(var(--design-w) * var(--u));
+            --app-h: calc(var(--design-h) * var(--u));
+
             --bg-void: #000000;
             --sheet-glass: rgba(10, 10, 12, 0.95); /* Darker, denser glass */
             --text-highlight: #FFFFFF;
@@ -28,16 +34,32 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        html {
+            font-size: calc(16 * var(--u));
+            height: 100%;
+        }
+
         body {
+            background-color: var(--bg-void);
+            font-family: "SF Mono", "SF Pro Display", monospace;
+            height: 100%;
+            overflow: hidden;
+            color: var(--text-highlight);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .app {
+            position: relative;
+            width: var(--app-w);
+            height: var(--app-h);
+            overflow: hidden;
             background-color: var(--bg-void);
             background-image: url("images/map2.png");
             background-size: contain;
             background-position: top center;
             background-repeat: no-repeat;
-            font-family: "SF Mono", "SF Pro Display", monospace;
-            height: 100vh;
-            overflow: hidden;
-            color: var(--text-highlight);
         }
         body.location-off .fog-layer {
             opacity: 1;
@@ -55,25 +77,25 @@
         }
 
         .fog-layer {
-            position: fixed;
+            position: absolute;
             inset: 0;
             z-index: 6;
             background: rgba(0, 0, 0, 0.25);
-            backdrop-filter: blur(18px);
+            backdrop-filter: blur(1.125rem);
             transition: opacity 0.4s ease;
             opacity: 0;
             pointer-events: none;
         }
     .edge-blur-right {
-        position: fixed;
+        position: absolute;
         top: 0;
         right: 0;
-        width: 38vw;
-        height: 100vh;
+        width: 38%;
+        height: 100%;
         z-index: 7;
         pointer-events: none;
-        backdrop-filter: blur(26px) saturate(120%);
-        -webkit-backdrop-filter: blur(26px) saturate(120%);
+        backdrop-filter: blur(1.625rem) saturate(120%);
+        -webkit-backdrop-filter: blur(1.625rem) saturate(120%);
         background: linear-gradient(
             to left,
             rgba(0, 0, 0, 0.65) 0%,
@@ -86,12 +108,12 @@
     }
 
         .living-header {
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 110px;
-            padding-top: 44px;
+            height: 6.875rem;
+            padding-top: 2.75rem;
             display: flex;
             justify-content: center;
             align-items: flex-start;
@@ -105,7 +127,7 @@
             background-image: url("images/landing.png");
             background-size: cover;
             background-position: center top;
-            filter: blur(18px) brightness(0.55);
+            filter: blur(1.125rem) brightness(0.55);
             opacity: 0.5;
             transition: opacity 0.4s ease;
         }
@@ -121,12 +143,12 @@
             z-index: 1;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 6px 12px;
-            border-radius: 999px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            gap: 0.5rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: 999rem;
+            border: 0.0625rem solid rgba(255, 255, 255, 0.08);
             background: rgba(18, 18, 22, 0.55);
-            backdrop-filter: blur(14px);
+            backdrop-filter: blur(0.875rem);
             color: rgba(255, 255, 255, 0.88);
             transition: transform 0.2s ease, background 0.2s ease;
         }
@@ -136,23 +158,23 @@
         }
         .status-dot {
             position: relative;
-            width: 8px;
-            height: 8px;
+            width: 0.5rem;
+            height: 0.5rem;
             border-radius: 50%;
             background: #9ca3af;
-            box-shadow: 0 0 6px rgba(148, 163, 184, 0.4);
+            box-shadow: 0 0 0.375rem rgba(148, 163, 184, 0.4);
         }
         .status-dot::after {
             content: "";
             position: absolute;
-            inset: -4px;
+            inset: -0.25rem;
             border-radius: 50%;
-            border: 1px solid rgba(148, 163, 184, 0.28);
+            border: 0.0625rem solid rgba(148, 163, 184, 0.28);
             opacity: 0;
         }
         body.location-on .status-dot {
             background: #22c55e;
-            box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+            box-shadow: 0 0 0.5rem rgba(34, 197, 94, 0.6);
         }
         body.location-on .status-dot::after {
             border-color: rgba(34, 197, 94, 0.45);
@@ -166,22 +188,22 @@
         .status-text {
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 0.125rem;
         }
         .status-primary {
-            font-size: 11px;
+            font-size: 0.6875rem;
             letter-spacing: 0.04em;
             color: rgba(255, 255, 255, 0.75);
         }
         .status-secondary {
-            font-size: 11px;
+            font-size: 0.6875rem;
             color: rgba(255, 255, 255, 0.5);
         }
         .status-action {
-            font-size: 10px;
+            font-size: 0.625rem;
             color: rgba(255, 255, 255, 0.55);
             letter-spacing: 0.04em;
-            margin-left: 6px;
+            margin-left: 0.375rem;
         }
 
         /* Background Visuals (The Galaxy) */
@@ -205,12 +227,12 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 50vh;
+            height: 50%;
             background: var(--sheet-glass);
-            border-top: 1px solid rgba(255,255,255,0.08);
-            border-top-left-radius: 24px;
-            border-top-right-radius: 24px;
-            backdrop-filter: blur(50px);
+            border-top: 0.0625rem solid rgba(255,255,255,0.08);
+            border-top-left-radius: 1.5rem;
+            border-top-right-radius: 1.5rem;
+            backdrop-filter: blur(3.125rem);
             display: flex;
             flex-direction: column;
             z-index: 10;
@@ -221,35 +243,35 @@
            Minimal. Suggestive.
         */
         .search-zone {
-            padding: 24px 24px 10px;
+            padding: 1.5rem 1.5rem 0.625rem;
             flex-shrink: 0;
         }
         .section-label {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 12px;
+            gap: 0.5rem;
+            font-size: 0.75rem;
             letter-spacing: 0.06em;
             color: rgba(255,255,255,0.65);
-            margin-bottom: 6px;
+            margin-bottom: 0.375rem;
             font-family: "SF Mono", "SF Pro Display", monospace;
             text-transform: none;
         }
         .section-indicator {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 0.375rem;
             flex-shrink: 0;
         }
         .search-input {
             width: 100%;
             background: transparent;
             border: none;
-            font-size: 20px;
+            font-size: 1.25rem;
             font-weight: 300;
             color: white;
-            padding-bottom: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 0.75rem;
+            border-bottom: 0.0625rem solid rgba(255,255,255,0.1);
             outline: none;
             font-family: "Caveat", "SF Pro Display", sans-serif;
         }
@@ -257,21 +279,21 @@
         .search-row {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 0.75rem;
         }
         .terminal-label {
-            margin: 10px 24px 0;
+            margin: 0.625rem 1.5rem 0;
             font-family: "SF Mono", "SF Pro Display", monospace;
-            font-size: 11px;
+            font-size: 0.6875rem;
             color: rgba(110, 132, 148, 0.85);
             letter-spacing: 0.08em;
             text-transform: uppercase;
         }
         .terminal-line {
-            margin: 2px 24px 0;
-            padding: 0 0 10px;
+            margin: 0.125rem 1.5rem 0;
+            padding: 0 0 0.625rem;
             font-family: "SF Mono", "SF Pro Display", monospace;
-            font-size: 11px;
+            font-size: 0.6875rem;
             color: rgba(110, 132, 148, 0.65);
             letter-spacing: 0.04em;
         }
@@ -282,16 +304,16 @@
         .search-btn {
             appearance: none;
             border: none;
-            padding: 10px 16px;
-            border-radius: 999px;
-            font-size: 13px;
+            padding: 0.625rem 1rem;
+            border-radius: 999rem;
+            font-size: 0.8125rem;
             font-weight: 600;
             color: #111111;
             background: #ffffff;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+            box-shadow: 0 0.375rem 1.125rem rgba(0,0,0,0.15);
             cursor: pointer;
             opacity: 0;
-            transform: translateY(6px) scale(0.98);
+            transform: translateY(0.375rem) scale(0.98);
             pointer-events: none;
             transition: opacity 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
         }
@@ -301,7 +323,7 @@
             pointer-events: auto;
         }
         .search-btn:hover {
-            box-shadow: 0 8px 22px rgba(0,0,0,0.2);
+            box-shadow: 0 0.5rem 1.375rem rgba(0,0,0,0.2);
         }
 
         /* 
@@ -311,7 +333,7 @@
         .feed-container {
             flex: 1;
             overflow-y: auto;
-            padding: 20px 0 60px 0;
+            padding: 1.25rem 0 3.75rem 0;
             scrollbar-width: none;
             -ms-overflow-style: none;
         }
@@ -322,8 +344,8 @@
            Organic grouping of a Title + A Stream of Text.
         */
         .cluster {
-            margin-bottom: 32px;
-            padding-left: 24px;
+            margin-bottom: 2rem;
+            padding-left: 1.5rem;
             position: relative;
         }
 
@@ -331,34 +353,34 @@
         .cluster-header {
             display: flex;
             align-items: baseline;
-            gap: 8px;
-            margin-bottom: 12px;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
         }
         .cluster-title {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 0.625rem;
             width: 100%;
         }
         .pattern-left {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 0.75rem;
             width: 100%;
         }
         .pattern-name {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 78px;
-            height: 60px;
+            width: 4.875rem;
+            height: 3.75rem;
             font-size: 0;
             line-height: 0;
             opacity: 0.85;
         }
         .pattern-name svg {
-            width: 72px;
-            height: 72px;
+            width: 4.5rem;
+            height: 4.5rem;
             overflow: visible;
         }
         .pattern-name path,
@@ -373,27 +395,27 @@
         }
         .pattern-name .spin-lock-fluid {
             stroke: #00897b;
-            stroke-width: 20px;
+            stroke-width: 1.25rem;
             stroke-dasharray: 600;
             stroke-dashoffset: 600;
             opacity: 0.8;
             animation: draw-loop 6s linear infinite;
         }
-        .pattern-name .spin-lock-eyes path { stroke: rgba(255, 255, 255, 0.9); stroke-width: 8px; }
+        .pattern-name .spin-lock-eyes path { stroke: rgba(255, 255, 255, 0.9); stroke-width: 0.5rem; }
         .pattern-name .spin-lock-eyes circle { fill: rgba(255, 255, 255, 0.9); stroke: none; }
         .pattern-name .spin-lock-eyes { animation: slow-blink 4s ease-in-out infinite; }
 
         .pattern-name .jitter-svg { animation: shake-hard 0.2s infinite; }
         .pattern-name .jitter-fluid {
             stroke: #e91e63;
-            stroke-width: 20px;
+            stroke-width: 1.25rem;
             opacity: 0.8;
             stroke-dasharray: 100 30;
             animation: jitter-flux 0.5s infinite alternate;
         }
-        .pattern-name .jitter-eyes circle.orbit { stroke: rgba(255, 255, 255, 0.9); stroke-width: 8px; }
+        .pattern-name .jitter-eyes circle.orbit { stroke: rgba(255, 255, 255, 0.9); stroke-width: 0.5rem; }
         .pattern-name .jitter-eyes circle.pupil { fill: rgba(255, 255, 255, 0.9); stroke: none; }
-        .pattern-name .jitter-eyes line { stroke: rgba(255, 255, 255, 0.9); stroke-width: 4px; }
+        .pattern-name .jitter-eyes line { stroke: rgba(255, 255, 255, 0.9); stroke-width: 0.25rem; }
 
         .pattern-name .overfit-group {
             transform-origin: center;
@@ -401,14 +423,14 @@
         }
         .pattern-name .overfit-sclera {
             stroke: #ff9800;
-            stroke-width: 18px;
+            stroke-width: 1.125rem;
             fill: rgba(255, 255, 255, 0.9);
-            filter: drop-shadow(0 0 15px rgba(255, 152, 0, 0.5));
+            filter: drop-shadow(0 0 0.9375rem rgba(255, 152, 0, 0.5));
             animation: sclera-pulse 2s infinite alternate;
         }
         .pattern-name .overfit-pupil {
             stroke: rgba(255, 255, 255, 0.9);
-            stroke-width: 6px;
+            stroke-width: 0.375rem;
             transform-origin: center;
             animation: pupil-spin 1s linear infinite;
         }
@@ -420,35 +442,35 @@
         .pattern-signal {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 2px 8px 3px;
-            border-radius: 999px;
-            font-size: 10px;
+            gap: 0.375rem;
+            padding: 0.125rem 0.5rem 0.1875rem;
+            border-radius: 999rem;
+            font-size: 0.625rem;
             font-family: "SF Mono", "SF Pro Display", monospace;
             letter-spacing: 0.06em;
             text-transform: none;
             color: rgba(255,255,255,0.75);
-            border: 1px solid rgba(255,255,255,0.12);
+            border: 0.0625rem solid rgba(255,255,255,0.12);
             background: rgba(255,255,255,0.04);
-            box-shadow: inset 0 0 10px rgba(255,255,255,0.06);
+            box-shadow: inset 0 0 0.625rem rgba(255,255,255,0.06);
         }
         .pattern-signal::before {
             content: "";
-            width: 6px;
-            height: 6px;
+            width: 0.375rem;
+            height: 0.375rem;
             border-radius: 50%;
             background: rgba(255,255,255,0.5);
-            box-shadow: 0 0 10px rgba(255,255,255,0.35);
+            box-shadow: 0 0 0.625rem rgba(255,255,255,0.35);
         }
         .signal-spin { border-color: rgba(255, 45, 85, 0.35); color: rgba(255, 195, 205, 0.85); }
-        .signal-spin::before { background: var(--color-burn); box-shadow: 0 0 10px rgba(255, 45, 85, 0.55); animation: glow-dim 2.8s ease-in-out infinite; }
+        .signal-spin::before { background: var(--color-burn); box-shadow: 0 0 0.625rem rgba(255, 45, 85, 0.55); animation: glow-dim 2.8s ease-in-out infinite; }
         .signal-jitter { border-color: rgba(10, 132, 255, 0.35); color: rgba(180, 215, 255, 0.85); }
-        .signal-jitter::before { background: var(--color-drift); box-shadow: 0 0 10px rgba(10, 132, 255, 0.55); animation: glow-flicker 1.6s ease-in-out infinite; }
+        .signal-jitter::before { background: var(--color-drift); box-shadow: 0 0 0.625rem rgba(10, 132, 255, 0.55); animation: glow-flicker 1.6s ease-in-out infinite; }
         .signal-overfit { border-color: rgba(191, 90, 242, 0.35); color: rgba(220, 185, 255, 0.85); }
-        .signal-overfit::before { background: var(--color-void); box-shadow: 0 0 10px rgba(191, 90, 242, 0.55); animation: glow-pulse 2.2s ease-in-out infinite; }
+        .signal-overfit::before { background: var(--color-void); box-shadow: 0 0 0.625rem rgba(191, 90, 242, 0.55); animation: glow-pulse 2.2s ease-in-out infinite; }
         @keyframes glow-dim {
-            0%, 100% { transform: scale(0.95); opacity: 0.55; box-shadow: 0 0 8px rgba(255, 45, 85, 0.35); }
-            50% { transform: scale(1.05); opacity: 0.9; box-shadow: 0 0 14px rgba(255, 45, 85, 0.55); }
+            0%, 100% { transform: scale(0.95); opacity: 0.55; box-shadow: 0 0 0.5rem rgba(255, 45, 85, 0.35); }
+            50% { transform: scale(1.05); opacity: 0.9; box-shadow: 0 0 0.875rem rgba(255, 45, 85, 0.55); }
         }
         @keyframes glow-flicker {
             0% { opacity: 0.45; transform: scale(0.9); }
@@ -459,28 +481,28 @@
             100% { opacity: 0.75; transform: scale(1); }
         }
         @keyframes glow-pulse {
-            0%, 100% { opacity: 0.6; transform: scale(0.96); box-shadow: 0 0 8px rgba(191, 90, 242, 0.35); }
-            50% { opacity: 1; transform: scale(1.08); box-shadow: 0 0 16px rgba(191, 90, 242, 0.6); }
+            0%, 100% { opacity: 0.6; transform: scale(0.96); box-shadow: 0 0 0.5rem rgba(191, 90, 242, 0.35); }
+            50% { opacity: 1; transform: scale(1.08); box-shadow: 0 0 1rem rgba(191, 90, 242, 0.6); }
         }
         @keyframes draw-loop { to { stroke-dashoffset: 0; } }
         @keyframes slow-blink { 0%, 80%, 100% { transform: scaleY(1); } 90% { transform: scaleY(0.1); } }
         @keyframes shake-hard {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            50% { transform: translate(-1px, -1px) rotate(1deg); }
+            0% { transform: translate(0.0625rem, 0.0625rem) rotate(0deg); }
+            50% { transform: translate(-0.0625rem, -0.0625rem) rotate(1deg); }
             100% { transform: translate(0, 0) rotate(0deg); }
         }
-        @keyframes jitter-flux { from { stroke-width: 18px; } to { stroke-width: 24px; } }
+        @keyframes jitter-flux { from { stroke-width: 1.125rem; } to { stroke-width: 1.5rem; } }
         @keyframes pupil-spin { to { transform: rotate(360deg); } }
         @keyframes overfit-float {
             0% { transform: translateY(0) scale(1); }
-            100% { transform: translateY(-10px) scale(1.05); }
+            100% { transform: translateY(-0.625rem) scale(1.05); }
         }
         @keyframes sclera-pulse {
-            0% { stroke-width: 18px; filter: drop-shadow(0 0 15px rgba(255, 152, 0, 0.5)); }
-            100% { stroke-width: 25px; filter: drop-shadow(0 0 30px rgba(255, 152, 0, 0.8)); }
+            0% { stroke-width: 1.125rem; filter: drop-shadow(0 0 0.9375rem rgba(255, 152, 0, 0.5)); }
+            100% { stroke-width: 1.5625rem; filter: drop-shadow(0 0 1.875rem rgba(255, 152, 0, 0.8)); }
         }
         .pattern-proof {
-            font-size: 10px;
+            font-size: 0.625rem;
             color: var(--text-dim);
             font-family: "SF Mono", "SF Pro Display", monospace;
             white-space: nowrap;
@@ -493,7 +515,7 @@
 
         .emotion-name {
             font-weight: 700;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.03125rem;
             /* Gradient Text for Artistry */
             background: linear-gradient(90deg, #fff, rgba(255,255,255,0.5));
             background-clip: text;
@@ -502,12 +524,12 @@
         }
 
         /* Size Logic: Bigger Volume = Bigger Text */
-        .size-l .emotion-name { font-size: 28px; }
-        .size-m .emotion-name { font-size: 20px; }
-        .size-s .emotion-name { font-size: 16px; opacity: 0.7; }
+        .size-l .emotion-name { font-size: 1.75rem; }
+        .size-m .emotion-name { font-size: 1.25rem; }
+        .size-s .emotion-name { font-size: 1rem; opacity: 0.7; }
 
         .count-badge {
-            font-size: 10px;
+            font-size: 0.625rem;
             color: var(--text-dim);
             font-family: monospace;
             vertical-align: super;
@@ -519,9 +541,9 @@
         */
         .memory-stream {
             display: flex;
-            gap: 24px; /* Space between memories */
+            gap: 1.5rem; /* Space between memories */
             overflow-x: auto;
-            padding-right: 24px;
+            padding-right: 1.5rem;
             scrollbar-width: none;
             align-items: center;
             /* Fade out the right edge */
@@ -533,10 +555,10 @@
         /* The Naked Memory Unit */
         .memory-node {
             flex-shrink: 0;
-            max-width: 240px;
+            max-width: 15rem;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 0.25rem;
             cursor: pointer;
             transition: opacity 0.2s;
         }
@@ -547,11 +569,11 @@
         .time-row {
             display: flex;
             justify-content: flex-start;
-            margin-top: 6px;
+            margin-top: 0.375rem;
         }
 
         .time-stamp {
-            font-size: 9px;
+            font-size: 0.5625rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.08em;
@@ -567,7 +589,7 @@
         /* The Content Text */
         .node-text {
             font-family: "Inter Tight", sans-serif;
-            font-size: 18px;
+            font-size: 1.125rem;
             line-height: 1.2;
             letter-spacing: -0.02em;
             color: #d4d4d4;
@@ -579,26 +601,26 @@
         .node-text.ancient { color: var(--text-dim); }
         .memory-node.definition {
             background: rgba(0,0,0,0.65);
-            border: 1px solid rgba(255,255,255,0.08);
-            padding: 12px 14px;
-            border-radius: 14px;
-            max-width: 260px;
+            border: 0.0625rem solid rgba(255,255,255,0.08);
+            padding: 0.75rem 0.875rem;
+            border-radius: 0.875rem;
+            max-width: 16.25rem;
         }
         .definition-header {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 6px;
+            gap: 0.5rem;
+            margin-bottom: 0.375rem;
         }
         .definition-badge {
-            width: 18px;
-            height: 18px;
+            width: 1.125rem;
+            height: 1.125rem;
             border-radius: 50%;
             background: radial-gradient(circle at 30% 30%, #ffffff, #8b5cf6);
-            box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+            box-shadow: 0 0 0.625rem rgba(139, 92, 246, 0.5);
         }
         .definition-label {
-            font-size: 10px;
+            font-size: 0.625rem;
             text-transform: uppercase;
             letter-spacing: 0.08em;
             color: rgba(255,255,255,0.6);
@@ -610,10 +632,10 @@
         */
         .thread-line {
             position: absolute;
-            left: 24px;
-            bottom: -16px;
-            width: 1px;
-            height: 16px;
+            left: 1.5rem;
+            bottom: -1rem;
+            width: 0.0625rem;
+            height: 1rem;
             background: linear-gradient(to bottom, rgba(255,255,255,0.1), transparent);
         }
 
@@ -621,22 +643,23 @@
 </head>
 <body>
 
-    <div class="galaxy-bg"></div>
-    <div class="fog-layer" aria-hidden="true"></div>
-    <div class="edge-blur-right" aria-hidden="true"></div>
+    <div class="app">
+        <div class="galaxy-bg"></div>
+        <div class="fog-layer" aria-hidden="true"></div>
+        <div class="edge-blur-right" aria-hidden="true"></div>
 
-    <header class="living-header" id="location-status" role="button" tabindex="0" aria-pressed="false">
-        <div class="status-bar" aria-live="polite">
-            <span class="status-dot" aria-hidden="true"></span>
-            <span class="status-text">
-                <span class="status-primary">Location off · Tuesday morning</span>
-                <span class="status-secondary">Turn on location to see events map</span>
-            </span>
-            <span class="status-action">Tap to enable</span>
-        </div>
-    </header>
+        <header class="living-header" id="location-status" role="button" tabindex="0" aria-pressed="false">
+            <div class="status-bar" aria-live="polite">
+                <span class="status-dot" aria-hidden="true"></span>
+                <span class="status-text">
+                    <span class="status-primary">Location off · Tuesday morning</span>
+                    <span class="status-secondary">Turn on location to see events map</span>
+                </span>
+                <span class="status-action">Tap to enable</span>
+            </div>
+        </header>
 
-    <div class="resonance-sheet">
+        <div class="resonance-sheet">
         
         <!-- Search: The Prompt -->
         <div class="search-zone">
@@ -806,6 +829,7 @@
                 </div>
             </div>
 
+        </div>
         </div>
     </div>
 
