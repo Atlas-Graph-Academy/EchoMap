@@ -416,13 +416,13 @@
                 inset 0 0.03125rem 0.1875rem rgba(255, 255, 255, 0.11);
             backdrop-filter: blur(0.875rem) saturate(108%);
             -webkit-backdrop-filter: blur(0.875rem) saturate(108%);
-            transition: opacity 0.2s ease, transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            transition: opacity 0.6s ease, transform 0.6s ease, border-color 0.6s ease, box-shadow 0.6s ease;
         }
         .search-zone.is-recovering {
             transition: opacity 1.7s ease, transform 1.7s cubic-bezier(0.22, 1, 0.36, 1), border-color 1.7s ease, box-shadow 1.7s ease;
         }
         .search-zone.is-instant {
-            transition-duration: 0.08s;
+            transition-duration: 0.2s;
         }
         .search-zone.is-dim {
             opacity: 0.12;
@@ -460,9 +460,10 @@
             opacity: 0;
             transform: translateY(0.9375rem) scale(0.94);
             pointer-events: none;
-            transition: opacity 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+            transition: opacity 0.6s ease, transform 0.6s ease, border-color 0.6s ease;
             cursor: pointer;
         }
+        .search-zone.is-dim + .search-recall,
         .search-zone.is-docked + .search-recall {
             opacity: 1;
             transform: translateY(0) scale(1);
@@ -584,7 +585,7 @@
             padding: 0.375rem 0 9rem 0;
             scrollbar-width: none;
             -ms-overflow-style: none;
-            transition: padding-bottom 0.22s ease;
+            transition: padding-bottom 0.66s ease;
         }
         .resonance-sheet.search-docked .feed-container {
             padding-bottom: 5.5rem;
@@ -1081,7 +1082,7 @@
                 <button class="feeling-chip" type="button">hopeful</button>
             </div>
         </div>
-        <button class="search-recall" type="button" aria-label="Open search input">Search</button>
+        <button class="search-recall" type="button" aria-label="Start search">Start Search</button>
         </div>
     </div>
     </div>
@@ -1146,10 +1147,18 @@
     let recoverEndTimer;
     let lastFeedScrollTop = 0;
     let touchStartY = null;
+    let dockIntentTimer;
+    const DOCK_INTENT_DELAY_MS = 480;
+    const SCROLL_DELTA_TRIGGER = 6;
+    const TOUCH_DELTA_TRIGGER = 72;
+    const WHEEL_DELTA_TRIGGER = 18;
 
     function clearRecoveryTimers() {
         clearTimeout(recoverDelayTimer);
         clearTimeout(recoverEndTimer);
+    }
+    function clearDockIntentTimer() {
+        clearTimeout(dockIntentTimer);
     }
 
     function dimSearchZone() {
@@ -1171,6 +1180,7 @@
 
     function brightenImmediately() {
         if (!searchZone) return;
+        clearDockIntentTimer();
         clearRecoveryTimers();
         searchZone.classList.add("is-instant");
         searchZone.classList.remove("is-recovering", "is-dim", "is-docked");
@@ -1182,6 +1192,7 @@
 
     function setSearchDocked(docked, instant = false) {
         if (!searchZone) return;
+        if (searchZone.classList.contains("is-docked") === docked) return;
         if (instant) searchZone.classList.add("is-instant");
         searchZone.classList.toggle("is-docked", docked);
         resonanceSheet?.classList.toggle("search-docked", docked);
@@ -1198,15 +1209,26 @@
             }, 120);
         }
     }
+    function requestDock(docked) {
+        if (docked) {
+            clearDockIntentTimer();
+            dockIntentTimer = setTimeout(() => {
+                setSearchDocked(true);
+            }, DOCK_INTENT_DELAY_MS);
+            return;
+        }
+        clearDockIntentTimer();
+        setSearchDocked(false);
+    }
 
     if (feedContainer && searchZone) {
         feedContainer.addEventListener("scroll", () => {
             const currentTop = feedContainer.scrollTop;
             const scrollDelta = currentTop - lastFeedScrollTop;
-            if (scrollDelta > 2) {
-                setSearchDocked(true);
-            } else if (scrollDelta < -2 && currentTop < 18) {
-                setSearchDocked(false);
+            if (scrollDelta > SCROLL_DELTA_TRIGGER) {
+                requestDock(true);
+            } else if (scrollDelta < -SCROLL_DELTA_TRIGGER && currentTop < 18) {
+                requestDock(false);
             }
             lastFeedScrollTop = currentTop;
             dimSearchZone();
@@ -1218,20 +1240,20 @@
             if (touchStartY === null) return;
             const currentY = event.touches[0]?.clientY ?? touchStartY;
             const deltaY = touchStartY - currentY;
-            if (deltaY > 24) {
-                setSearchDocked(true);
-            } else if (deltaY < -24 && feedContainer.scrollTop < 18) {
-                setSearchDocked(false);
+            if (deltaY > TOUCH_DELTA_TRIGGER) {
+                requestDock(true);
+            } else if (deltaY < -TOUCH_DELTA_TRIGGER && feedContainer.scrollTop < 18) {
+                requestDock(false);
             }
         }, { passive: true });
         feedContainer.addEventListener("touchend", () => {
             touchStartY = null;
         }, { passive: true });
         feedContainer.addEventListener("wheel", (event) => {
-            if (event.deltaY > 6) {
-                setSearchDocked(true);
-            } else if (event.deltaY < -6 && feedContainer.scrollTop < 18) {
-                setSearchDocked(false);
+            if (event.deltaY > WHEEL_DELTA_TRIGGER) {
+                requestDock(true);
+            } else if (event.deltaY < -WHEEL_DELTA_TRIGGER && feedContainer.scrollTop < 18) {
+                requestDock(false);
             }
         }, { passive: true });
     }
