@@ -809,7 +809,7 @@
             overflow-x: auto;
             padding-right: 1.5rem;
             scrollbar-width: none;
-            align-items: center;
+            align-items: flex-start;
             /* Fade out the right edge */
             mask-image: linear-gradient(to right, black 85%, transparent 100%);
             -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
@@ -819,12 +819,15 @@
         /* The Naked Memory Unit */
         .memory-node {
             flex-shrink: 0;
+            width: 15rem;
             max-width: 15rem;
+            min-height: 3.875rem;
             display: flex;
             flex-direction: column;
-            gap: 0.3125rem;
+            gap: 0.1875rem;
             cursor: pointer;
             transition: opacity 0.2s;
+            overflow: hidden;
         }
 
         .memory-sticker {
@@ -869,7 +872,7 @@
             justify-content: flex-start;
             align-items: center;
             gap: 0.25rem;
-            margin-top: 0.375rem;
+            margin-top: 0.125rem;
         }
 
         .time-sep {
@@ -900,6 +903,13 @@
             letter-spacing: -0.02em;
             color: #d4d4d4;
             font-weight: 400;
+            min-height: calc(1.2em * 2);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            overflow-wrap: anywhere;
         }
         
         /* Fading older memories */
@@ -911,6 +921,9 @@
             padding: 0.75rem 0.875rem;
             border-radius: 0.875rem;
             max-width: 16.25rem;
+            width: auto;
+            height: auto;
+            overflow: visible;
         }
         .definition-header {
             display: flex;
