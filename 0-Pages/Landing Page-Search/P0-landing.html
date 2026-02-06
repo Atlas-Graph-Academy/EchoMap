@@ -576,8 +576,8 @@
         }
         .pattern-left {
             display: flex;
-            align-items: center;
-            gap: 0.75rem;
+            align-items: flex-end;
+            gap: 0.42rem;
             width: 100%;
         }
         .pattern-name {
@@ -586,6 +586,7 @@
             justify-content: center;
             width: 4.875rem;
             height: 3.75rem;
+            position: relative;
             font-size: 0;
             line-height: 0;
             opacity: 0.85;
@@ -720,11 +721,15 @@
             100% { stroke-width: 1.5625rem; filter: drop-shadow(0 0 1.875rem rgba(255, 152, 0, 0.8)); }
         }
         .pattern-proof {
+            position: static;
             font-size: 0.625rem;
-            color: var(--text-dim);
+            color: rgba(255, 255, 255, 0.5);
             font-family: "SF Mono", "SF Pro Display", monospace;
             white-space: nowrap;
-            margin-left: auto;
+            letter-spacing: 0.02em;
+            line-height: 1;
+            transform: translateY(-0.55rem);
+            text-shadow: 0 0.0625rem 0.25rem rgba(0, 0, 0, 0.45);
         }
 
         .glyph {
@@ -906,8 +911,7 @@
                             <span class="pattern-name" aria-label="Happy icon">
                                 <img src="../../image/happy.png" alt="Happy visualization">
                             </span>
-                            <span class="pattern-signal signal-spin">My mind keeps spinning</span>
-                            <span class="pattern-proof">219 people</span>
+                            <span class="pattern-proof">219 people </span>
                         </span>
                     </div>
                 </div>
@@ -955,8 +959,7 @@
                             <span class="pattern-name" aria-label="Jittering icon">
                                 <img src="../../image/jittering.png" alt="Jittering visualization">
                             </span>
-                            <span class="pattern-signal signal-jitter">Pulled by every small noise</span>
-                            <span class="pattern-proof">89 people</span>
+                            <span class="pattern-proof">89 people </span>
                         </span>
                     </div>
                 </div>
@@ -994,8 +997,7 @@
                             <span class="pattern-name" aria-label="Angry icon">
                                 <img src="../../image/angry.png" alt="Angry visualization">
                             </span>
-                            <span class="pattern-signal signal-overfit">Forcing myself to stay lit</span>
-                            <span class="pattern-proof">1.2k people</span>
+                            <span class="pattern-proof">1.2k people </span>
                         </span>
                     </div>
                 </div>
