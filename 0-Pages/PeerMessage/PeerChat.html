@@ -470,18 +470,9 @@
         .used-memory-inline {
             margin-top: 0.625rem;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 0.375rem;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            overflow-y: hidden;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            padding-bottom: 0.125rem;
-        }
-
-        .used-memory-inline::-webkit-scrollbar {
-            display: none;
+            flex-wrap: wrap;
         }
 
         .used-memory-label {
@@ -500,6 +491,38 @@
             letter-spacing: 0.02rem;
             white-space: nowrap;
             flex: 0 0 auto;
+        }
+
+        .used-memory-list {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            flex-wrap: wrap;
+        }
+
+        .used-memory-list:not(.is-open) .memory-chip:nth-child(n+2) {
+            display: none;
+        }
+
+        .memory-more-btn {
+            min-height: 1.25rem;
+            padding: 0 0.4375rem;
+            border-radius: 999rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.72);
+            font-size: 0.6875rem;
+            line-height: 1;
+            font-family: inherit;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .memory-more-btn:hover,
+        .memory-more-btn:focus-visible {
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
         }
 
         .memory-chip {
@@ -1015,17 +1038,20 @@
             <div class="used-memory-inline">
                 <div class="used-memory-label">Memories,</div>
                 <div class="used-memory-count">3</div>
-                <span class="memory-chip memory-chip-other" style="--r: 108; --g: 176; --b: 210;">
-                    Higher-level thinking
-                </span>
-                <span class="memory-chip memory-chip-private">
-                    <span class="lock-icon-mini"></span>
-                    Letter I Never Sent
-                </span>
-                <span class="memory-chip memory-chip-private">
-                    <span class="lock-icon-mini"></span>
-                    That Conversation
-                </span>
+                <div class="used-memory-list" id="used-memory-list-1">
+                    <span class="memory-chip memory-chip-other" style="--r: 108; --g: 176; --b: 210;">
+                        Higher-level thinking
+                    </span>
+                    <span class="memory-chip memory-chip-private">
+                        <span class="lock-icon-mini"></span>
+                        Letter I Never Sent
+                    </span>
+                    <span class="memory-chip memory-chip-private">
+                        <span class="lock-icon-mini"></span>
+                        That Conversation
+                    </span>
+                </div>
+                <button class="memory-more-btn" type="button" data-memory-toggle="used-memory-list-1" aria-expanded="false">2+</button>
             </div>
         </div>
 
@@ -1140,6 +1166,27 @@
                 }
             });
         }
+
+        const memoryToggles = document.querySelectorAll("[data-memory-toggle]");
+        memoryToggles.forEach((toggle) => {
+            const listId = toggle.getAttribute("data-memory-toggle");
+            const list = listId ? document.getElementById(listId) : null;
+            if (!list) return;
+
+            const chips = list.querySelectorAll(".memory-chip");
+            const hiddenCount = Math.max(chips.length - 1, 0);
+            if (hiddenCount <= 0) {
+                toggle.style.display = "none";
+                return;
+            }
+
+            toggle.textContent = `${hiddenCount}+`;
+            toggle.addEventListener("click", () => {
+                const isOpen = list.classList.toggle("is-open");
+                toggle.setAttribute("aria-expanded", String(isOpen));
+                toggle.textContent = isOpen ? "Hide" : `${hiddenCount}+`;
+            });
+        });
 
     </script>
 
