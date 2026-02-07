@@ -353,7 +353,7 @@
         }
         .sheet-grabber {
             position: absolute;
-            top: 0.3rem;
+            top: 0rem;
             left: 50%;
             transform: translateX(-50%);
             width: 2.8rem;
@@ -464,6 +464,7 @@
 
         /* Bottom Mood Search Dock */
         .search-zone {
+            --search-collapse: 0;
             position: absolute;
             left: 0.75rem;
             right: 0.75rem;
@@ -478,8 +479,13 @@
                 inset 0 0.03125rem 0.1875rem rgba(255, 255, 255, 0.11);
             backdrop-filter: blur(0.875rem) saturate(108%);
             -webkit-backdrop-filter: blur(0.875rem) saturate(108%);
-            transition: opacity 0.6s ease, transform 0.6s ease, border-color 0.6s ease, box-shadow 0.6s ease;
+            opacity: calc(1 - (var(--search-collapse) * 0.9));
+            transform: translateY(calc(var(--search-collapse) * 4.25rem)) scale(calc(1 - (var(--search-collapse) * 0.05)));
+            transition: opacity 0.38s ease, transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.38s ease, box-shadow 0.38s ease;
             isolation: isolate;
+        }
+        .app.stage-min-active .search-zone {
+            bottom: 1.5rem;
         }
         .search-zone::before {
             content: "";
@@ -510,6 +516,9 @@
             transform: translateY(0) scale(1) !important;
             pointer-events: auto;
         }
+        .search-zone.is-collapsed {
+            pointer-events: none;
+        }
         .search-recall {
             position: absolute;
             right: 1rem;
@@ -529,11 +538,14 @@
             opacity: 0;
             transform: translateY(0.9375rem) scale(0.94);
             pointer-events: none;
-            transition: opacity 0.6s ease, transform 0.6s ease, border-color 0.6s ease;
+            transition: opacity 0.34s ease, transform 0.34s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.34s ease;
             cursor: pointer;
         }
-        .search-zone.is-dim + .search-recall,
-        .search-zone.is-docked + .search-recall { opacity: 0; pointer-events: none; }
+        .search-recall.is-visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
         .section-label {
             display: flex;
             align-items: center;
@@ -1372,8 +1384,10 @@
     const SCROLL_DELTA_TRIGGER = 6;
     const TOUCH_DELTA_TRIGGER = 72;
     const WHEEL_DELTA_TRIGGER = 18;
-    const STAGE_RATIOS = [0.3, 0.52, 0.9];
+    const STAGE_RATIOS = [0.1, 0.52, 0.9];
     const STAGE_INTENT_COOLDOWN_MS = 260;
+    const SEARCH_COLLAPSE_THRESHOLD = 0.72;
+    const SNAP_TO_STAGE_DISTANCE = 18;
 
     function clamp(value, min, max) {
         return Math.min(Math.max(value, min), max);
@@ -1392,6 +1406,20 @@
             });
         }
         resonanceSheet.style.setProperty("--sheet-offset", `${currentSheetOffset}px`);
+        updateSearchPresence();
+    }
+    function updateSearchPresence() {
+        if (!searchZone || !searchRecall || !stageOffsets.length) return;
+        // Keep Search Zone fully visible through min/mid stages.
+        // Start collapsing only when sheet moves from mid -> full.
+        const midOffset = stageOffsets[1] ?? stageOffsets[0] ?? 0;
+        const fullOffset = stageOffsets[stageOffsets.length - 1] ?? 0;
+        const collapseRange = Math.max(1, midOffset - fullOffset);
+        const collapse = clamp((midOffset - currentSheetOffset) / collapseRange, 0, 1);
+        searchZone.style.setProperty("--search-collapse", `${collapse}`);
+        const collapsed = collapse >= SEARCH_COLLAPSE_THRESHOLD;
+        searchZone.classList.toggle("is-collapsed", collapsed);
+        searchRecall.classList.toggle("is-visible", collapsed);
     }
     function getNearestStage(offset) {
         let nearest = 0;
@@ -1405,9 +1433,9 @@
         }
         return nearest;
     }
-    function snapToStage(stageIndex, animate = true) {
-        if (!stageOffsets.length) return;
+    function applyStageVisualState(stageIndex) {
         currentStage = clamp(stageIndex, 0, stageOffsets.length - 1);
+        appRoot?.classList.toggle("stage-min-active", currentStage === 0);
         resonanceSheet?.classList.remove("stage-min", "stage-mid", "stage-full");
         resonanceSheet?.classList.add(currentStage === 0 ? "stage-min" : currentStage === 1 ? "stage-mid" : "stage-full");
         if (currentStage === 0) {
@@ -1416,6 +1444,10 @@
             clearRecoveryTimers();
             searchZone?.classList.remove("is-recovering", "is-dim");
         }
+    }
+    function snapToStage(stageIndex, animate = true) {
+        if (!stageOffsets.length) return;
+        applyStageVisualState(stageIndex);
         setSheetOffset(stageOffsets[currentStage], animate);
     }
     function tryStepStage(direction) {
@@ -1429,9 +1461,15 @@
     }
     function recalcSheetStages() {
         if (!appRoot || !resonanceSheet) return;
+        const hadStages = stageOffsets.length > 0;
+        const prevMaxOffset = hadStages ? stageOffsets[0] : 0;
+        const prevMinOffset = hadStages ? stageOffsets[stageOffsets.length - 1] : 0;
+        const prevOffset = currentSheetOffset;
+        const isFreeOffset = hadStages
+            && Math.abs((stageOffsets[currentStage] ?? prevOffset) - prevOffset) > SNAP_TO_STAGE_DISTANCE;
         const appHeight = appRoot.clientHeight;
         const sheetBottom = parseFloat(getComputedStyle(resonanceSheet).bottom) || 0;
-        const minStageHeight = Math.round(appHeight * 0.16);
+        const minStageHeight = Math.round(appHeight * 0.1);
         const maxStageHeight = Math.max(minStageHeight, Math.round(appHeight - sheetBottom - 4));
         const minHeight = clamp(Math.round((appHeight * STAGE_RATIOS[0]) - sheetBottom), minStageHeight, maxStageHeight);
         const midHeight = clamp(Math.round((appHeight * STAGE_RATIOS[1]) - sheetBottom), minStageHeight, maxStageHeight);
@@ -1440,7 +1478,18 @@
         const stageHeights = [minHeight, midHeight, fullHeight];
         stageOffsets = stageHeights.map((height) => maxSheetHeight - height);
         resonanceSheet.style.height = `${maxSheetHeight}px`;
-        snapToStage(currentStage, false);
+        if (isFreeOffset) {
+            const prevRange = Math.max(1, prevMaxOffset - prevMinOffset);
+            const progress = clamp((prevOffset - prevMinOffset) / prevRange, 0, 1);
+            const nextMaxOffset = stageOffsets[0];
+            const nextMinOffset = stageOffsets[stageOffsets.length - 1];
+            const mappedOffset = nextMinOffset + ((nextMaxOffset - nextMinOffset) * progress);
+            applyStageVisualState(getNearestStage(mappedOffset));
+            setSheetOffset(mappedOffset, false);
+        } else {
+            snapToStage(currentStage, false);
+        }
+        updateSearchPresence();
     }
     function startSheetDrag(clientY, pointerId) {
         if (!stageOffsets.length) return;
@@ -1464,7 +1513,14 @@
         isDraggingSheet = false;
         activePointerId = null;
         resonanceSheet?.classList.remove("is-dragging");
-        snapToStage(getNearestStage(currentSheetOffset), true);
+        const nearestStage = getNearestStage(currentSheetOffset);
+        const nearestDistance = Math.abs(stageOffsets[nearestStage] - currentSheetOffset);
+        if (nearestDistance <= SNAP_TO_STAGE_DISTANCE) {
+            snapToStage(nearestStage, true);
+            return;
+        }
+        applyStageVisualState(nearestStage);
+        setSheetOffset(currentSheetOffset, false);
     }
 
     function clearRecoveryTimers() {
@@ -1480,6 +1536,7 @@
         clearRecoveryTimers();
         searchZone.classList.remove("is-recovering", "is-dim", "is-docked");
         resonanceSheet?.classList.remove("search-docked");
+        updateSearchPresence();
     }
 
     function brightenImmediately() {
@@ -1499,6 +1556,7 @@
         if (instant) searchZone.classList.add("is-instant");
         searchZone.classList.remove("is-docked", "is-dim", "is-recovering");
         resonanceSheet?.classList.remove("search-docked");
+        updateSearchPresence();
         if (instant) {
             setTimeout(() => {
                 searchZone.classList.remove("is-instant");
@@ -1590,8 +1648,8 @@
     }
     if (searchRecall) {
         searchRecall.addEventListener("click", () => {
+            snapToStage(1, true);
             setSearchDocked(false, true);
-            brightenImmediately();
             promptInput?.focus();
         });
     }
