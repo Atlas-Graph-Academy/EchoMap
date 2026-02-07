@@ -23,10 +23,7 @@
 
             /* Palette: Deep Void to Bioluminescence */
             --bg-void: #05080c;
-            --bg-panel: #0f131a;
-            --glass-surface: rgba(20, 25, 35, 0.65);
             --glass-border: rgba(255, 255, 255, 0.08);
-            --glass-highlight: rgba(255, 255, 255, 0.15);
             
             /* Typography as Light */
             --text-primary: rgba(255, 255, 255, 0.95);
@@ -35,10 +32,6 @@
 
             /* Accents */
             --accent-cyan: #00f0ff;
-            --accent-gold: #cfaa70;
-            --accent-orange: #ff9d00;
-            --echo-active: #ffb444;
-            --status-green: #00d68f;
         }
 
         * {
@@ -158,13 +151,6 @@
             justify-content: center;
         }
         
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
         .user-info {
             display: flex;
             flex-direction: column;
@@ -258,29 +244,6 @@
             align-items: center;
             gap: 0.75rem;
         }
-
-        .stats-pill {
-            background: rgba(30, 35, 45, 0.6);
-            border: 1px solid var(--glass-border);
-            border-radius: 1.25rem;
-            padding: 0.25rem 0.75rem;
-            display: flex;
-            gap: 0.75rem;
-            backdrop-filter: blur(0.5rem);
-        }
-
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .stat-label { font-size: 0.5rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.03125rem; }
-        .stat-value { font-size: 0.8125rem; font-weight: 600; }
-        .stat-value.pink { color: #ff5db4; text-shadow: 0 0 0.5rem rgba(255, 93, 180, 0.4); }
-        .stat-value.cyan { color: var(--status-green); text-shadow: 0 0 0.5rem rgba(0, 214, 143, 0.4); }
-
-        .divider { width: 0.0625rem; background: var(--glass-border); height: 1.5rem; }
 
         .menu-btn {
             width: 2.25rem;
@@ -455,52 +418,28 @@
             pointer-events: none;
         }
 
-        .citation {
-            display: inline-block;
-            font-size: 0.625rem;
-            color: var(--accent-cyan);
-            background: rgba(0, 240, 255, 0.1);
-            padding: 0 0.25rem;
-            border-radius: 0.25rem;
-            vertical-align: super;
-            margin-left: 0.125rem;
-            border: 1px solid rgba(0, 240, 255, 0.2);
-        }
-
         .used-memory-inline {
             margin-top: 0.625rem;
-            display: flex;
-            align-items: flex-start;
-            gap: 0.375rem;
-            flex-wrap: wrap;
+            display: grid;
+            row-gap: 0.3125rem;
         }
 
-        .used-memory-label {
+        .used-memory-title {
             font-size: 0.625rem;
             text-transform: uppercase;
             letter-spacing: 0.05rem;
             color: rgba(255, 255, 255, 0.45);
-            margin: 0;
-            white-space: nowrap;
-            flex: 0 0 auto;
+            line-height: 1;
         }
 
-        .used-memory-count {
-            font-size: 0.625rem;
-            color: rgba(255, 255, 255, 0.58);
-            letter-spacing: 0.02rem;
-            white-space: nowrap;
-            flex: 0 0 auto;
-        }
-
-        .used-memory-list {
+        .used-memory-items {
             display: inline-flex;
             align-items: center;
             gap: 0.375rem;
             flex-wrap: wrap;
         }
 
-        .used-memory-list:not(.is-open) .memory-chip:nth-child(n+2) {
+        .used-memory-items:not(.is-open) .memory-chip:nth-child(n+2) {
             display: none;
         }
 
@@ -546,17 +485,6 @@
             color: rgb(var(--r), var(--g), var(--b));
             box-shadow: 0 0 1.125rem rgba(var(--r), var(--g), var(--b), 0.26);
             text-shadow: 0 0 0.875rem rgba(var(--r), var(--g), var(--b), 0.5);
-        }
-
-        .memory-chip .avatar {
-            width: 1rem;
-            height: 1rem;
-            border-radius: 50%;
-            object-fit: cover;
-            flex-shrink: 0;
-            margin-left: -0.0625rem;
-            border: 1px solid rgba(var(--r), var(--g), var(--b), 0.45);
-            box-shadow: 0 0 0.75rem rgba(var(--r), var(--g), var(--b), 0.32);
         }
 
         .memory-chip-other {
@@ -645,32 +573,6 @@
             padding-bottom: var(--safe-bottom);
             background: linear-gradient(to top, #000 20%, transparent 100%);
             z-index: 200;
-        }
-
-        .wallet-bar {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 0.5rem;
-            padding-right: 0.25rem;
-        }
-
-        .wallet-info {
-            font-size: 0.75rem;
-            color: var(--accent-gold);
-            font-weight: 600;
-            letter-spacing: 0.03125rem;
-            text-shadow: 0 0 0.625rem rgba(207, 170, 112, 0.3);
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-        
-        .diamond {
-            width: 0.5rem;
-            height: 0.5rem;
-            background: var(--accent-orange);
-            transform: rotate(45deg);
-            box-shadow: 0 0 0.375rem var(--accent-orange);
         }
 
         .input-deck {
@@ -882,14 +784,6 @@
             color: var(--text-primary);
         }
         
-        .input-actions {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            z-index: 1;
-        }
-        
-
         .send-btn {
             width: 2.5rem;
             height: 2.5rem;
@@ -946,11 +840,6 @@
             box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.45), 0 0 1.125rem rgba(255, 255, 255, 0.7);
         }
         
-        .input-button.press-to-talk .input-field {
-            color: var(--text-primary);
-        }
-        
-
     </style>
 </head>
 <body data-memory-count="54">
@@ -1036,9 +925,8 @@
                 Simon has been focused on testing and patching the system lately. For example, he found and fixed a few small bugs in the long-press message feature.
             </div>
             <div class="used-memory-inline">
-                <div class="used-memory-label">Memories,</div>
-                <div class="used-memory-count">3</div>
-                <div class="used-memory-list" id="used-memory-list-1">
+                <div class="used-memory-title">Memories</div>
+                <div class="used-memory-items" id="used-memory-list-1">
                     <span class="memory-chip memory-chip-other" style="--r: 108; --g: 176; --b: 210;">
                         Higher-level thinking
                     </span>
@@ -1050,8 +938,8 @@
                         <span class="lock-icon-mini"></span>
                         That Conversation
                     </span>
+                    <button class="memory-more-btn" type="button" data-memory-toggle="used-memory-list-1" aria-expanded="false">2+</button>
                 </div>
-                <button class="memory-more-btn" type="button" data-memory-toggle="used-memory-list-1" aria-expanded="false">2+</button>
             </div>
         </div>
 
