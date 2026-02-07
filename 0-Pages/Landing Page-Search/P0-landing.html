@@ -111,6 +111,28 @@
             padding-bottom: calc(var(--safe-bottom) + var(--bottom-gap));
             border-radius: calc(2.1rem * var(--u));
         }
+        .app::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 16%;
+            z-index: 11;
+            pointer-events: none;
+            background:
+                radial-gradient(130% 75% at 16% 100%, rgba(8, 10, 13, 0.52) 0%, rgba(8, 10, 13, 0.12) 34%, rgba(8, 10, 13, 0) 62%),
+                radial-gradient(125% 72% at 50% 100%, rgba(8, 10, 13, 0.66) 0%, rgba(8, 10, 13, 0.2) 36%, rgba(8, 10, 13, 0) 66%),
+                radial-gradient(130% 75% at 84% 100%, rgba(8, 10, 13, 0.52) 0%, rgba(8, 10, 13, 0.12) 34%, rgba(8, 10, 13, 0) 62%),
+                linear-gradient(
+                    to top,
+                    rgba(8, 10, 13, 0.88) 0%,
+                    rgba(8, 10, 13, 0.48) 22%,
+                    rgba(8, 10, 13, 0.16) 44%,
+                    rgba(8, 10, 13, 0) 100%
+                );
+            filter: blur(0.22rem);
+        }
         body.location-off .fog-layer {
             opacity: 1;
             pointer-events: auto;
@@ -273,6 +295,7 @@
            High Density. Vertical Scroll.
         */
         .resonance-sheet {
+            --sheet-offset: 0px;
             position: absolute;
             bottom: calc(var(--safe-bottom) + var(--bottom-gap));
             left: 0.375rem;
@@ -296,6 +319,12 @@
             z-index: 10;
             padding-top: 0.75rem;
             overflow: visible;
+            transform: translateY(var(--sheet-offset));
+            transition: transform 0.44s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform;
+        }
+        .resonance-sheet.is-dragging {
+            transition: none;
         }
         .resonance-sheet::before {
             content: "";
@@ -322,6 +351,35 @@
             );
             filter: blur(0.58rem);
         }
+        .sheet-grabber {
+            position: absolute;
+            top: 0.3rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2.8rem;
+            height: 1rem;
+            border: none;
+            border-radius: 999rem;
+            background: transparent;
+            cursor: grab;
+            touch-action: none;
+            z-index: 16;
+        }
+        .sheet-grabber::before {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 0.36rem;
+            transform: translateX(-50%);
+            width: 1.55rem;
+            height: 0.25rem;
+            border-radius: 999rem;
+            background: rgba(255, 255, 255, 0.38);
+            box-shadow: 0 0 0.5rem rgba(255, 255, 255, 0.12);
+        }
+        .resonance-sheet.is-dragging .sheet-grabber {
+            cursor: grabbing;
+        }
         .moment-unit {
             padding: 0.5rem 1rem 0.45rem;
             display: flex;
@@ -333,6 +391,10 @@
             top: 0;
             transform: translateY(-92%);
             z-index: 12;
+            transition: transform 0.44s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .resonance-sheet.stage-full .moment-unit {
+            transform: translateY(-72%);
         }
         .moment-unit::before {
             content: "";
@@ -417,6 +479,20 @@
             backdrop-filter: blur(0.875rem) saturate(108%);
             -webkit-backdrop-filter: blur(0.875rem) saturate(108%);
             transition: opacity 0.6s ease, transform 0.6s ease, border-color 0.6s ease, box-shadow 0.6s ease;
+            isolation: isolate;
+        }
+        .search-zone::before {
+            content: "";
+            position: absolute;
+            left: -0.35rem;
+            right: -0.35rem;
+            bottom: -0.55rem;
+            height: 2.8rem;
+            z-index: -1;
+            border-radius: 1.4rem;
+            pointer-events: none;
+            background: radial-gradient(100% 70% at 50% 100%, rgba(8, 10, 13, 0.42) 0%, rgba(8, 10, 13, 0.14) 48%, rgba(8, 10, 13, 0) 100%);
+            filter: blur(0.24rem);
         }
         .search-zone.is-recovering {
             transition: opacity 1.7s ease, transform 1.7s cubic-bezier(0.22, 1, 0.36, 1), border-color 1.7s ease, box-shadow 1.7s ease;
@@ -425,21 +501,14 @@
             transition-duration: 0.2s;
         }
         .search-zone.is-dim {
-            opacity: 0.12;
-            transform: translateY(0.3rem) scale(0.982);
-            border-color: rgba(255, 255, 255, 0.035);
-            box-shadow:
-                0 0.1875rem 0.625rem rgba(0, 0, 0, 0.2),
-                inset 0 0.03125rem 0.1875rem rgba(255, 255, 255, 0.06);
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
         }
         .search-zone.is-docked {
-            opacity: 0.08;
-            transform: translateY(4.6rem) scale(0.96);
-            pointer-events: none;
-            border-color: rgba(255, 255, 255, 0.02);
-            box-shadow:
-                0 0.125rem 0.4375rem rgba(0, 0, 0, 0.14),
-                inset 0 0.03125rem 0.125rem rgba(255, 255, 255, 0.04);
+            opacity: 1 !important;
+            transform: translateY(0) scale(1) !important;
+            pointer-events: auto;
         }
         .search-recall {
             position: absolute;
@@ -464,11 +533,7 @@
             cursor: pointer;
         }
         .search-zone.is-dim + .search-recall,
-        .search-zone.is-docked + .search-recall {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-            pointer-events: auto;
-        }
+        .search-zone.is-docked + .search-recall { opacity: 0; pointer-events: none; }
         .section-label {
             display: flex;
             align-items: center;
@@ -608,6 +673,28 @@
                 rgba(8, 10, 13, 0) 100%
             );
             filter: blur(0.2rem);
+        }
+        .feed-container::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 6.8rem;
+            pointer-events: none;
+            z-index: 2;
+            background:
+                radial-gradient(120% 68% at 18% 100%, rgba(8, 10, 13, 0.6) 0%, rgba(8, 10, 13, 0.16) 34%, rgba(8, 10, 13, 0) 60%),
+                radial-gradient(120% 72% at 50% 100%, rgba(8, 10, 13, 0.72) 0%, rgba(8, 10, 13, 0.22) 36%, rgba(8, 10, 13, 0) 64%),
+                radial-gradient(120% 68% at 82% 100%, rgba(8, 10, 13, 0.6) 0%, rgba(8, 10, 13, 0.16) 34%, rgba(8, 10, 13, 0) 60%),
+                linear-gradient(
+                    to top,
+                    rgba(8, 10, 13, 0.9) 0%,
+                    rgba(8, 10, 13, 0.44) 24%,
+                    rgba(8, 10, 13, 0.12) 44%,
+                    rgba(8, 10, 13, 0) 100%
+                );
+            filter: blur(0.18rem);
         }
         .resonance-sheet.search-docked .feed-container {
             padding-bottom: 5.5rem;
@@ -1003,6 +1090,8 @@
 
         <div class="resonance-sheet">
 
+        <button class="sheet-grabber" type="button" aria-label="Adjust resonance sheet"></button>
+
         <div class="moment-unit" aria-label="moment">
             <div class="moment-card">
                 <div class="moment-thumb">
@@ -1205,6 +1294,8 @@
     const searchRecall = document.querySelector(".search-recall");
     const resonanceSheet = document.querySelector(".resonance-sheet");
     const feedContainer = document.querySelector(".feed-container");
+    const appRoot = document.querySelector(".app");
+    const sheetGrabber = document.querySelector(".sheet-grabber");
     const promptInput = document.querySelector(".search-input");
     const feelingChips = document.querySelectorAll(".feeling-chip");
     const suggestions = [
@@ -1219,6 +1310,13 @@
     let suggestionIndex = 0;
     let charIndex = 0;
     let dots = 0;
+
+    if (appRoot && searchZone && searchZone.parentElement !== appRoot) {
+        appRoot.appendChild(searchZone);
+    }
+    if (appRoot && searchRecall && searchRecall.parentElement !== appRoot) {
+        appRoot.appendChild(searchRecall);
+    }
 
     function typeLoop() {
         if (promptInput.value.trim().length > 0) {
@@ -1260,10 +1358,114 @@
     let lastFeedScrollTop = 0;
     let touchStartY = null;
     let dockIntentTimer;
+    let stageIntentLockUntil = 0;
+    let activePointerId = null;
+    let isDraggingSheet = false;
+    let hasDraggedSheet = false;
+    let dragStartY = 0;
+    let dragStartOffset = 0;
+    let currentSheetOffset = 0;
+    let currentStage = 1;
+    let stageOffsets = [];
+    let maxSheetHeight = 0;
     const DOCK_INTENT_DELAY_MS = 480;
     const SCROLL_DELTA_TRIGGER = 6;
     const TOUCH_DELTA_TRIGGER = 72;
     const WHEEL_DELTA_TRIGGER = 18;
+    const STAGE_RATIOS = [0.3, 0.52, 0.9];
+    const STAGE_INTENT_COOLDOWN_MS = 260;
+
+    function clamp(value, min, max) {
+        return Math.min(Math.max(value, min), max);
+    }
+    function setSheetOffset(offset, animate = true) {
+        if (!resonanceSheet || !stageOffsets.length) return;
+        const minOffset = stageOffsets[stageOffsets.length - 1];
+        const maxOffset = stageOffsets[0];
+        currentSheetOffset = clamp(offset, minOffset, maxOffset);
+        if (!animate && !isDraggingSheet) {
+            resonanceSheet.classList.add("is-dragging");
+            requestAnimationFrame(() => {
+                if (!isDraggingSheet) {
+                    resonanceSheet.classList.remove("is-dragging");
+                }
+            });
+        }
+        resonanceSheet.style.setProperty("--sheet-offset", `${currentSheetOffset}px`);
+    }
+    function getNearestStage(offset) {
+        let nearest = 0;
+        let bestDistance = Number.POSITIVE_INFINITY;
+        for (let i = 0; i < stageOffsets.length; i += 1) {
+            const distance = Math.abs(stageOffsets[i] - offset);
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                nearest = i;
+            }
+        }
+        return nearest;
+    }
+    function snapToStage(stageIndex, animate = true) {
+        if (!stageOffsets.length) return;
+        currentStage = clamp(stageIndex, 0, stageOffsets.length - 1);
+        resonanceSheet?.classList.remove("stage-min", "stage-mid", "stage-full");
+        resonanceSheet?.classList.add(currentStage === 0 ? "stage-min" : currentStage === 1 ? "stage-mid" : "stage-full");
+        if (currentStage === 0) {
+            clearDockIntentTimer();
+            setSearchDocked(false, true);
+            clearRecoveryTimers();
+            searchZone?.classList.remove("is-recovering", "is-dim");
+        }
+        setSheetOffset(stageOffsets[currentStage], animate);
+    }
+    function tryStepStage(direction) {
+        const now = Date.now();
+        if (now < stageIntentLockUntil) return false;
+        const nextStage = clamp(currentStage + direction, 0, stageOffsets.length - 1);
+        if (nextStage === currentStage) return false;
+        stageIntentLockUntil = now + STAGE_INTENT_COOLDOWN_MS;
+        snapToStage(nextStage, true);
+        return true;
+    }
+    function recalcSheetStages() {
+        if (!appRoot || !resonanceSheet) return;
+        const appHeight = appRoot.clientHeight;
+        const sheetBottom = parseFloat(getComputedStyle(resonanceSheet).bottom) || 0;
+        const minStageHeight = Math.round(appHeight * 0.16);
+        const maxStageHeight = Math.max(minStageHeight, Math.round(appHeight - sheetBottom - 4));
+        const minHeight = clamp(Math.round((appHeight * STAGE_RATIOS[0]) - sheetBottom), minStageHeight, maxStageHeight);
+        const midHeight = clamp(Math.round((appHeight * STAGE_RATIOS[1]) - sheetBottom), minStageHeight, maxStageHeight);
+        const fullHeight = clamp(Math.round((appHeight * STAGE_RATIOS[2]) - sheetBottom), minStageHeight, maxStageHeight);
+        maxSheetHeight = fullHeight;
+        const stageHeights = [minHeight, midHeight, fullHeight];
+        stageOffsets = stageHeights.map((height) => maxSheetHeight - height);
+        resonanceSheet.style.height = `${maxSheetHeight}px`;
+        snapToStage(currentStage, false);
+    }
+    function startSheetDrag(clientY, pointerId) {
+        if (!stageOffsets.length) return;
+        isDraggingSheet = true;
+        hasDraggedSheet = false;
+        activePointerId = pointerId;
+        dragStartY = clientY;
+        dragStartOffset = currentSheetOffset;
+        resonanceSheet?.classList.add("is-dragging");
+    }
+    function moveSheetDrag(clientY) {
+        if (!isDraggingSheet) return;
+        const deltaY = clientY - dragStartY;
+        if (Math.abs(deltaY) > 6) {
+            hasDraggedSheet = true;
+        }
+        setSheetOffset(dragStartOffset + deltaY, false);
+    }
+    function endSheetDrag() {
+        if (!isDraggingSheet) return;
+        isDraggingSheet = false;
+        activePointerId = null;
+        resonanceSheet?.classList.remove("is-dragging");
+        snapToStage(getNearestStage(currentSheetOffset), true);
+    }
 
     function clearRecoveryTimers() {
         clearTimeout(recoverDelayTimer);
@@ -1275,19 +1477,9 @@
 
     function dimSearchZone() {
         if (!searchZone) return;
-        if (searchZone.classList.contains("is-docked")) return;
-        searchZone.classList.remove("is-recovering");
-        searchZone.classList.add("is-dim");
         clearRecoveryTimers();
-        recoverDelayTimer = setTimeout(() => {
-            searchZone.classList.add("is-recovering");
-            requestAnimationFrame(() => {
-                searchZone.classList.remove("is-dim");
-            });
-            recoverEndTimer = setTimeout(() => {
-                searchZone.classList.remove("is-recovering");
-            }, 1700);
-        }, 1500);
+        searchZone.classList.remove("is-recovering", "is-dim", "is-docked");
+        resonanceSheet?.classList.remove("search-docked");
     }
 
     function brightenImmediately() {
@@ -1304,17 +1496,9 @@
 
     function setSearchDocked(docked, instant = false) {
         if (!searchZone) return;
-        if (searchZone.classList.contains("is-docked") === docked) return;
         if (instant) searchZone.classList.add("is-instant");
-        searchZone.classList.toggle("is-docked", docked);
-        resonanceSheet?.classList.toggle("search-docked", docked);
-        if (docked) {
-            clearRecoveryTimers();
-            searchZone.classList.remove("is-recovering");
-            searchZone.classList.add("is-dim");
-        } else {
-            searchZone.classList.remove("is-dim", "is-recovering");
-        }
+        searchZone.classList.remove("is-docked", "is-dim", "is-recovering");
+        resonanceSheet?.classList.remove("search-docked");
         if (instant) {
             setTimeout(() => {
                 searchZone.classList.remove("is-instant");
@@ -1322,13 +1506,6 @@
         }
     }
     function requestDock(docked) {
-        if (docked) {
-            clearDockIntentTimer();
-            dockIntentTimer = setTimeout(() => {
-                setSearchDocked(true);
-            }, DOCK_INTENT_DELAY_MS);
-            return;
-        }
         clearDockIntentTimer();
         setSearchDocked(false);
     }
@@ -1339,8 +1516,12 @@
             const scrollDelta = currentTop - lastFeedScrollTop;
             if (scrollDelta > SCROLL_DELTA_TRIGGER) {
                 requestDock(true);
+                if (currentTop < 20) {
+                    tryStepStage(1);
+                }
             } else if (scrollDelta < -SCROLL_DELTA_TRIGGER && currentTop < 18) {
                 requestDock(false);
+                tryStepStage(-1);
             }
             lastFeedScrollTop = currentTop;
             dimSearchZone();
@@ -1354,8 +1535,12 @@
             const deltaY = touchStartY - currentY;
             if (deltaY > TOUCH_DELTA_TRIGGER) {
                 requestDock(true);
+                if (feedContainer.scrollTop < 20) {
+                    tryStepStage(1);
+                }
             } else if (deltaY < -TOUCH_DELTA_TRIGGER && feedContainer.scrollTop < 18) {
                 requestDock(false);
+                tryStepStage(-1);
             }
         }, { passive: true });
         feedContainer.addEventListener("touchend", () => {
@@ -1364,11 +1549,42 @@
         feedContainer.addEventListener("wheel", (event) => {
             if (event.deltaY > WHEEL_DELTA_TRIGGER) {
                 requestDock(true);
+                if (feedContainer.scrollTop < 20) {
+                    tryStepStage(1);
+                }
             } else if (event.deltaY < -WHEEL_DELTA_TRIGGER && feedContainer.scrollTop < 18) {
                 requestDock(false);
+                tryStepStage(-1);
             }
         }, { passive: true });
     }
+    if (sheetGrabber && resonanceSheet) {
+        sheetGrabber.addEventListener("pointerdown", (event) => {
+            startSheetDrag(event.clientY, event.pointerId);
+            sheetGrabber.setPointerCapture(event.pointerId);
+        });
+        sheetGrabber.addEventListener("pointermove", (event) => {
+            if (!isDraggingSheet || activePointerId !== event.pointerId) return;
+            moveSheetDrag(event.clientY);
+        });
+        sheetGrabber.addEventListener("pointerup", (event) => {
+            if (activePointerId === event.pointerId) {
+                sheetGrabber.releasePointerCapture(event.pointerId);
+                endSheetDrag();
+            }
+        });
+        sheetGrabber.addEventListener("pointercancel", endSheetDrag);
+        sheetGrabber.addEventListener("click", () => {
+            if (hasDraggedSheet) {
+                hasDraggedSheet = false;
+                return;
+            }
+            const nextStage = currentStage >= stageOffsets.length - 1 ? 0 : currentStage + 1;
+            snapToStage(nextStage, true);
+        });
+    }
+    window.addEventListener("resize", recalcSheetStages, { passive: true });
+    recalcSheetStages();
     if (searchZone) {
         searchZone.addEventListener("pointerdown", brightenImmediately);
     }
