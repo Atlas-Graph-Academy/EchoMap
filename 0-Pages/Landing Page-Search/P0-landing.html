@@ -500,21 +500,8 @@
             background: radial-gradient(100% 70% at 50% 100%, rgba(8, 10, 13, 0.42) 0%, rgba(8, 10, 13, 0.14) 48%, rgba(8, 10, 13, 0) 100%);
             filter: blur(0.24rem);
         }
-        .search-zone.is-recovering {
-            transition: opacity 1.7s ease, transform 1.7s cubic-bezier(0.22, 1, 0.36, 1), border-color 1.7s ease, box-shadow 1.7s ease;
-        }
         .search-zone.is-instant {
             transition-duration: 0.2s;
-        }
-        .search-zone.is-dim {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-            pointer-events: auto;
-        }
-        .search-zone.is-docked {
-            opacity: 1 !important;
-            transform: translateY(0) scale(1) !important;
-            pointer-events: auto;
         }
         .search-zone.is-collapsed {
             pointer-events: none;
@@ -707,9 +694,6 @@
                     rgba(8, 10, 13, 0) 100%
                 );
             filter: blur(0.18rem);
-        }
-        .resonance-sheet.search-docked .feed-container {
-            padding-bottom: 5.5rem;
         }
         .feed-container::-webkit-scrollbar { display: none; }
 
@@ -1365,11 +1349,8 @@
             promptInput.focus();
         });
     });
-    let recoverDelayTimer;
-    let recoverEndTimer;
     let lastFeedScrollTop = 0;
     let touchStartY = null;
-    let dockIntentTimer;
     let stageIntentLockUntil = 0;
     let activePointerId = null;
     let isDraggingSheet = false;
@@ -1380,14 +1361,17 @@
     let currentStage = 1;
     let stageOffsets = [];
     let maxSheetHeight = 0;
-    const DOCK_INTENT_DELAY_MS = 480;
-    const SCROLL_DELTA_TRIGGER = 6;
-    const TOUCH_DELTA_TRIGGER = 72;
-    const WHEEL_DELTA_TRIGGER = 18;
-    const STAGE_RATIOS = [0.1, 0.52, 0.9];
-    const STAGE_INTENT_COOLDOWN_MS = 260;
-    const SEARCH_COLLAPSE_THRESHOLD = 0.72;
-    const SNAP_TO_STAGE_DISTANCE = 18;
+    let searchInstantTimer = null;
+    const SHEET_CONFIG = {
+        stageRatios: [0.1, 0.52, 0.9],
+        minHeightRatio: 0.1,
+        stageIntentCooldownMs: 260,
+        snapDistancePx: 18,
+        searchCollapseThreshold: 0.72,
+        scrollDeltaTrigger: 6,
+        touchDeltaTrigger: 72,
+        wheelDeltaTrigger: 18
+    };
 
     function clamp(value, min, max) {
         return Math.min(Math.max(value, min), max);
@@ -1417,7 +1401,7 @@
         const collapseRange = Math.max(1, midOffset - fullOffset);
         const collapse = clamp((midOffset - currentSheetOffset) / collapseRange, 0, 1);
         searchZone.style.setProperty("--search-collapse", `${collapse}`);
-        const collapsed = collapse >= SEARCH_COLLAPSE_THRESHOLD;
+        const collapsed = collapse >= SHEET_CONFIG.searchCollapseThreshold;
         searchZone.classList.toggle("is-collapsed", collapsed);
         searchRecall.classList.toggle("is-visible", collapsed);
     }
@@ -1438,11 +1422,11 @@
         appRoot?.classList.toggle("stage-min-active", currentStage === 0);
         resonanceSheet?.classList.remove("stage-min", "stage-mid", "stage-full");
         resonanceSheet?.classList.add(currentStage === 0 ? "stage-min" : currentStage === 1 ? "stage-mid" : "stage-full");
+        if (resonanceSheet) {
+            resonanceSheet.dataset.stage = currentStage === 0 ? "min" : currentStage === 1 ? "mid" : "full";
+        }
         if (currentStage === 0) {
-            clearDockIntentTimer();
-            setSearchDocked(false, true);
-            clearRecoveryTimers();
-            searchZone?.classList.remove("is-recovering", "is-dim");
+            brightenImmediately();
         }
     }
     function snapToStage(stageIndex, animate = true) {
@@ -1455,7 +1439,7 @@
         if (now < stageIntentLockUntil) return false;
         const nextStage = clamp(currentStage + direction, 0, stageOffsets.length - 1);
         if (nextStage === currentStage) return false;
-        stageIntentLockUntil = now + STAGE_INTENT_COOLDOWN_MS;
+        stageIntentLockUntil = now + SHEET_CONFIG.stageIntentCooldownMs;
         snapToStage(nextStage, true);
         return true;
     }
@@ -1466,14 +1450,14 @@
         const prevMinOffset = hadStages ? stageOffsets[stageOffsets.length - 1] : 0;
         const prevOffset = currentSheetOffset;
         const isFreeOffset = hadStages
-            && Math.abs((stageOffsets[currentStage] ?? prevOffset) - prevOffset) > SNAP_TO_STAGE_DISTANCE;
+            && Math.abs((stageOffsets[currentStage] ?? prevOffset) - prevOffset) > SHEET_CONFIG.snapDistancePx;
         const appHeight = appRoot.clientHeight;
         const sheetBottom = parseFloat(getComputedStyle(resonanceSheet).bottom) || 0;
-        const minStageHeight = Math.round(appHeight * 0.1);
+        const minStageHeight = Math.round(appHeight * SHEET_CONFIG.minHeightRatio);
         const maxStageHeight = Math.max(minStageHeight, Math.round(appHeight - sheetBottom - 4));
-        const minHeight = clamp(Math.round((appHeight * STAGE_RATIOS[0]) - sheetBottom), minStageHeight, maxStageHeight);
-        const midHeight = clamp(Math.round((appHeight * STAGE_RATIOS[1]) - sheetBottom), minStageHeight, maxStageHeight);
-        const fullHeight = clamp(Math.round((appHeight * STAGE_RATIOS[2]) - sheetBottom), minStageHeight, maxStageHeight);
+        const minHeight = clamp(Math.round((appHeight * SHEET_CONFIG.stageRatios[0]) - sheetBottom), minStageHeight, maxStageHeight);
+        const midHeight = clamp(Math.round((appHeight * SHEET_CONFIG.stageRatios[1]) - sheetBottom), minStageHeight, maxStageHeight);
+        const fullHeight = clamp(Math.round((appHeight * SHEET_CONFIG.stageRatios[2]) - sheetBottom), minStageHeight, maxStageHeight);
         maxSheetHeight = fullHeight;
         const stageHeights = [minHeight, midHeight, fullHeight];
         stageOffsets = stageHeights.map((height) => maxSheetHeight - height);
@@ -1515,7 +1499,7 @@
         resonanceSheet?.classList.remove("is-dragging");
         const nearestStage = getNearestStage(currentSheetOffset);
         const nearestDistance = Math.abs(stageOffsets[nearestStage] - currentSheetOffset);
-        if (nearestDistance <= SNAP_TO_STAGE_DISTANCE) {
+        if (nearestDistance <= SHEET_CONFIG.snapDistancePx) {
             snapToStage(nearestStage, true);
             return;
         }
@@ -1523,66 +1507,33 @@
         setSheetOffset(currentSheetOffset, false);
     }
 
-    function clearRecoveryTimers() {
-        clearTimeout(recoverDelayTimer);
-        clearTimeout(recoverEndTimer);
-    }
-    function clearDockIntentTimer() {
-        clearTimeout(dockIntentTimer);
-    }
-
-    function dimSearchZone() {
+    function syncSearchZoneState() {
         if (!searchZone) return;
-        clearRecoveryTimers();
-        searchZone.classList.remove("is-recovering", "is-dim", "is-docked");
-        resonanceSheet?.classList.remove("search-docked");
+        searchZone.classList.remove("is-instant");
         updateSearchPresence();
     }
-
     function brightenImmediately() {
         if (!searchZone) return;
-        clearDockIntentTimer();
-        clearRecoveryTimers();
+        clearTimeout(searchInstantTimer);
         searchZone.classList.add("is-instant");
-        searchZone.classList.remove("is-recovering", "is-dim", "is-docked");
-        resonanceSheet?.classList.remove("search-docked");
-        setTimeout(() => {
+        searchInstantTimer = setTimeout(() => {
             searchZone.classList.remove("is-instant");
         }, 120);
-    }
-
-    function setSearchDocked(docked, instant = false) {
-        if (!searchZone) return;
-        if (instant) searchZone.classList.add("is-instant");
-        searchZone.classList.remove("is-docked", "is-dim", "is-recovering");
-        resonanceSheet?.classList.remove("search-docked");
-        updateSearchPresence();
-        if (instant) {
-            setTimeout(() => {
-                searchZone.classList.remove("is-instant");
-            }, 120);
-        }
-    }
-    function requestDock(docked) {
-        clearDockIntentTimer();
-        setSearchDocked(false);
     }
 
     if (feedContainer && searchZone) {
         feedContainer.addEventListener("scroll", () => {
             const currentTop = feedContainer.scrollTop;
             const scrollDelta = currentTop - lastFeedScrollTop;
-            if (scrollDelta > SCROLL_DELTA_TRIGGER) {
-                requestDock(true);
+            if (scrollDelta > SHEET_CONFIG.scrollDeltaTrigger) {
                 if (currentTop < 20) {
                     tryStepStage(1);
                 }
-            } else if (scrollDelta < -SCROLL_DELTA_TRIGGER && currentTop < 18) {
-                requestDock(false);
+            } else if (scrollDelta < -SHEET_CONFIG.scrollDeltaTrigger && currentTop < 18) {
                 tryStepStage(-1);
             }
             lastFeedScrollTop = currentTop;
-            dimSearchZone();
+            syncSearchZoneState();
         }, { passive: true });
         feedContainer.addEventListener("touchstart", (event) => {
             touchStartY = event.touches[0]?.clientY ?? null;
@@ -1591,13 +1542,11 @@
             if (touchStartY === null) return;
             const currentY = event.touches[0]?.clientY ?? touchStartY;
             const deltaY = touchStartY - currentY;
-            if (deltaY > TOUCH_DELTA_TRIGGER) {
-                requestDock(true);
+            if (deltaY > SHEET_CONFIG.touchDeltaTrigger) {
                 if (feedContainer.scrollTop < 20) {
                     tryStepStage(1);
                 }
-            } else if (deltaY < -TOUCH_DELTA_TRIGGER && feedContainer.scrollTop < 18) {
-                requestDock(false);
+            } else if (deltaY < -SHEET_CONFIG.touchDeltaTrigger && feedContainer.scrollTop < 18) {
                 tryStepStage(-1);
             }
         }, { passive: true });
@@ -1605,13 +1554,11 @@
             touchStartY = null;
         }, { passive: true });
         feedContainer.addEventListener("wheel", (event) => {
-            if (event.deltaY > WHEEL_DELTA_TRIGGER) {
-                requestDock(true);
+            if (event.deltaY > SHEET_CONFIG.wheelDeltaTrigger) {
                 if (feedContainer.scrollTop < 20) {
                     tryStepStage(1);
                 }
-            } else if (event.deltaY < -WHEEL_DELTA_TRIGGER && feedContainer.scrollTop < 18) {
-                requestDock(false);
+            } else if (event.deltaY < -SHEET_CONFIG.wheelDeltaTrigger && feedContainer.scrollTop < 18) {
                 tryStepStage(-1);
             }
         }, { passive: true });
@@ -1649,7 +1596,7 @@
     if (searchRecall) {
         searchRecall.addEventListener("click", () => {
             snapToStage(1, true);
-            setSearchDocked(false, true);
+            brightenImmediately();
             promptInput?.focus();
         });
     }
