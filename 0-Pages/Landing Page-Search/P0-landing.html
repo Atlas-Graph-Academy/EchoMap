@@ -215,18 +215,28 @@
             z-index: 1;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 0.375rem 0.75rem;
+            gap: 0.42rem;
+            padding: 0.32rem 0.62rem;
             border-radius: 999rem;
-            border: 0.0625rem solid rgba(255, 255, 255, 0.08);
-            background: rgba(18, 18, 22, 0.55);
-            backdrop-filter: blur(0.875rem);
-            color: rgba(255, 255, 255, 0.88);
-            transition: transform 0.2s ease, background 0.2s ease;
+            border: 0.0625rem solid rgba(255, 255, 255, 0.16);
+            background: linear-gradient(
+                180deg,
+                rgba(22, 24, 31, 0.92) 0%,
+                rgba(12, 14, 19, 0.88) 100%
+            );
+            box-shadow:
+                0 0.25rem 0.75rem rgba(0, 0, 0, 0.28),
+                inset 0 0.0625rem 0 rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(1rem);
+            color: rgba(255, 255, 255, 0.9);
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
         }
         .living-header:active .status-bar {
             transform: scale(0.98);
-            background: rgba(18, 18, 22, 0.7);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow:
+                0 0.25rem 0.875rem rgba(0, 0, 0, 0.3),
+                inset 0 0.0625rem 0 rgba(255, 255, 255, 0.14);
         }
         .status-dot {
             position: relative;
@@ -260,22 +270,23 @@
         .status-text {
             display: flex;
             flex-direction: column;
-            gap: 0.125rem;
+            gap: 0;
+            min-width: 0;
         }
         .status-primary {
-            font-size: 0.6875rem;
-            letter-spacing: 0.04em;
-            color: rgba(255, 255, 255, 0.75);
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            color: rgba(255, 255, 255, 0.92);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .status-secondary {
-            font-size: 0.6875rem;
-            color: rgba(255, 255, 255, 0.5);
+            display: none;
         }
         .status-action {
-            font-size: 0.625rem;
-            color: rgba(255, 255, 255, 0.55);
-            letter-spacing: 0.04em;
-            margin-left: 0.375rem;
+            display: none;
         }
 
         /* Background Visuals (The Galaxy) */
@@ -1077,8 +1088,8 @@
             <div class="status-bar" aria-live="polite">
                 <span class="status-dot" aria-hidden="true"></span>
                 <span class="status-text">
-                    <span class="status-primary">Location off · Tuesday morning</span>
-                    <span class="status-secondary">Turn on location to see events map</span>
+                    <span class="status-primary">Location Off</span>
+                    <span class="status-secondary">Turn on location to see nearby Echo Gatherings</span>
                 </span>
                 <span class="status-action">Tap to enable</span>
             </div>
@@ -1615,24 +1626,16 @@
     let locationEnabled = false;
     bodyEl.classList.add("location-off");
 
-    function getTimeDescriptor() {
-        const now = new Date();
-        const hours = now.getHours();
-        const dayName = now.toLocaleDateString("en-US", { weekday: "long" });
-        const period = hours < 12 ? "morning" : hours < 18 ? "afternoon" : "evening";
-        return `${dayName} ${period}`;
-    }
-
     function renderLocationState() {
         bodyEl.classList.toggle("location-on", locationEnabled);
         bodyEl.classList.toggle("location-off", !locationEnabled);
         if (locationEnabled) {
-            statusPrimary.textContent = `Marina · San Francisco · ${getTimeDescriptor()}`;
+            statusPrimary.textContent = "Location On";
             statusSecondary.textContent = "12 online · 48 new memories";
             statusAction.textContent = "Tap to turn off";
             statusHeader.setAttribute("aria-pressed", "true");
         } else {
-            statusPrimary.textContent = `Location off · ${getTimeDescriptor()}`;
+            statusPrimary.textContent = "Location Off";
             statusSecondary.textContent = "Turn on location to see nearby Echo Gatherings";
             statusAction.textContent = "Tap to enable";
             statusHeader.setAttribute("aria-pressed", "false");
