@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Now – Tag Variants</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+            background: #000000;
+            min-height: 100vh;
+            padding: 60px 40px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .section {
+            margin-bottom: 48px;
+        }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.35);
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .tags-col {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 14px;
+        }
+
+        /* ========================================
+           BASE TAG
+           ======================================== */
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 20px;
+            border-radius: 28px;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        /* Press-in feel — borrowed from luminous-bubble :active */
+        .tag:active {
+            transform: scale(0.98);
+        }
+
+        .tag .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .tag .tag-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .tag .tag-username {
+            font-size: 11px;
+            font-weight: 400;
+            opacity: 0.45;
+            letter-spacing: 0.2px;
+        }
+
+        /* Lock icon (SVG mask, same approach as White-tags) */
+        .lock-icon {
+            width: 14px;
+            height: 14px;
+            background: currentColor;
+            opacity: 0.6;
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='2' ry='2'%3E%3C/rect%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'%3E%3C/path%3E%3C/svg%3E");
+            -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='2' ry='2'%3E%3C/rect%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'%3E%3C/path%3E%3C/svg%3E");
+            mask-repeat: no-repeat;
+            -webkit-mask-repeat: no-repeat;
+            mask-position: center;
+            -webkit-mask-position: center;
+            mask-size: contain;
+            -webkit-mask-size: contain;
+            flex-shrink: 0;
+        }
+
+        /* ========================================
+           MY PUBLIC MEMORY
+           Quiet white/gray — no avatar, no lock
+           ======================================== */
+
+        .tag-my-public {
+            background: rgba(255, 255, 255, 0.09);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            color: rgba(255, 255, 255, 0.9);
+            box-shadow:
+                /* Top rim light — sharp highlight */
+                inset 0px 3px 5px -1px rgba(200, 210, 240, 0.35),
+                /* Top soft glow — scattered light */
+                inset 0px 10px 18px -4px rgba(180, 190, 230, 0.18),
+                /* Bottom bounce — cool reflected light */
+                inset 0px -10px 20px -6px rgba(120, 130, 180, 0.15),
+                /* Outer glow — ambient presence */
+                0 0 28px rgba(255, 255, 255, 0.12),
+                0 0 70px rgba(255, 255, 255, 0.06),
+                /* Drop shadow — lift from surface */
+                0px 14px 30px -8px rgba(0, 0, 0, 0.5);
+            text-shadow: 0 0 18px rgba(255, 255, 255, 0.3);
+            animation: public-breathe 3.8s ease-in-out infinite;
+            overflow: hidden;
+        }
+
+        .tag-my-public:hover {
+            background: rgba(255, 255, 255, 0.14);
+            box-shadow:
+                inset 0px 3px 6px -1px rgba(200, 210, 240, 0.45),
+                inset 0px 12px 22px -4px rgba(180, 190, 230, 0.25),
+                inset 0px -12px 24px -6px rgba(120, 130, 180, 0.2),
+                0 0 40px rgba(255, 255, 255, 0.18),
+                0 0 80px rgba(255, 255, 255, 0.08),
+                0px 18px 36px -8px rgba(0, 0, 0, 0.55);
+            transform: translateY(-1px);
+        }
+
+        .tag-my-public:active {
+            box-shadow:
+                inset 0px 2px 4px -1px rgba(200, 210, 240, 0.28),
+                inset 0px 7px 14px -4px rgba(180, 190, 230, 0.12),
+                inset 0px -7px 14px -6px rgba(120, 130, 180, 0.1),
+                0px 8px 16px -4px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Public shimmer + breath */
+        .tag-my-public::before {
+            content: '';
+            position: absolute;
+            inset: -40% -30%;
+            background: radial-gradient(
+                circle at 30% 30%,
+                rgba(255, 255, 255, 0.35),
+                rgba(255, 255, 255, 0.05) 45%,
+                rgba(255, 255, 255, 0) 70%
+            );
+            opacity: 0.55;
+            transform: translateX(-30%);
+            animation: public-flow 6.5s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes public-breathe {
+            0%, 100% {
+                box-shadow:
+                    inset 0px 3px 5px -1px rgba(200, 210, 240, 0.35),
+                    inset 0px 10px 18px -4px rgba(180, 190, 230, 0.18),
+                    inset 0px -10px 20px -6px rgba(120, 130, 180, 0.15),
+                    0 0 24px rgba(255, 255, 255, 0.1),
+                    0 0 60px rgba(255, 255, 255, 0.05),
+                    0px 14px 30px -8px rgba(0, 0, 0, 0.5);
+            }
+            50% {
+                box-shadow:
+                    inset 0px 4px 6px -1px rgba(210, 220, 245, 0.5),
+                    inset 0px 14px 24px -4px rgba(190, 200, 240, 0.32),
+                    inset 0px -14px 24px -6px rgba(140, 150, 200, 0.22),
+                    0 0 38px rgba(255, 255, 255, 0.2),
+                    0 0 90px rgba(255, 255, 255, 0.1),
+                    0px 18px 36px -8px rgba(0, 0, 0, 0.55);
+            }
+        }
+
+        @keyframes public-flow {
+            0% { transform: translateX(-35%) translateY(0%); opacity: 0.4; }
+            50% { transform: translateX(10%) translateY(-4%); opacity: 0.75; }
+            100% { transform: translateX(35%) translateY(0%); opacity: 0.45; }
+        }
+
+        /* ========================================
+           MY PUBLIC MEMORY — LIGHT PULSE
+           Light flicker / glow pulse
+           ======================================== */
+
+        .tag-my-public-pulse {
+            background: rgba(255, 255, 255, 0.085);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            color: rgba(255, 255, 255, 0.92);
+            box-shadow:
+                inset 0px 2px 4px -1px rgba(210, 220, 245, 0.35),
+                inset 0px 8px 14px -6px rgba(190, 200, 240, 0.18),
+                inset 0px -8px 16px -8px rgba(140, 150, 200, 0.14),
+                0 0 18px rgba(255, 255, 255, 0.1),
+                0px 12px 26px -8px rgba(0, 0, 0, 0.52);
+            text-shadow: 0 0 14px rgba(255, 255, 255, 0.26);
+            animation: public-light-pulse 3s ease-in-out infinite;
+            overflow: hidden;
+        }
+
+        .tag-my-public-pulse:hover {
+            background: rgba(255, 255, 255, 0.13);
+            box-shadow:
+                inset 0px 3px 5px -1px rgba(220, 230, 250, 0.45),
+                inset 0px 10px 20px -6px rgba(200, 210, 250, 0.26),
+                inset 0px -10px 20px -8px rgba(150, 160, 210, 0.2),
+                0 0 28px rgba(255, 255, 255, 0.18),
+                0px 16px 32px -10px rgba(0, 0, 0, 0.55);
+            transform: translateY(-1px);
+        }
+
+        @keyframes public-light-pulse {
+            0%, 100% {
+                opacity: 0.95;
+                box-shadow:
+                    inset 0px 3px 5px -1px rgba(220, 232, 255, 0.3),
+                    inset 0px 10px 18px -6px rgba(200, 210, 250, 0.16),
+                    inset 0px -10px 18px -8px rgba(150, 160, 210, 0.12),
+                    0 0 18px rgba(255, 255, 255, 0.1),
+                    0px 14px 28px -10px rgba(0, 0, 0, 0.48);
+            }
+            45% {
+                opacity: 0.98;
+                box-shadow:
+                    inset 0px 4px 6px -1px rgba(230, 242, 255, 0.38),
+                    inset 0px 12px 20px -6px rgba(210, 222, 255, 0.22),
+                    inset 0px -12px 20px -8px rgba(165, 175, 225, 0.16),
+                    0 0 26px rgba(255, 255, 255, 0.14),
+                    0px 18px 34px -10px rgba(0, 0, 0, 0.52);
+            }
+        }
+
+        .tag-my-public-pulse::before {
+            content: '';
+            position: absolute;
+            inset: -35% 0;
+            background: linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0.22),
+                rgba(255, 255, 255, 0.1) 38%,
+                rgba(255, 255, 255, 0) 70%
+            );
+            opacity: 0;
+            transform: translateY(0);
+            animation: none;
+            pointer-events: none;
+        }
+
+        @keyframes public-light-sweep {
+            0% { transform: translateY(-40%); opacity: 0.4; }
+            60% { transform: translateY(12%); opacity: 0.46; }
+            100% { transform: translateY(40%); opacity: 0.4; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .tag-my-public-pulse {
+                animation: none;
+            }
+
+            .tag-my-public-pulse::before {
+                animation: none;
+                opacity: 0.28;
+                transform: translateY(-20%);
+            }
+        }
+
+        /* ========================================
+           MY PRIVATE MEMORY
+           Quiet white/gray — lock, no avatar
+           ======================================== */
+
+        .tag-my-private {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px dashed rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.7);
+            box-shadow:
+                /* Top rim — dimmer for private */
+                inset 0px 2px 4px -1px rgba(180, 190, 220, 0.25),
+                /* Soft inner glow */
+                inset 0px 8px 14px -4px rgba(150, 160, 210, 0.12),
+                /* Bottom bounce */
+                inset 0px -8px 16px -6px rgba(80, 80, 130, 0.12),
+                /* Ambient */
+                0 0 14px rgba(255, 255, 255, 0.03),
+                0 0 35px rgba(255, 255, 255, 0.015),
+                /* Drop shadow */
+                0px 10px 24px -6px rgba(0, 0, 0, 0.45);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+
+        .tag-my-private:hover {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow:
+                inset 0px 3px 5px -1px rgba(180, 190, 220, 0.35),
+                inset 0px 10px 18px -4px rgba(150, 160, 210, 0.18),
+                inset 0px -10px 20px -6px rgba(80, 80, 130, 0.16),
+                0 0 22px rgba(255, 255, 255, 0.06),
+                0 0 45px rgba(255, 255, 255, 0.025),
+                0px 14px 28px -6px rgba(0, 0, 0, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .tag-my-private:active {
+            box-shadow:
+                inset 0px 1px 3px -1px rgba(180, 190, 220, 0.18),
+                inset 0px 6px 10px -4px rgba(150, 160, 210, 0.08),
+                inset 0px -6px 10px -6px rgba(80, 80, 130, 0.08),
+                0px 6px 12px -4px rgba(0, 0, 0, 0.55);
+        }
+
+        .tag-my-private .lock-icon {
+            opacity: 0.5;
+        }
+
+        /* ========================================
+           MY PRIVATE MEMORY — LONG TIME AGO
+           Faded, ghostly, barely there
+           ======================================== */
+
+        .tag-my-old {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px dashed rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.35);
+            box-shadow:
+                /* Ghost-level luminous — barely there, like fading light */
+                inset 0px 1px 3px -1px rgba(160, 170, 200, 0.12),
+                inset 0px 5px 10px -4px rgba(140, 150, 190, 0.06),
+                inset 0px -5px 10px -6px rgba(60, 60, 100, 0.06),
+                0 0 8px rgba(255, 255, 255, 0.01),
+                0px 6px 16px -6px rgba(0, 0, 0, 0.3);
+            text-shadow: 0 0 6px rgba(255, 255, 255, 0.05);
+        }
+
+        .tag-my-old:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            box-shadow:
+                inset 0px 2px 4px -1px rgba(160, 170, 200, 0.2),
+                inset 0px 7px 14px -4px rgba(140, 150, 190, 0.1),
+                inset 0px -7px 14px -6px rgba(60, 60, 100, 0.1),
+                0 0 16px rgba(255, 255, 255, 0.03),
+                0px 10px 20px -6px rgba(0, 0, 0, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .tag-my-old:active {
+            box-shadow:
+                inset 0px 1px 2px -1px rgba(160, 170, 200, 0.08),
+                inset 0px 4px 8px -4px rgba(140, 150, 190, 0.04),
+                inset 0px -4px 8px -6px rgba(60, 60, 100, 0.04),
+                0px 4px 8px -4px rgba(0, 0, 0, 0.35);
+        }
+
+        .tag-my-old .lock-icon {
+            opacity: 0.3;
+        }
+
+        /* ========================================
+           OTHERS' MEMORY — Dynamic Color via JS
+           Colors driven by CSS custom properties
+           ======================================== */
+
+        .tag-other {
+            gap: 8px;
+            padding: 0 12px 0 0;
+            border-radius: 999px;
+            font-size: 15px;
+            line-height: 1.25;
+            vertical-align: baseline;
+            font-weight: 560;
+            letter-spacing: 0.12px;
+            background: rgba(var(--r), var(--g), var(--b), 0.08);
+            border: 1px solid rgba(var(--r), var(--g), var(--b), 0.22);
+            color: rgba(var(--r), var(--g), var(--b), 0.96);
+            box-shadow: 0 0 14px rgba(var(--r), var(--g), var(--b), 0.16);
+            text-shadow: 0 0 10px rgba(var(--r), var(--g), var(--b), 0.28);
+            overflow: hidden;
+        }
+
+        .tag-other::before {
+            content: none;
+        }
+
+        .tag-other .avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            margin-left: -1px;
+            border: 1px solid rgba(var(--r), var(--g), var(--b), 0.35);
+            box-shadow: 0 0 10px rgba(var(--r), var(--g), var(--b), 0.22);
+        }
+
+        .tag-other:hover {
+            background: rgba(var(--r), var(--g), var(--b), 0.12);
+            border-color: rgba(var(--r), var(--g), var(--b), 0.3);
+            box-shadow: 0 0 18px rgba(var(--r), var(--g), var(--b), 0.2);
+            transform: none;
+        }
+
+        .tag-other:active {
+            box-shadow: 0 0 10px rgba(var(--r), var(--g), var(--b), 0.14);
+        }
+
+        /* ========================================
+           OTHERS' MEMORY — BRIGHT (Dynamic)
+           ======================================== */
+
+        .tag-other-bright {
+            gap: 8px;
+            padding: 0 12px 0 0;
+            border-radius: 999px;
+            font-size: 15px;
+            line-height: 1.25;
+            vertical-align: baseline;
+            font-weight: 570;
+            letter-spacing: 0.14px;
+            background: rgba(var(--r), var(--g), var(--b), 0.12);
+            border: 1px solid rgba(var(--r), var(--g), var(--b), 0.34);
+            color: rgb(var(--r), var(--g), var(--b));
+            box-shadow: 0 0 18px rgba(var(--r), var(--g), var(--b), 0.26);
+            text-shadow: 0 0 14px rgba(var(--r), var(--g), var(--b), 0.5);
+            overflow: hidden;
+        }
+
+        .tag-other-bright::before {
+            content: none;
+        }
+
+        .tag-other-bright .avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            margin-left: -1px;
+            border: 1px solid rgba(var(--r), var(--g), var(--b), 0.45);
+            box-shadow: 0 0 12px rgba(var(--r), var(--g), var(--b), 0.32);
+        }
+
+        .tag-other-bright:hover {
+            background: rgba(var(--r), var(--g), var(--b), 0.16);
+            box-shadow: 0 0 22px rgba(var(--r), var(--g), var(--b), 0.32);
+            transform: none;
+        }
+
+        .tag-other-bright:active {
+            box-shadow: 0 0 12px rgba(var(--r), var(--g), var(--b), 0.22);
+        }
+
+        /* ========================================
+           COLOR PALETTE STRIP
+           ======================================== */
+
+        .palette-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+
+        .palette-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.35);
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .palette-swatches {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .swatch {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            cursor: default;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .swatch:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
+        }
+
+        .shuffle-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+        }
+
+        .shuffle-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.75);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ========================================
+           DIVIDER & DEMO CHROME
+           ======================================== */
+
+        .divider {
+            height: 1px;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.08) 50%,
+                transparent 100%
+            );
+            margin: 48px 0;
+        }
+
+        .demo-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 12px;
+        }
+
+        .demo-subtitle {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="demo-title">Memory Now</h1>
+        <p class="demo-subtitle">Quiet glow tag variants</p>
+
+        <!-- MY PUBLIC MEMORY — LIGHT PULSE -->
+        <div class="section">
+            <div class="section-label">My Public Memory · Light Pulse</div>
+            <div class="tags-col">
+                <span class="tag tag-my-public-pulse">Open Field</span>
+                <span class="tag tag-my-public-pulse">City Rains</span>
+            </div>
+        </div>
+
+        <!-- MY PRIVATE MEMORY -->
+        <div class="section">
+            <div class="section-label">My Private Memory</div>
+            <div class="tags-col">
+                <span class="tag tag-my-private">
+                    <span class="lock-icon"></span>
+                    Letter I Never Sent
+                </span>
+                <span class="tag tag-my-private">
+                    <span class="lock-icon"></span>
+                    That Conversation
+                </span>
+            </div>
+        </div>
+
+        <!-- MY PRIVATE MEMORY — LONG TIME AGO -->
+        <div class="section">
+            <div class="section-label">My Private Memory · Long Time Ago</div>
+            <div class="tags-col">
+                <span class="tag tag-my-old">
+                    <span class="lock-icon"></span>
+                    Childhood Room
+                </span>
+                <span class="tag tag-my-old">
+                    <span class="lock-icon"></span>
+                    First Promise
+                </span>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- COLOR PALETTE -->
+        <div class="palette-bar">
+            <span class="palette-label">Palette</span>
+            <div class="palette-swatches" id="paletteSwatches"></div>
+            <button class="shuffle-btn" id="shuffleBtn">Shuffle</button>
+        </div>
+
+        <!-- OTHERS' MEMORY (Muted) -->
+        <div class="section">
+            <div class="section-label">Others' Memory</div>
+            <div class="tags-col" id="othersMuted">
+                <span class="tag tag-other">
+                    <img src="https://i.pravatar.cc/100?img=12" alt="" class="avatar">
+                    Freedom
+                </span>
+                <span class="tag tag-other">
+                    <img src="https://i.pravatar.cc/100?img=8" alt="" class="avatar">
+                    Higher-level thinking
+                </span>
+                <span class="tag tag-other">
+                    <img src="https://i.pravatar.cc/100?img=15" alt="" class="avatar">
+                    Philosophy
+                </span>
+                <span class="tag tag-other">
+                    <img src="https://i.pravatar.cc/100?img=9" alt="" class="avatar">
+                    Nostalgia
+                </span>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- OTHERS' MEMORY — BRIGHT -->
+        <div class="section">
+            <div class="section-label">Others' Memory · Bright</div>
+            <div class="tags-col" id="othersBright">
+                <span class="tag tag-other-bright">
+                    <img src="https://i.pravatar.cc/100?img=12" alt="" class="avatar">
+                    Freedom
+                </span>
+                <span class="tag tag-other-bright">
+                    <img src="https://i.pravatar.cc/100?img=8" alt="" class="avatar">
+                    Higher-level thinking
+                </span>
+                <span class="tag tag-other-bright">
+                    <img src="https://i.pravatar.cc/100?img=15" alt="" class="avatar">
+                    Philosophy
+                </span>
+                <span class="tag tag-other-bright">
+                    <img src="https://i.pravatar.cc/100?img=9" alt="" class="avatar">
+                    Nostalgia
+                </span>
+            </div>
+        </div>
+
+        <!-- MY PUBLIC MEMORY (Backup) -->
+        <div class="section">
+            <div class="section-label">My Public Memory</div>
+            <div class="tags-col">
+                <span class="tag tag-my-public">Tokyo Sunrise</span>
+                <span class="tag tag-my-public">The Bridge at Dawn</span>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ==========================================
+        // COLOR PALETTE — inspired by Flowwow botanical
+        // Lush greens, warm oranges, sky blues,
+        // golden amber, soft corals, earthy olive
+        // ==========================================
+
+        const PALETTE = [
+            { name: 'Forest',      r: 75,  g: 158, b: 107 },  // deep green
+            { name: 'Leaf',        r: 122, g: 174, b: 94  },  // bright leaf
+            { name: 'Olive',       r: 142, g: 162, b: 88  },  // earthy olive
+            { name: 'Amber',       r: 224, g: 170, b: 62  },  // warm gold
+            { name: 'Marigold',    r: 240, g: 148, b: 54  },  // deep orange
+            { name: 'Coral',       r: 228, g: 120, b: 90  },  // warm coral
+            { name: 'Terracotta',  r: 200, g: 107, b: 74  },  // earthy red
+            { name: 'Salmon',      r: 232, g: 145, b: 122 },  // soft pink
+            { name: 'Sky',         r: 108, g: 176, b: 210 },  // calm blue
+            { name: 'Cornflower',  r: 100, g: 140, b: 200 },  // deeper blue
+            { name: 'Lavender',    r: 155, g: 135, b: 195 },  // soft violet
+            { name: 'Buttercup',   r: 240, g: 200, b: 80  },  // bright yellow
+        ];
+
+        // Render palette swatches
+        function renderSwatches() {
+            const container = document.getElementById('paletteSwatches');
+            container.innerHTML = '';
+            PALETTE.forEach(c => {
+                const el = document.createElement('div');
+                el.className = 'swatch';
+                el.style.background = `rgb(${c.r}, ${c.g}, ${c.b})`;
+                el.title = c.name;
+                container.appendChild(el);
+            });
+        }
+
+        // Fisher-Yates shuffle (non-mutating)
+        function shuffled(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        // Assign random palette colors to all .tag-other and .tag-other-bright
+        function assignColors() {
+            const mutedTags = document.querySelectorAll('#othersMuted .tag-other');
+            const brightTags = document.querySelectorAll('#othersBright .tag-other-bright');
+            const pool = shuffled(PALETTE);
+
+            mutedTags.forEach((tag, i) => {
+                const c = pool[i % pool.length];
+                tag.style.setProperty('--r', c.r);
+                tag.style.setProperty('--g', c.g);
+                tag.style.setProperty('--b', c.b);
+            });
+
+            // Bright gets a different shuffle so they don't match 1:1
+            const pool2 = shuffled(PALETTE);
+            brightTags.forEach((tag, i) => {
+                const c = pool2[i % pool2.length];
+                tag.style.setProperty('--r', c.r);
+                tag.style.setProperty('--g', c.g);
+                tag.style.setProperty('--b', c.b);
+            });
+        }
+
+        // Init
+        renderSwatches();
+        assignColors();
+
+        document.getElementById('shuffleBtn').addEventListener('click', assignColors);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory-of-Others</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&family=Special+Elite&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-void: #000000;
+            --text-primary: #FFFFFF;
+            --text-secondary: #9CA3AF;
+            --accent-orange: #F97316;
+            --accent-blue: #06B6D4;
+            --dock-height: 250px;
+            
+            --glass-panel: rgba(20, 20, 20, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --surface-hover: rgba(255, 255, 255, 0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+
+        body {
+            background-color: #111;
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* --- THE MONOLITH (Device Frame) --- */
+        .device-frame {
+            width: 430px;
+            height: 932px;
+            background: var(--bg-void);
+            border-radius: 54px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 0 14px #080808, 0 0 100px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-hero {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.16;
+            filter: contrast(1.05) saturate(0.9);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .manga-detail-btn {
+            position: absolute;
+            top: clamp(180px, 24vh, 260px);
+            right: 24px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(14, 14, 14, 0.7);
+            color: #E5E7EB;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+            cursor: pointer;
+            z-index: 15;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+
+        .manga-detail-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .manga-detail-btn:hover {
+            background: rgba(20, 20, 20, 0.85);
+            border-color: rgba(255, 255, 255, 0.28);
+        }
+
+        .content-core.is-scrolled ~ .manga-detail-btn {
+            opacity: 0;
+            transform: translateY(-6px);
+            pointer-events: none;
+        }
+
+        /* --- 2. HEADER UI --- */
+        .header-ui {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            padding: calc(env(safe-area-inset-top) + 48px) 24px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 20;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .edit-memory-top {
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(12, 12, 12, 0.35);
+            color: rgba(229, 231, 235, 0.7);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .memory-tags {
+            position: absolute;
+            top: calc(env(safe-area-inset-top) + 28px);
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            z-index: 25;
+        }
+
+        .memory-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: rgba(20,20,20,0.75);
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 999px;
+            color: rgba(245,246,247,0.9);
+            font-family: 'Special Elite', 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 400;
+            letter-spacing: 0.6px;
+            backdrop-filter: blur(10px);
+            white-space: nowrap;
+        }
+
+        .memory-label {
+            font-family: 'Caveat', 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(245,246,247,0.8);
+            text-shadow:
+                0 0 6px rgba(255,255,255,0.18),
+                0 0 14px rgba(255,255,255,0.12);
+            filter: blur(0.2px);
+        }
+
+        .memory-chip.time {
+            background: rgba(20,20,20,0.65);
+            border-style: dashed;
+            letter-spacing: 1px;
+        }
+
+        .memory-chip.source b { color: #FFFFFF; font-weight: 700; }
+
+        .memory-chip.user img {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .btn-icon {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: rgba(30,30,30,0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            color: white;
+            cursor: pointer;
+        }
+
+        .source-pill {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 16px;
+            background: rgba(20,20,20,0.8);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 100px;
+            backdrop-filter: blur(12px);
+        }
+        
+        .source-icon {
+            width: 10px; height: 14px; background: white; border-radius: 2px;
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+        
+        .source-text { font-size: 11px; color: #ccc; }
+        .source-text b { color: white; font-weight: 600; }
+
+        /* --- 3. CONTENT CORE --- */
+        .content-core {
+            position: absolute;
+            top: clamp(160px, 28vh, 360px);
+            bottom: 0;
+            left: 0; right: 0;
+            padding: 0 24px calc(var(--dock-height) + 28px);
+            z-index: 10;
+            transform: translateY(0);
+            transition: transform 0.4s ease, top 0.35s ease;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-core.is-scrolled {
+            top: clamp(140px, 20vh, 320px);
+        }
+
+        .content-core::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: -120px;
+            bottom: -260px;
+            background: linear-gradient(
+                to bottom,
+                rgba(0,0,0,0.15) 0%,
+                rgba(0,0,0,0.45) 35%,
+                rgba(0,0,0,0.7) 65%,
+                rgba(0,0,0,0.98) 100%
+            );
+            filter: blur(12px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .content-core::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -40px;
+            height: 120px;
+            background: linear-gradient(
+                to bottom,
+                rgba(0,0,0,0) 0%,
+                rgba(0,0,0,0.65) 60%,
+                rgba(0,0,0,0.95) 100%
+            );
+            filter: blur(10px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .content-core > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .memory-title-block {
+            position: relative;
+            padding: 4px 0 8px;
+        }
+
+        .memory-title-block::after {
+            content: "";
+            position: absolute;
+            left: -24px;
+            right: -24px;
+            bottom: -8px;
+            height: 28px;
+            background: linear-gradient(
+                to bottom,
+                rgba(0,0,0,0.2) 0%,
+                rgba(0,0,0,0.45) 45%,
+                rgba(0,0,0,0.7) 100%
+            );
+            filter: blur(6px);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .content-scroll {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding-bottom: 40px;
+            padding-top: 6px;
+        }
+
+        .content-scroll::-webkit-scrollbar {
+            width: 0;
+        }
+
+        .content-scroll::-webkit-scrollbar-thumb {
+            background: transparent;
+        }
+
+        /* The User Chip (Floating above text) */
+        .user-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #000;
+            border: 1px solid #333;
+            padding: 6px 16px 6px 6px;
+            border-radius: 100px;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .user-avi {
+            width: 28px; height: 28px; border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            color: white; font-weight: 700; font-size: 13px;
+        }
+
+        /* Metadata */
+        .meta-row {
+            display: flex; align-items: center; gap: 8px;
+            margin-bottom: 8px;
+        }
+        .dot { width: 6px; height: 6px; background: var(--accent-orange); border-radius: 50%; box-shadow: 0 0 8px var(--accent-orange); }
+        .meta-text { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--accent-orange); font-weight: 600; letter-spacing: 0.5px; }
+        .time-ago {
+            color: #C9CDD3;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .meta-row.dim .meta-text {
+            color: #6B7280;
+            opacity: 0.7;
+        }
+
+        .meta-row.dim .dot {
+            opacity: 0.4;
+            box-shadow: 0 0 4px rgba(249, 115, 22, 0.35);
+        }
+
+        /* Title — My Public Memory · Light Pulse */
+        .memory-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 20px;
+            border-radius: 28px;
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.085);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            color: rgba(255, 255, 255, 0.92);
+            box-shadow:
+                inset 0px 2px 4px -1px rgba(210, 220, 245, 0.35),
+                inset 0px 8px 14px -6px rgba(190, 200, 240, 0.18),
+                inset 0px -8px 16px -8px rgba(140, 150, 200, 0.14),
+                0 0 18px rgba(255, 255, 255, 0.1),
+                0px 12px 26px -8px rgba(0, 0, 0, 0.52);
+            text-shadow: 0 0 14px rgba(255, 255, 255, 0.26);
+            animation: memory-title-pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes memory-title-pulse {
+            0%, 100% {
+                opacity: 0.95;
+                box-shadow:
+                    inset 0px 3px 5px -1px rgba(220, 232, 255, 0.3),
+                    inset 0px 10px 18px -6px rgba(200, 210, 250, 0.16),
+                    inset 0px -10px 18px -8px rgba(150, 160, 210, 0.12),
+                    0 0 18px rgba(255, 255, 255, 0.1),
+                    0px 14px 28px -10px rgba(0, 0, 0, 0.48);
+            }
+            45% {
+                opacity: 0.98;
+                box-shadow:
+                    inset 0px 4px 6px -1px rgba(230, 242, 255, 0.38),
+                    inset 0px 12px 20px -6px rgba(210, 222, 255, 0.22),
+                    inset 0px -12px 20px -8px rgba(165, 175, 225, 0.16),
+                    0 0 26px rgba(255, 255, 255, 0.14),
+                    0px 18px 34px -10px rgba(0, 0, 0, 0.52);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .memory-title {
+                animation: none;
+            }
+        }
+
+        p {
+            font-size: 15px; line-height: 1.5; color: #B0B0B0;
+            margin-bottom: 20px;
+        }
+
+        .reactions-panel {
+            margin-top: 18px;
+            margin-bottom: 10px;
+            padding: 0;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+        }
+
+        .echo-count {
+            font-size: 12px;
+            font-weight: 700;
+            color: #C4C9D4;
+            letter-spacing: 0.6px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .echo-subtext {
+            font-size: 11px;
+            color: #9CA3AF;
+            letter-spacing: 0.2px;
+            margin-bottom: 10px;
+        }
+
+        .reactions-title {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            color: #C9CDD3;
+            margin-bottom: 10px;
+        }
+
+        .reactions-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .reaction-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(20, 20, 20, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #E5E7EB;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .reaction-pill.active {
+            border-color: rgba(6, 182, 212, 0.45);
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+        }
+
+        .reaction-list {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(8, 8, 8, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #C9CDD3;
+            font-size: 12px;
+            display: none;
+        }
+
+        .reaction-list.is-open {
+            display: block;
+        }
+
+        .reaction-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .reaction-list li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reaction-avi {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Social Pile */
+        .social-row {
+            display: flex; align-items: center; gap: 12px;
+        }
+        .avatars { display: flex; }
+        .av-sm {
+            width: 24px; height: 24px; border-radius: 50%; border: 2px solid #000;
+            margin-left: -8px; display: flex; align-items: center; justify-content: center;
+            font-size: 9px; font-weight: 700; color: #000;
+        }
+        .av-sm:first-child { margin-left: 0; }
+        .social-text { font-size: 12px; color: #777; }
+        .social-text b { color: #ddd; }
+
+        /* --- 4. INTERACTIVE DOCK (Owner Actions) --- */
+        .dock-area {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            padding: 18px 24px 40px;
+            background: #000;
+            z-index: 50;
+        }
+
+        .dock-area::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: -90px;
+            height: 90px;
+            background: linear-gradient(
+                to top,
+                rgba(0,0,0,0.98) 0%,
+                rgba(0,0,0,0.55) 55%,
+                rgba(0,0,0,0) 100%
+            );
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .dock-area > * {
+            position: relative;
+            z-index: 1;
+        }
+        .dock-note {
+            color: #7DD3FC;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dock-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+            min-height: 80px;
+        }
+
+        .action-btn {
+            height: 52px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .action-btn.with-sub {
+            flex-direction: column;
+            gap: 2px;
+            padding: 8px 12px;
+        }
+
+        .action-btn .btn-main {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-btn .btn-icon-small {
+            width: 16px;
+            height: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn .btn-sub {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(229, 231, 235, 0.8);
+            letter-spacing: 0.2px;
+        }
+
+        .action-btn.primary {
+            background: #0B5C6A;
+            color: #EAFBFF;
+            box-shadow: 0 8px 18px rgba(6, 182, 212, 0.15);
+        }
+
+        .action-btn.secondary {
+            background: #111;
+            color: #E5E7EB;
+            border-color: #2A2A2A;
+        }
+
+        .edit-memory-btn {
+            font-family: 'Caveat', 'Inter', sans-serif;
+            font-size: 16px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .action-btn.floating {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 15, 15, 0.9);
+            border-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(16px);
+            box-shadow:
+                0 16px 30px rgba(0, 0, 0, 0.55),
+                0 6px 16px rgba(6, 182, 212, 0.18);
+        }
+
+        .privacy-status {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .privacy-status.private {
+            background: rgba(248, 113, 113, 0.12);
+            color: #FCA5A5;
+            border: 1px solid rgba(248, 113, 113, 0.35);
+        }
+
+        .privacy-status.dim {
+            opacity: 0.35;
+            filter: saturate(0.7);
+        }
+
+        .privacy-status.public {
+            background: rgba(34, 197, 94, 0.12);
+            color: #86EFAC;
+            border: 1px solid rgba(34, 197, 94, 0.45);
+        }
+
+        .match-panel {
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            filter: brightness(1) saturate(1.05);
+            margin-top: 6px;
+        }
+
+        .match-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .match-header {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            color: #C4C9D4;
+            white-space: nowrap;
+        }
+
+        .match-explore {
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(12, 12, 12, 0.6);
+            color: #C9CDD3;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .match-extra {
+            display: none;
+            margin-top: 10px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .match-extra.is-open {
+            display: flex;
+        }
+
+        .match-list {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            overflow: visible;
+            white-space: normal;
+            animation: none;
+        }
+
+        .match-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px 4px 6px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.18);
+            width: fit-content;
+            max-width: 220px;
+            height: 34px;
+            cursor: pointer;
+            text-align: left;
+            background: rgba(18, 18, 18, 0.9);
+            box-shadow:
+                inset 0 0 10px rgba(255,255,255,0.04),
+                0 4px 12px rgba(0, 0, 0, 0.45);
+        }
+
+        .match-item.cyan {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(8, 8, 8, 0.95));
+            border-color: rgba(6, 182, 212, 0.22);
+            box-shadow:
+                inset 0 0 8px rgba(6, 182, 212, 0.12),
+                0 4px 10px rgba(6, 182, 212, 0.08);
+        }
+
+        .match-item.yellow {
+            background: linear-gradient(135deg, rgba(250, 204, 21, 0.1), rgba(8, 8, 8, 0.95));
+            border-color: rgba(250, 204, 21, 0.22);
+            box-shadow:
+                inset 0 0 8px rgba(250, 204, 21, 0.12),
+                0 4px 10px rgba(250, 204, 21, 0.08);
+        }
+
+        .match-item.purple {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(8, 8, 8, 0.95));
+            border-color: rgba(168, 85, 247, 0.22);
+            box-shadow:
+                inset 0 0 8px rgba(168, 85, 247, 0.12),
+                0 4px 10px rgba(168, 85, 247, 0.08);
+        }
+
+        .match-avi {
+            width: 1.75rem;
+            height: 1.75rem;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid rgba(255,255,255,0.28);
+            box-shadow: 0 0 8px rgba(255,255,255,0.18);
+            margin-left: -2px;
+        }
+
+        .match-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: #EAFBFF;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            letter-spacing: 0.2px;
+            text-shadow:
+                0 0 6px rgba(255, 255, 255, 0.35),
+                0 0 12px rgba(255, 255, 255, 0.2);
+        }
+
+        .match-item.cyan .match-name {
+            color: #7ED3E0;
+            text-shadow:
+                0 0 4px rgba(6, 182, 212, 0.25),
+                0 0 8px rgba(6, 182, 212, 0.18);
+        }
+
+        .match-item.yellow .match-name {
+            color: #E8C158;
+            text-shadow:
+                0 0 4px rgba(250, 204, 21, 0.25),
+                0 0 8px rgba(250, 204, 21, 0.18);
+        }
+
+        .match-item.purple .match-name {
+            color: #CDB2F0;
+            text-shadow:
+                0 0 4px rgba(168, 85, 247, 0.25),
+                0 0 8px rgba(168, 85, 247, 0.18);
+        }
+
+
+        @keyframes matchScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .match-panel + .dock-actions {
+            margin-top: 16px;
+        }
+
+        .modal-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 80;
+        }
+
+        .modal-backdrop.is-open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            width: min(320px, 90%);
+            background: rgba(12, 12, 12, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 18px;
+            padding: 18px;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+            color: #E5E7EB;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #FFFFFF;
+            margin-bottom: 8px;
+        }
+
+        .modal-text {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #C9CDD3;
+            margin-bottom: 12px;
+        }
+
+        .modal-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 14px;
+            font-size: 12px;
+            color: #B8BDC6;
+        }
+
+        .modal-list li {
+            padding-left: 14px;
+            position: relative;
+            margin-bottom: 6px;
+        }
+
+        .modal-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #8BE9F7;
+        }
+
+        .modal-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .modal-primary {
+            height: 44px;
+            border-radius: 12px;
+            border: none;
+            background: #0B5C6A;
+            color: #EAFBFF;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .modal-secondary {
+            background: transparent;
+            border: none;
+            color: #9CA3AF;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="device-frame">
+
+    <img class="page-hero" src="../../image/manga.png" alt="Manga panel">
+
+    <div class="memory-tags">
+        <span class="memory-label">Memory</span>
+        <div class="memory-chip source">Extracted from <b>this moment</b></div>
+    </div>
+
+    <!-- HEADER -->
+    <div class="header-ui">
+        <div class="btn-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </div>
+        <div class="header-actions">
+            <button class="btn-icon edit-memory-top" type="button" aria-label="Edit memory">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 20h9"></path>
+                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="content-core" id="contentCore">
+        <div class="meta-row dim">
+            <div class="dot"></div>
+            <span class="meta-text">15.01.20, 6:30 PM</span>
+            <span class="meta-text time-ago">• by you</span>
+            <span class="privacy-status private dim">Private</span>
+        </div>
+        <div class="meta-row timeline-row">
+            <div class="dot"></div>
+            <span class="meta-text">15.02.20, 7:30 PM</span>
+            <span class="meta-text">• by you</span>
+            <span class="privacy-status public">Public</span>
+        </div>
+        <div class="memory-title-block">
+            <div class="memory-title">The Constraints of Creativity</div>
+        </div>
+        <div class="content-scroll">
+            <!-- User Badge moved to top tags -->
+            <p>The panel illustrates a profound disconnection. It feels like cognition isn't one's own—much like the neutrinos passing through us. This connects to our discussion on agency in digital spaces.</p>
+            <p>We started with a simple prompt: what happens when the interface becomes a witness? The image held tension between light and absence, like the moment just before a message arrives. I tried to trace the edges of that feeling instead of summarizing it.</p>
+            <p>In the sketchbook the notes were shorter, but the memory kept unfolding. It wasn't about the panel anymore; it was about the room it implied, the hum outside the frame, and the way time felt granular that night.</p>
+            <p>There was an urge to edit the story into a clean line, but the constraint was the point. I kept the fragments intact—half sentences, recorded distances, a list of tiny sounds that made the scene feel inhabited.</p>
+            <p>By the end, I could see why the constraint mattered: it stopped me from turning a real experience into a headline. The interface asks for clarity, yet the memory asks for texture. That tension is what I want to preserve.</p>
+            <p>Later, when I re-read it, I noticed the quiet recurrence of "we" and "you." It wasn't a solo memory; it was co-authored by everyone who stayed and looked a little longer.</p>
+
+        </div>
+    </div>
+
+    <button class="manga-detail-btn" type="button" aria-label="View manga details">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="4" y="4" width="7" height="7"></rect>
+            <rect x="13" y="4" width="7" height="7"></rect>
+            <rect x="4" y="13" width="7" height="7"></rect>
+            <rect x="13" y="13" width="7" height="7"></rect>
+        </svg>
+        View Manga
+    </button>
+
+    <!-- OWNER ACTION DOCK -->
+    <div class="dock-area">
+        <div class="reactions-panel" id="reactionsPanel">
+            <div class="echo-count">Echoed 18 times</div>
+            <div class="echo-subtext">Each view or match counts as an Echo.</div>
+            <div class="reactions-row" aria-label="Emoji reactions">
+                <button class="reaction-pill" data-reaction="fire" type="button">🔥 12</button>
+                <button class="reaction-pill" data-reaction="sad" type="button">😢 8</button>
+                <button class="reaction-pill" data-reaction="heart" type="button">💜 23</button>
+                <button class="reaction-pill" data-reaction="agree" type="button">👍 14</button>
+                <button class="reaction-pill" data-reaction="careful" type="button">⚠️ 6</button>
+            </div>
+            <div class="reaction-list" id="reactionList" aria-live="polite">
+                <ul id="reactionNames"></ul>
+            </div>
+        </div>
+
+        <div class="match-panel">
+            <div class="match-header-row">
+                <div class="match-header">3 people have similar memories.</div>
+            </div>
+            <div class="match-list" aria-label="Memory matching list">
+                <button class="match-explore" type="button" id="exploreMoreBtn">Explore more</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="matchGateModal" aria-hidden="true">
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="matchGateTitle">
+            <div class="modal-title" id="matchGateTitle">See Their Story?</div>
+            <div class="modal-text">
+                To protect everyone's vulnerability, memories are only visible to those who share similar experiences.
+                Make yours visible first — then you'll unlock theirs.
+            </div>
+            <div class="modal-text">Don't worry:</div>
+            <ul class="modal-list">
+                <li>Only people who resonate will ever see this</li>
+                <li>Your friends can see it on your profile</li>
+                <li>You can hide it anytime</li>
+            </ul>
+            <div class="modal-actions">
+                <button class="modal-primary" id="makeVisibleBtn">Make This Visible</button>
+                <button class="modal-secondary" id="dismissModalBtn">Not Now</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const matchGateModal = document.getElementById("matchGateModal");
+    const makeVisibleBtn = document.getElementById("makeVisibleBtn");
+    const dismissModalBtn = document.getElementById("dismissModalBtn");
+    const contentCore = document.getElementById("contentCore");
+    const contentScroll = document.querySelector(".content-scroll");
+
+    const openMatchGate = () => {
+        matchGateModal.classList.add("is-open");
+        matchGateModal.setAttribute("aria-hidden", "false");
+    };
+
+    const closeMatchGate = () => {
+        matchGateModal.classList.remove("is-open");
+        matchGateModal.setAttribute("aria-hidden", "true");
+    };
+
+    document.querySelectorAll('.match-item:not([aria-hidden="true"])').forEach((item) => {
+        item.addEventListener("click", openMatchGate);
+    });
+
+    dismissModalBtn.addEventListener("click", closeMatchGate);
+
+    const updateCoreScrollState = () => {
+        if (!contentCore || !contentScroll) return;
+        const scrollSlack = contentScroll.scrollHeight - contentScroll.clientHeight;
+        const canScroll = scrollSlack > 2;
+        const shouldLift = canScroll && contentScroll.scrollTop > 12;
+        contentCore.classList.toggle("is-scrolled", shouldLift);
+        contentScroll.style.overflowY = canScroll ? "auto" : "hidden";
+    };
+
+    if (contentScroll) {
+        contentScroll.addEventListener("scroll", updateCoreScrollState);
+        window.addEventListener("resize", updateCoreScrollState);
+        updateCoreScrollState();
+    }
+
+    matchGateModal.addEventListener("click", (event) => {
+        if (event.target === matchGateModal) {
+            closeMatchGate();
+        }
+    });
+
+    makeVisibleBtn.addEventListener("click", () => {
+        closeMatchGate();
+    });
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && matchGateModal.classList.contains("is-open")) {
+            closeMatchGate();
+        }
+    });
+
+    const reactionData = {
+        fire: [
+            { name: "Neon Quiet", avatar: "https://i.pravatar.cc/150?u=rx-fire-1" },
+            { name: "Soft Static", avatar: "https://i.pravatar.cc/150?u=rx-fire-2" },
+            { name: "City Afterglow", avatar: "https://i.pravatar.cc/150?u=rx-fire-3" }
+        ],
+        sad: [
+            { name: "Velvet Rain", avatar: "https://i.pravatar.cc/150?u=rx-sad-1" },
+            { name: "Echo Field", avatar: "https://i.pravatar.cc/150?u=rx-sad-2" }
+        ],
+        heart: [
+            { name: "Aurora Hush", avatar: "https://i.pravatar.cc/150?u=rx-heart-1" },
+            { name: "Signal in the Snow", avatar: "https://i.pravatar.cc/150?u=rx-heart-2" },
+            { name: "Ember Corridor", avatar: "https://i.pravatar.cc/150?u=rx-heart-3" }
+        ],
+        agree: [
+            { name: "Quiet Harbor", avatar: "https://i.pravatar.cc/150?u=rx-agree-1" },
+            { name: "Blue Static", avatar: "https://i.pravatar.cc/150?u=rx-agree-2" }
+        ],
+        careful: [
+            { name: "Night Signal", avatar: "https://i.pravatar.cc/150?u=rx-careful-1" },
+            { name: "Grainlight", avatar: "https://i.pravatar.cc/150?u=rx-careful-2" }
+        ]
+    };
+
+    const reactionButtons = document.querySelectorAll(".reaction-pill");
+    const reactionList = document.getElementById("reactionList");
+    const reactionNames = document.getElementById("reactionNames");
+
+    const renderReactionNames = (key) => {
+        const entries = reactionData[key] || [];
+        reactionNames.innerHTML = entries
+            .map(
+                (entry) =>
+                    `<li><img class="reaction-avi" src="${entry.avatar}" alt="${entry.name}"><span>${entry.name}</span></li>`
+            )
+            .join("");
+    };
+
+    reactionButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            const key = button.dataset.reaction;
+            const isActive = button.classList.contains("active");
+
+            reactionButtons.forEach((btn) => btn.classList.remove("active"));
+
+            if (isActive) {
+                reactionList.classList.remove("is-open");
+                return;
+            }
+
+            button.classList.add("active");
+            renderReactionNames(key);
+            reactionList.classList.add("is-open");
+        });
+    });
+
+    const exploreMoreBtn = document.getElementById("exploreMoreBtn");
+    const matchList = document.querySelector(".match-list");
+
+    const matchData = [
+        { name: "Aurora Hush", avatar: "https://i.pravatar.cc/150?u=match-aurora", tone: "cyan" },
+        { name: "Signal in the Snow", avatar: "https://i.pravatar.cc/150?u=match-signal", tone: "yellow" },
+        { name: "Ember Corridor", avatar: "https://i.pravatar.cc/150?u=match-ember", tone: "purple" },
+        { name: "River Without Sound", avatar: "https://i.pravatar.cc/150?u=match-river", tone: "cyan" },
+        { name: "Glasslight", avatar: "https://i.pravatar.cc/150?u=match-glow", tone: "yellow" },
+        { name: "Quiet Bloom", avatar: "https://i.pravatar.cc/150?u=match-bloom", tone: "purple" },
+        { name: "Soft Static", avatar: "https://i.pravatar.cc/150?u=match-soft", tone: "cyan" },
+        { name: "Echo Vale", avatar: "https://i.pravatar.cc/150?u=match-echo", tone: "yellow" },
+        { name: "Blue Archive", avatar: "https://i.pravatar.cc/150?u=match-blue", tone: "purple" }
+    ];
+
+    const shuffle = (list) => {
+        const copy = [...list];
+        for (let i = copy.length - 1; i > 0; i -= 1) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [copy[i], copy[j]] = [copy[j], copy[i]];
+        }
+        return copy;
+    };
+
+    const renderMatchItems = () => {
+        if (!matchList || !exploreMoreBtn) return;
+        const existing = matchList.querySelectorAll(".match-item");
+        existing.forEach((node) => node.remove());
+        const picks = shuffle(matchData).slice(0, 3);
+        picks.forEach((entry, index) => {
+            const item = document.createElement("div");
+            item.className = `match-item ${entry.tone}`;
+            item.innerHTML = `
+                <img class="match-avi" src="${entry.avatar}" alt="Memory match ${index + 1}">
+                <span class="match-name">${entry.name}</span>
+            `;
+            matchList.insertBefore(item, exploreMoreBtn);
+        });
+    };
+
+    if (exploreMoreBtn && matchList) {
+        renderMatchItems();
+        exploreMoreBtn.addEventListener("click", renderMatchItems);
+    }
+</script>
+
+</body>
+</html>

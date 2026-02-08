@@ -85,7 +85,7 @@
         .phone-shell::after {
             content: "";
             position: absolute;
-            top: calc(var(--bezel) * 0.55);
+            top: calc(var(--bezel) + 5 * var(--u));
             left: 50%;
             transform: translateX(-50%);
             width: calc(120 * var(--u));
@@ -94,6 +94,7 @@
             background: #0a0b0e;
             box-shadow: inset 0 0 0 0.0625rem rgba(255,255,255,0.06);
             pointer-events: none;
+            z-index: 300;
         }
 
         .app {
@@ -260,6 +261,8 @@
 
         /* --- Chat Stream --- */
         .chat-stream {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
             position: absolute;
             inset: 0;
             overflow-y: auto;
@@ -268,7 +271,18 @@
             flex-direction: column;
             gap: 1rem;
         }
-        
+
+        .chat-stream::-webkit-scrollbar {
+            width: 0.375rem;
+        }
+        .chat-stream::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .chat-stream::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 999rem;
+        }
+
         .welcome-echo {
             align-self: flex-start;
             max-width: 95%;

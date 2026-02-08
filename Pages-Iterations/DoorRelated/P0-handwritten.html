@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Echo: The Sealed Whisper</title>
+    <!-- 引入更像手指涂鸦的字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-void: #000000;
+            --glow-white: rgba(255, 255, 255, 0.9);
+            --glow-blur: rgba(255, 255, 255, 0.5);
+            --echo-gold: #FFD056;
+            --echo-orange: #FF5500;
+            --glass-panel: rgba(20, 20, 20, 0.6);
+            --border-dim: rgba(255, 255, 255, 0.1);
+            --bg-core: #020208;
+            --bg-gradient: radial-gradient(circle at 50% 20%, #0d0d2b, #050510, #000000);
+            --mist-blue: rgba(100, 200, 255, 1);
+            --mist-gold: rgba(255, 220, 150, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+        body {
+            background-color: var(--bg-void);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .device-frame {
+            width: 390px;
+            height: 844px;
+            background: #000;
+            position: relative;
+            border-radius: 44px;
+            box-shadow: 0 0 100px rgba(255, 85, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .restart-button {
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 999px;
+            padding: 10px 18px;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        }
+
+        .restart-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #fff;
+        }
+
+        /* Harmonious Memory Dots (Top Area) */
+        .memory-dots {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        #ambient-bg {
+            position: absolute;
+            inset: 0;
+            background: var(--bg-gradient);
+            opacity: 0.7;
+        }
+
+        #echo-stage {
+            position: absolute;
+            top: 12%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 28%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: top 0.3s ease-out;
+        }
+
+        .memory-tag {
+            position: absolute;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 11px;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.85);
+            background: rgba(10, 10, 20, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 0 18px rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(6px);
+            transform: translate(-50%, -50%);
+            will-change: transform, filter, opacity;
+            mix-blend-mode: screen;
+            white-space: nowrap;
+        }
+
+        .memory-tag.blue {
+            border-color: rgba(100, 200, 255, 0.45);
+            box-shadow: 0 0 20px rgba(100, 200, 255, 0.2);
+        }
+
+        .memory-tag.gold {
+            border-color: rgba(255, 220, 150, 0.5);
+            box-shadow: 0 0 20px rgba(255, 200, 100, 0.2);
+        }
+
+        /* Ambient Background */
+        .ambient-light {
+            position: absolute;
+            top: -150px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+            filter: blur(80px);
+            z-index: 0;
+            opacity: 0.6;
+            animation: pulse 6s infinite alternate;
+        }
+
+        .content-layer {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* === 1. TOP: The Gain (Value) === */
+        .header-echo {
+            height: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-top: 20px;
+            animation: fadeIn 1s ease;
+            gap: 8px;
+            position: absolute;
+            bottom: 64px;
+            left: 0;
+            width: 100%;
+            z-index: 12;
+        }
+
+        .echo-pill {
+            background: rgba(255, 208, 86, 0.1);
+            border: 1px solid rgba(255, 208, 86, 0.3);
+            padding: 6px 16px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 0 20px rgba(255, 208, 86, 0.1);
+        }
+
+        .echo-icon {
+            width: 12px; height: 12px; background: var(--echo-gold);
+            transform: rotate(45deg); box-shadow: 0 0 10px var(--echo-gold);
+        }
+
+        .echo-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 14px;
+            color: var(--echo-gold);
+            font-weight: 700;
+        }
+
+        .echo-status {
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.45);
+            text-transform: uppercase;
+            opacity: 0;
+            transform: translateY(-4px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .echo-status.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .echo-indicator {
+            position: absolute;
+            bottom: 24px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            z-index: 12;
+            pointer-events: none;
+        }
+
+        /* === 2. CANVAS: The Finger Writing (Hook) === */
+        .canvas-area {
+            flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 0 40px;
+            margin-bottom: 20px;
+        }
+
+        /* The glowing finger trace effect */
+        .handwritten-hook {
+            font-family: 'Gochi Hand', cursive;
+            font-size: 38px;
+            line-height: 1.4;
+            color: var(--glow-white);
+            text-align: center;
+            /* Key Magic: Simulating light bleeding on retina */
+            text-shadow: 0 0 8px var(--glow-blur), 0 0 20px rgba(255,255,255,0.2);
+            transform: rotate(-2deg);
+            opacity: 0;
+            animation: writeIn 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards 0.3s;
+        }
+
+        .timestamp-float {
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 1px;
+            margin-top: 6px;
+        }
+
+        .identity-quote {
+            font-family: "Inter", sans-serif;
+            font-size: 20px;
+            line-height: 1.5;
+            letter-spacing: 0.4px;
+            color: rgba(255, 255, 255, 0.85);
+            text-align: center;
+        }
+
+        .identity-divider {
+            width: 36px;
+            height: 2px;
+            margin: 14px auto 12px;
+            background: rgba(255, 208, 86, 0.7);
+        }
+
+        /* Animations */
+        @keyframes pulse { 0% { opacity: 0.4; } 100% { opacity: 0.7; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes writeIn { from { opacity: 0; filter: blur(10px); } to { opacity: 1; filter: blur(0); } }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="device-frame" id="device">
+        <div class="memory-dots" aria-hidden="true">
+            <div id="ambient-bg"></div>
+            <div id="echo-stage"><div id="cluster-core"></div></div>
+        </div>
+        <div class="ambient-light"></div>
+
+        <div class="content-layer">
+            
+            <!-- 1. Header: Value Gain -->
+            <div class="header-echo">
+                <div class="echo-pill">
+                    <div class="echo-icon"></div>
+                    <div class="echo-value">+<span id="echoCount">0</span> ECHOES</div>
+                </div>
+            </div>
+
+            <!-- 2. The Finger-Written Hook -->
+            <div class="canvas-area">
+                <div class="handwritten-hook">
+                    "Structural loss...<br>it feels like time is just slipping through my fingers."
+                </div>
+                <div class="identity-divider"></div>
+                <div class="identity-quote">You, the de Factual builder</div>
+                <div class="timestamp-float">JAN 30 • 18:42</div>
+            </div>
+
+        </div>
+        <div class="echo-indicator">
+            <div class="echo-status" id="echoStatus"></div>
+        </div>
+    </div>
+    <button class="restart-button" id="restartButton">Restart</button>
+
+    <script>
+        const container = document.getElementById('cluster-core');
+        const stage = document.getElementById('echo-stage');
+        const restartButton = document.getElementById('restartButton');
+        const echoStatus = document.getElementById('echoStatus');
+        const echoCountEl = document.getElementById('echoCount');
+        const tags = [
+            'memory thread',
+            'soft recall',
+            'quiet vow',
+            'latent order',
+            'glint of time',
+            'inner map',
+            'calm signal',
+            'shared echo'
+        ];
+        const nodes = [];
+
+        const config = [
+            { type: 'gold', orbit: 12, speed: 0.004 },
+            { type: 'blue', orbit: 28, speed: -0.010 },
+            { type: 'blue', orbit: 42, speed: 0.011 },
+            { type: 'gold', orbit: 20, speed: 0.017 },
+            { type: 'blue', orbit: 58, speed: -0.008 },
+            { type: 'blue', orbit: 34, speed: 0.013 },
+            { type: 'gold', orbit: 72, speed: -0.006 },
+            { type: 'blue', orbit: 48, speed: 0.009 }
+        ];
+
+        tags.forEach((label, i) => {
+            const el = document.createElement('div');
+            const type = config[i % config.length].type;
+            el.className = `memory-tag ${type}`;
+            el.textContent = label;
+            container.appendChild(el);
+            nodes.push({
+                el: el,
+                angle: (Math.PI * 2 / tags.length) * i,
+                phase: Math.random() * Math.PI * 2,
+                orbit: config[i % config.length].orbit,
+                speed: config[i % config.length].speed
+            });
+        });
+
+        let hasSettled = false;
+        let startTime = Date.now();
+        let statusTimer = null;
+        let statusIndex = 0;
+        let echoCount = 0;
+        let echoAnimFrame = null;
+        const startTop = 4;
+        const endTop = 72;
+        const statusSteps = [
+            'moment created',
+            'memory found',
+            'process is over'
+        ];
+
+        function updateEchoCount(delta = 3, duration = 600) {
+            const start = echoCount;
+            const end = echoCount + delta;
+            const startTimeMs = performance.now();
+
+            if (echoAnimFrame) {
+                cancelAnimationFrame(echoAnimFrame);
+                echoAnimFrame = null;
+            }
+
+            const tick = (now) => {
+                const progress = Math.min(1, (now - startTimeMs) / duration);
+                const value = Math.round(start + (end - start) * progress);
+                if (echoCountEl) {
+                    echoCountEl.textContent = String(value);
+                }
+                if (progress < 1) {
+                    echoAnimFrame = requestAnimationFrame(tick);
+                } else {
+                    echoCount = end;
+                    echoAnimFrame = null;
+                }
+            };
+
+            echoAnimFrame = requestAnimationFrame(tick);
+        }
+
+        function resetEchoCount() {
+            echoCount = 0;
+            if (echoCountEl) {
+                echoCountEl.textContent = '0';
+            }
+        }
+
+        function runStatusSequence() {
+            if (!echoStatus) return;
+            if (statusTimer) {
+                clearTimeout(statusTimer);
+                statusTimer = null;
+            }
+            statusIndex = 0;
+            resetEchoCount();
+            echoStatus.textContent = statusSteps[statusIndex];
+            echoStatus.classList.add('is-visible');
+            updateEchoCount(3, 400);
+
+            const advance = () => {
+                statusIndex += 1;
+                if (statusIndex < statusSteps.length) {
+                    echoStatus.textContent = statusSteps[statusIndex];
+                    updateEchoCount(3, 400);
+                    statusTimer = setTimeout(advance, 1100);
+                } else {
+                    echoStatus.classList.remove('is-visible');
+                    statusTimer = null;
+                }
+            };
+
+            statusTimer = setTimeout(advance, 1100);
+        }
+
+        const holdDuration = 2000;
+
+        function animateCluster() {
+            const time = Date.now() - startTime;
+            const holdTime = Math.max(0, time - holdDuration);
+            let rawClarity = (Math.sin(holdTime * 0.0016 - Math.PI / 2) + 1) / 2;
+            let clarity = Math.pow(rawClarity, 1.7);
+            if (hasSettled) {
+                clarity = 1;
+            }
+
+            if (stage) {
+                if (!hasSettled) {
+                    const targetTop = time < holdDuration
+                        ? startTop
+                        : startTop + (endTop - startTop) * clarity;
+                    stage.style.top = `${targetTop}%`;
+                    if (clarity > 0.92) {
+                        hasSettled = true;
+                        stage.style.top = `${endTop}%`;
+                    }
+                } else {
+                    stage.style.top = `${endTop}%`;
+                }
+            }
+
+            nodes.forEach((node) => {
+                if (!hasSettled) {
+                    node.angle += node.speed;
+                } else if (node.settledAngle === undefined) {
+                    node.settledAngle = node.angle;
+                }
+
+                const angle = hasSettled ? node.settledAngle : node.angle;
+                const jitterAmt = hasSettled ? 0 : (1 - clarity) * 12;
+                const x = Math.cos(angle) * node.orbit + Math.sin(time * 0.0015 + node.phase) * jitterAmt;
+                const y = Math.sin(angle) * node.orbit + Math.cos(time * 0.0015 + node.phase) * jitterAmt;
+
+                const blurVal = hasSettled ? 0 : (1 - clarity) * 12;
+                const scaleVal = hasSettled ? 1 : 1.15 - (clarity * 0.35);
+                const opacityVal = hasSettled ? 1 : 0.45 + (clarity * 0.5);
+
+                node.el.style.filter = `blur(${blurVal}px)`;
+                node.el.style.opacity = opacityVal;
+                node.el.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${scaleVal})`;
+            });
+
+            requestAnimationFrame(animateCluster);
+        }
+
+        if (container) {
+            animateCluster();
+        }
+
+        runStatusSequence();
+
+        if (restartButton) {
+            restartButton.addEventListener('click', () => {
+                hasSettled = false;
+                startTime = Date.now();
+                runStatusSequence();
+                if (stage) {
+                    stage.style.top = `${startTop}%`;
+                }
+            });
+        }
+    </script>
+</body>
+</html>

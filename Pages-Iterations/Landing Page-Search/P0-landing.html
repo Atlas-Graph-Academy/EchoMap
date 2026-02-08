@@ -87,7 +87,7 @@
         .phone-shell::after {
             content: "";
             position: absolute;
-            top: calc(var(--bezel) * 0.55);
+            top: calc(var(--bezel) + 5 * var(--u));
             left: 50%;
             transform: translateX(-50%);
             width: calc(120 * var(--u));
@@ -96,6 +96,7 @@
             background: #0a0b0e;
             box-shadow: inset 0 0 0 0.0625rem rgba(255,255,255,0.06);
             pointer-events: none;
+            z-index: 300;
         }
 
         .app {

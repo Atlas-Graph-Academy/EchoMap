@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aura - Neural Fabric</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Inter+Tight:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* 
+           ARIS SYSTEM: NEURAL FABRIC
+           --------------------------
+           No Cards. No Borders. Pure Signal.
+        */
+        :root {
+            --design-w: 430;
+            --design-h: 932;
+            --viewport-pad: 3vh;
+            --shell-w-base: 462;
+            --shell-h-base: 964;
+            --u: min(
+                calc((100vw - (var(--viewport-pad) * 2)) / var(--shell-w-base)),
+                calc((100vh - (var(--viewport-pad) * 2)) / var(--shell-h-base))
+            );
+            --bezel: calc(16 * var(--u));
+            --bezel-soft: calc(10 * var(--u));
+            --app-w: calc(var(--design-w) * var(--u));
+            --app-h: calc(var(--design-h) * var(--u));
+
+            --bg-void: transparent;
+            --sheet-glass: rgba(10, 10, 12, 0.95); /* Darker, denser glass */
+            --text-highlight: #FFFFFF;
+            --text-mid: #A1A1AA;
+            --text-dim: #52525B;
+            --safe-bottom: calc(34 * var(--u));
+            --bottom-gap: calc(28 * var(--u));
+            
+            /* The Resonance Colors */
+            --color-burn: #FF2D55;   /* Intense/Pain */
+            --color-void: #BF5AF2;   /* Confusion/Dream */
+            --color-drift: #0A84FF;  /* Melancholy/Flow */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html {
+            font-size: calc(16 * var(--u));
+            height: 100%;
+        }
+
+        body {
+            background-color: #0f1114;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+            background-size: 1.25rem 1.25rem;
+            font-family: "SF Mono", "SF Pro Display", monospace;
+            height: 100%;
+            overflow: hidden;
+            color: var(--text-highlight);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--viewport-pad);
+        }
+
+        .phone-shell {
+            position: relative;
+            width: calc(var(--app-w) + (var(--bezel) * 2));
+            height: calc(var(--app-h) + (var(--bezel) * 2));
+            padding: var(--bezel);
+            border-radius: calc(2.75rem * var(--u));
+            background: linear-gradient(165deg, #1f232a, #0b0d10 60%, #0a0b0e);
+            box-shadow:
+                0 1.5rem 3rem rgba(0,0,0,0.45),
+                inset 0 0 0 0.0625rem rgba(255,255,255,0.06);
+        }
+        .phone-shell::before {
+            content: "";
+            position: absolute;
+            inset: var(--bezel-soft);
+            border-radius: calc(2.3rem * var(--u));
+            border: 0.0625rem solid rgba(255,255,255,0.08);
+            pointer-events: none;
+        }
+        .phone-shell::after {
+            content: "";
+            position: absolute;
+            top: calc(var(--bezel) + 5 * var(--u));
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(120 * var(--u));
+            height: calc(22 * var(--u));
+            border-radius: 999rem;
+            background: #0a0b0e;
+            box-shadow: inset 0 0 0 0.0625rem rgba(255,255,255,0.06);
+            pointer-events: none;
+            z-index: 300;
+        }
+
+        .app {
+            position: relative;
+            width: var(--app-w);
+            height: var(--app-h);
+            overflow: hidden;
+            background-color: var(--bg-void);
+            background-image: url("../Pages-Iterations/Landing Page-Search/images/map2.png");
+            background-size: contain;
+            background-position: top center;
+            background-repeat: no-repeat;
+            padding-bottom: calc(var(--safe-bottom) + var(--bottom-gap));
+            border-radius: calc(2.1rem * var(--u));
+        }
+        .app::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 16%;
+            z-index: 11;
+            pointer-events: none;
+            background:
+                radial-gradient(130% 75% at 16% 100%, rgba(8, 10, 13, 0.52) 0%, rgba(8, 10, 13, 0.12) 34%, rgba(8, 10, 13, 0) 62%),
+                radial-gradient(125% 72% at 50% 100%, rgba(8, 10, 13, 0.66) 0%, rgba(8, 10, 13, 0.2) 36%, rgba(8, 10, 13, 0) 66%),
+                radial-gradient(130% 75% at 84% 100%, rgba(8, 10, 13, 0.52) 0%, rgba(8, 10, 13, 0.12) 34%, rgba(8, 10, 13, 0) 62%),
+                linear-gradient(
+                    to top,
+                    rgba(8, 10, 13, 0.88) 0%,
+                    rgba(8, 10, 13, 0.48) 22%,
+                    rgba(8, 10, 13, 0.16) 44%,
+                    rgba(8, 10, 13, 0) 100%
+                );
+            filter: blur(0.22rem);
+        }
+        body.location-off .fog-layer {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        body.location-on .fog-layer {
+            opacity: 0;
+            pointer-events: none;
+        }
+        body.location-off .living-header::before {
+            opacity: 0.65;
+        }
+        body.location-on .living-header::before {
+            opacity: 0.25;
+        }
+
+        .fog-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 6;
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(1.125rem);
+            transition: opacity 0.4s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+    .edge-blur-right {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 38%;
+        height: 100%;
+        z-index: 7;
+        pointer-events: none;
+        backdrop-filter: blur(1.625rem) saturate(120%);
+        -webkit-backdrop-filter: blur(1.625rem) saturate(120%);
+        background: linear-gradient(
+            to left,
+            rgba(0, 0, 0, 0.65) 0%,
+            rgba(0, 0, 0, 0.35) 35%,
+            rgba(0, 0, 0, 0.12) 60%,
+            rgba(0, 0, 0, 0) 100%
+        );
+        mask-image: linear-gradient(to left, black 0%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to left, black 0%, transparent 100%);
+    }
+
+        .living-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6.875rem;
+            padding-top: 2.75rem;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            z-index: 12;
+            cursor: pointer;
+        }
+        .living-header::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: url("../Pages-Iterations/Landing Page-Search/images/landing.png");
+            background-size: cover;
+            background-position: center top;
+            filter: blur(1.125rem) brightness(0.55);
+            opacity: 0.5;
+            transition: opacity 0.4s ease;
+        }
+        .living-header::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0) 100%);
+            pointer-events: none;
+        }
+        .status-bar {
+            position: relative;
+            z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.42rem;
+            padding: 0.32rem 0.62rem;
+            border-radius: 999rem;
+            border: 0.0625rem solid rgba(255, 255, 255, 0.16);
+            background: linear-gradient(
+                180deg,
+                rgba(22, 24, 31, 0.92) 0%,
+                rgba(12, 14, 19, 0.88) 100%
+            );
+            box-shadow:
+                0 0.25rem 0.75rem rgba(0, 0, 0, 0.28),
+                inset 0 0.0625rem 0 rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(1rem);
+            color: rgba(255, 255, 255, 0.9);
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .living-header:active .status-bar {
+            transform: scale(0.98);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow:
+                0 0.25rem 0.875rem rgba(0, 0, 0, 0.3),
+                inset 0 0.0625rem 0 rgba(255, 255, 255, 0.14);
+        }
+        .status-dot {
+            position: relative;
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+            background: #9ca3af;
+            box-shadow: 0 0 0.375rem rgba(148, 163, 184, 0.4);
+        }
+        .status-dot::after {
+            content: "";
+            position: absolute;
+            inset: -0.25rem;
+            border-radius: 50%;
+            border: 0.0625rem solid rgba(148, 163, 184, 0.28);
+            opacity: 0;
+        }
+        body.location-on .status-dot {
+            background: #22c55e;
+            box-shadow: 0 0 0.5rem rgba(34, 197, 94, 0.6);
+        }
+        body.location-on .status-dot::after {
+            border-color: rgba(34, 197, 94, 0.45);
+            opacity: 1;
+            animation: status-pulse 1.8s ease-out infinite;
+        }
+        @keyframes status-pulse {
+            0% { transform: scale(0.6); opacity: 0.8; }
+            100% { transform: scale(1.8); opacity: 0; }
+        }
+        .status-text {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            min-width: 0;
+        }
+        .status-primary {
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            color: rgba(255, 255, 255, 0.92);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .status-secondary {
+            display: none;
+        }
+        .status-action {
+            display: none;
+        }
+
+        /* Background Visuals (The Galaxy) */
+        .galaxy-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60%;
+            background: radial-gradient(circle at 50% 30%, #1a1a1a 0%, #000 70%);
+            z-index: 0;
+            display: none;
+        }
+
+        /* 
+           THE RESONANCE SHEET (Bottom 50%)
+           High Density. Vertical Scroll.
+        */
+        .resonance-sheet {
+            --sheet-offset: 0px;
+            position: absolute;
+            bottom: calc(var(--safe-bottom) + var(--bottom-gap));
+            left: 0.375rem;
+            right: 0.375rem;
+            height: 52%;
+            background: linear-gradient(
+                to bottom,
+                rgba(9, 11, 14, 0.72) 0%,
+                rgba(8, 10, 13, 0.88) 24%,
+                rgba(7, 9, 12, 0.94) 100%
+            );
+            border: 0.0625rem solid rgba(255, 255, 255, 0.07);
+            border-radius: 1.7rem;
+            backdrop-filter: blur(3.125rem);
+            -webkit-backdrop-filter: blur(3.125rem);
+            box-shadow:
+                0 0.875rem 2.125rem rgba(0, 0, 0, 0.38),
+                inset 0 0.0625rem 0.3125rem rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            padding-top: 0.75rem;
+            overflow: visible;
+            transform: translateY(var(--sheet-offset));
+            transition: transform 0.44s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform;
+        }
+        .resonance-sheet.is-dragging {
+            transition: none;
+        }
+        .resonance-sheet::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            pointer-events: none;
+            background: radial-gradient(circle at 38% -12%, rgba(172, 209, 255, 0.16), rgba(172, 209, 255, 0.03) 42%, transparent 72%);
+        }
+        .resonance-sheet::after {
+            content: "";
+            position: absolute;
+            left: -0.4rem;
+            right: -0.4rem;
+            top: -1.2rem;
+            height: 2.3rem;
+            border-radius: 1.4rem 1.4rem 0 0;
+            pointer-events: none;
+            background: linear-gradient(
+                to bottom,
+                rgba(8, 10, 13, 0) 0%,
+                rgba(8, 10, 13, 0.42) 55%,
+                rgba(8, 10, 13, 0.75) 100%
+            );
+            filter: blur(0.58rem);
+        }
+        .sheet-grabber {
+            position: absolute;
+            top: 0rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2.8rem;
+            height: 1rem;
+            border: none;
+            border-radius: 999rem;
+            background: transparent;
+            cursor: grab;
+            touch-action: none;
+            z-index: 16;
+        }
+        .sheet-grabber::before {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 0.36rem;
+            transform: translateX(-50%);
+            width: 1.55rem;
+            height: 0.25rem;
+            border-radius: 999rem;
+            background: rgba(255, 255, 255, 0.38);
+            box-shadow: 0 0 0.5rem rgba(255, 255, 255, 0.12);
+        }
+        .resonance-sheet.is-dragging .sheet-grabber {
+            cursor: grabbing;
+        }
+        .moment-unit {
+            padding: 0.5rem 1rem 0.45rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            transform: translateY(-92%);
+            z-index: 12;
+            transition: transform 0.44s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .resonance-sheet.stage-full .moment-unit {
+            transform: translateY(-72%);
+        }
+        .moment-unit::before {
+            content: "";
+            position: absolute;
+            left: 0.75rem;
+            top: 1.15rem;
+            width: 11.5rem;
+            height: 3.15rem;
+            border-radius: 999rem;
+            background: radial-gradient(circle at 20% 50%, rgba(170, 212, 255, 0.24), rgba(170, 212, 255, 0.07) 45%, rgba(170, 212, 255, 0) 75%);
+            filter: blur(0.38rem);
+            pointer-events: none;
+            z-index: -1;
+        }
+        .moment-unit::after { content: none; }
+        .moment-card {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            align-items: end;
+            gap: 0.5rem;
+            width: fit-content;
+        }
+        .moment-meta {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 0.0625rem;
+            transform: translateY(0.0625rem);
+        }
+        .moment-thumb {
+            width: calc(54 * var(--u));
+            height: calc(41 * var(--u));
+            border-radius: calc(5 * var(--u));
+            overflow: hidden;
+            position: relative;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            transform: translateY(calc(-0.125rem * var(--u)));
+        }
+        .moment-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: opacity 0.6s ease;
+        }
+        .moment-thumb img.is-fading {
+            opacity: 0;
+        }
+        .moment-date {
+            font-size: 0.5625rem;
+            color: rgba(255, 255, 255, 0.52);
+            letter-spacing: 0.04em;
+            font-family: "SF Mono", "SF Pro Display", monospace;
+            line-height: 1.1;
+        }
+        .moment-title {
+            font-size: 1.02rem;
+            font-weight: 700;
+            letter-spacing: -0.015em;
+            color: rgba(255, 255, 255, 0.95);
+            line-height: 1.02;
+            white-space: nowrap;
+            text-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.55);
+        }
+
+        /* Bottom Mood Search Dock */
+        .search-zone {
+            --search-collapse: 0;
+            position: absolute;
+            left: 0.75rem;
+            right: 0.75rem;
+            bottom: 0.5rem;
+            z-index: 13;
+            padding: 0.5625rem 0.625rem 0.625rem;
+            border-radius: 1.125rem;
+            border: 0.0625rem solid rgba(255, 255, 255, 0.08);
+            background: radial-gradient(circle at 25% 10%, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03) 42%, rgba(6, 8, 11, 0.88) 100%);
+            box-shadow:
+                0 0.375rem 1.125rem rgba(0, 0, 0, 0.3),
+                inset 0 0.03125rem 0.1875rem rgba(255, 255, 255, 0.11);
+            backdrop-filter: blur(0.875rem) saturate(108%);
+            -webkit-backdrop-filter: blur(0.875rem) saturate(108%);
+            opacity: calc(1 - (var(--search-collapse) * 0.9));
+            transform: translateY(calc(var(--search-collapse) * 4.25rem)) scale(calc(1 - (var(--search-collapse) * 0.05)));
+            transition: opacity 0.38s ease, transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.38s ease, box-shadow 0.38s ease;
+            isolation: isolate;
+        }
+        .app.stage-min-active .search-zone {
+            bottom: 1.5rem;
+        }
+        .search-zone::before {
+            content: "";
+            position: absolute;
+            left: -0.35rem;
+            right: -0.35rem;
+            bottom: -0.55rem;
+            height: 2.8rem;
+            z-index: -1;
+            border-radius: 1.4rem;
+            pointer-events: none;
+            background: radial-gradient(100% 70% at 50% 100%, rgba(8, 10, 13, 0.42) 0%, rgba(8, 10, 13, 0.14) 48%, rgba(8, 10, 13, 0) 100%);
+            filter: blur(0.24rem);
+        }
+        .search-zone.is-instant {
+            transition-duration: 0.2s;
+        }
+        .search-zone.is-collapsed {
+            pointer-events: none;
+        }
+        .search-recall {
+            position: absolute;
+            right: 1rem;
+            bottom: 0.625rem;
+            z-index: 14;
+            height: 2.0625rem;
+            padding: 0 0.875rem;
+            border-radius: 999rem;
+            border: 0.0625rem solid rgba(255, 255, 255, 0.16);
+            background: rgba(14, 16, 20, 0.9);
+            color: rgba(255, 255, 255, 0.88);
+            font-family: "SF Mono", "SF Pro Display", monospace;
+            font-size: 0.6875rem;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            box-shadow: 0 0.375rem 1rem rgba(0, 0, 0, 0.24);
+            opacity: 0;
+            transform: translateY(0.9375rem) scale(0.94);
+            pointer-events: none;
+            transition: opacity 0.34s ease, transform 0.34s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.34s ease;
+            cursor: pointer;
+        }
+        .search-recall.is-visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+        .section-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.6875rem;
+            letter-spacing: 0.03em;
+            color: rgba(255,255,255,0.6);
+            margin: 0 0.375rem 0.25rem;
+            font-family: "SF Mono", "SF Pro Display", monospace;
+            text-transform: none;
+        }
+        .section-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            flex-shrink: 0;
+        }
+        .search-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            font-size: 1.02rem;
+            font-weight: 300;
+            color: white;
+            padding-bottom: 0.4375rem;
+            border-bottom: 0.0625rem solid rgba(255,255,255,0.16);
+            outline: none;
+            font-family: "Caveat", "SF Pro Display", sans-serif;
+        }
+        .search-input::placeholder { color: rgba(255,255,255,0.3); font-style: italic; }
+        .search-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0 0.375rem;
+        }
+        .feeling-chips {
+            display: flex;
+            gap: 0.375rem;
+            overflow-x: auto;
+            padding: 0.4375rem 0.375rem 0;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .feeling-chips::-webkit-scrollbar { display: none; }
+        .feeling-chip {
+            flex-shrink: 0;
+            appearance: none;
+            border: 0.0625rem solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.75);
+            border-radius: 999rem;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.625rem;
+            letter-spacing: 0.02em;
+            font-family: "SF Mono", "SF Pro Display", monospace;
+            cursor: pointer;
+        }
+        .feeling-chip:active {
+            opacity: 0.7;
+        }
+        .terminal-label {
+            margin: 0.1875rem 1.5rem 0;
+            font-family: "SF Mono", "SF Pro Display", monospace;
+            font-size: 0.6875rem;
+            color: rgba(110, 132, 148, 0.85);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .terminal-line {
+            margin: 0 1.5rem 0;
+            padding: 0 0 0.625rem;
+            font-family: "SF Mono", "SF Pro Display", monospace;
+            font-size: 0.6875rem;
+            color: rgba(132, 155, 174, 0.9);
+            letter-spacing: 0.04em;
+            transform: translateY(0);
+            position: relative;
+            z-index: 2;
+        }
+        .terminal-line::before {
+            content: "> ";
+            color: rgba(110, 132, 148, 0.85);
+        }
+        .search-btn {
+            appearance: none;
+            border: none;
+            padding: 0.625rem 1rem;
+            border-radius: 999rem;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: #111111;
+            background: #ffffff;
+            box-shadow: 0 0.375rem 1.125rem rgba(0,0,0,0.15);
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(0.375rem) scale(0.98);
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .search-zone.has-text .search-btn {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+        .search-btn:hover {
+            box-shadow: 0 0.5rem 1.375rem rgba(0,0,0,0.2);
+        }
+
+        /* 
+           2. THE NEURAL FEED
+           Vertical Scroll Container.
+        */
+        .feed-container {
+            flex: 1;
+            position: relative;
+            overflow-y: auto;
+            padding: 0.125rem 0 9rem 0;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            transition: padding-bottom 0.66s ease;
+        }
+        .feed-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2.5rem;
+            pointer-events: none;
+            z-index: 1;
+            background: linear-gradient(
+                to bottom,
+                rgba(8, 10, 13, 0.66) 0%,
+                rgba(8, 10, 13, 0.42) 36%,
+                rgba(8, 10, 13, 0.16) 72%,
+                rgba(8, 10, 13, 0) 100%
+            );
+            filter: blur(0.2rem);
+        }
+        .feed-container::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 6.8rem;
+            pointer-events: none;
+            z-index: 2;
+            background:
+                radial-gradient(120% 68% at 18% 100%, rgba(8, 10, 13, 0.6) 0%, rgba(8, 10, 13, 0.16) 34%, rgba(8, 10, 13, 0) 60%),
+                radial-gradient(120% 72% at 50% 100%, rgba(8, 10, 13, 0.72) 0%, rgba(8, 10, 13, 0.22) 36%, rgba(8, 10, 13, 0) 64%),
+                radial-gradient(120% 68% at 82% 100%, rgba(8, 10, 13, 0.6) 0%, rgba(8, 10, 13, 0.16) 34%, rgba(8, 10, 13, 0) 60%),
+                linear-gradient(
+                    to top,
+                    rgba(8, 10, 13, 0.9) 0%,
+                    rgba(8, 10, 13, 0.44) 24%,
+                    rgba(8, 10, 13, 0.12) 44%,
+                    rgba(8, 10, 13, 0) 100%
+                );
+            filter: blur(0.18rem);
+        }
+        .feed-container::-webkit-scrollbar { display: none; }
+
+        /* 
+           THE CLUSTER (Emotion Node)
+           Organic grouping of a Title + A Stream of Text.
+        */
+        .cluster {
+            margin-bottom: 1.7rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        /* The Emotion Anchor (Left Side) */
+        .cluster-header {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .cluster-title {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            width: 100%;
+        }
+        .pattern-left {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.42rem;
+            width: 100%;
+        }
+        .pattern-name {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 4.875rem;
+            height: 3.75rem;
+            position: relative;
+            font-size: 0;
+            line-height: 0;
+            opacity: 0.85;
+        }
+        .pattern-name svg {
+            width: 4.5rem;
+            height: 4.5rem;
+            overflow: visible;
+        }
+        .pattern-name img {
+            width: 4.5rem;
+            height: 4.5rem;
+            object-fit: contain;
+            display: block;
+        }
+        .pattern-name path,
+        .pattern-name circle,
+        .pattern-name rect,
+        .pattern-name ellipse,
+        .pattern-name line {
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: all 0.5s ease;
+        }
+        .pattern-name .spin-lock-fluid {
+            stroke: #00897b;
+            stroke-width: 1.25rem;
+            stroke-dasharray: 600;
+            stroke-dashoffset: 600;
+            opacity: 0.8;
+            animation: draw-loop 6s linear infinite;
+        }
+        .pattern-name .spin-lock-eyes path { stroke: rgba(255, 255, 255, 0.9); stroke-width: 0.5rem; }
+        .pattern-name .spin-lock-eyes circle { fill: rgba(255, 255, 255, 0.9); stroke: none; }
+        .pattern-name .spin-lock-eyes { animation: slow-blink 4s ease-in-out infinite; }
+
+        .pattern-name .jitter-svg { animation: shake-hard 0.2s infinite; }
+        .pattern-name .jitter-fluid {
+            stroke: #e91e63;
+            stroke-width: 1.25rem;
+            opacity: 0.8;
+            stroke-dasharray: 100 30;
+            animation: jitter-flux 0.5s infinite alternate;
+        }
+        .pattern-name .jitter-eyes circle.orbit { stroke: rgba(255, 255, 255, 0.9); stroke-width: 0.5rem; }
+        .pattern-name .jitter-eyes circle.pupil { fill: rgba(255, 255, 255, 0.9); stroke: none; }
+        .pattern-name .jitter-eyes line { stroke: rgba(255, 255, 255, 0.9); stroke-width: 0.25rem; }
+
+        .pattern-name .overfit-group {
+            transform-origin: center;
+            animation: overfit-float 3s ease-in-out infinite alternate;
+        }
+        .pattern-name .overfit-sclera {
+            stroke: #ff9800;
+            stroke-width: 1.125rem;
+            fill: rgba(255, 255, 255, 0.9);
+            filter: drop-shadow(0 0 0.9375rem rgba(255, 152, 0, 0.5));
+            animation: sclera-pulse 2s infinite alternate;
+        }
+        .pattern-name .overfit-pupil {
+            stroke: rgba(255, 255, 255, 0.9);
+            stroke-width: 0.375rem;
+            transform-origin: center;
+            animation: pupil-spin 1s linear infinite;
+        }
+        .pattern-name .overfit-shine {
+            fill: #fff;
+            stroke: none;
+            opacity: 0.6;
+        }
+        .pattern-signal {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.125rem 0.5rem 0.1875rem;
+            border-radius: 999rem;
+            font-size: 0.625rem;
+            font-family: "SF Mono", "SF Pro Display", monospace;
+            letter-spacing: 0.06em;
+            text-transform: none;
+            color: rgba(255,255,255,0.75);
+            border: 0.0625rem solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            box-shadow: inset 0 0 0.625rem rgba(255,255,255,0.06);
+        }
+        .pattern-signal::before {
+            content: "";
+            width: 0.375rem;
+            height: 0.375rem;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            box-shadow: 0 0 0.625rem rgba(255,255,255,0.35);
+        }
+        .signal-spin { border-color: rgba(255, 45, 85, 0.35); color: rgba(255, 195, 205, 0.85); }
+        .signal-spin::before { background: var(--color-burn); box-shadow: 0 0 0.625rem rgba(255, 45, 85, 0.55); animation: glow-dim 2.8s ease-in-out infinite; }
+        .signal-jitter { border-color: rgba(10, 132, 255, 0.35); color: rgba(180, 215, 255, 0.85); }
+        .signal-jitter::before { background: var(--color-drift); box-shadow: 0 0 0.625rem rgba(10, 132, 255, 0.55); animation: glow-flicker 1.6s ease-in-out infinite; }
+        .signal-overfit { border-color: rgba(191, 90, 242, 0.35); color: rgba(220, 185, 255, 0.85); }
+        .signal-overfit::before { background: var(--color-void); box-shadow: 0 0 0.625rem rgba(191, 90, 242, 0.55); animation: glow-pulse 2.2s ease-in-out infinite; }
+        @keyframes glow-dim {
+            0%, 100% { transform: scale(0.95); opacity: 0.55; box-shadow: 0 0 0.5rem rgba(255, 45, 85, 0.35); }
+            50% { transform: scale(1.05); opacity: 0.9; box-shadow: 0 0 0.875rem rgba(255, 45, 85, 0.55); }
+        }
+        @keyframes glow-flicker {
+            0% { opacity: 0.45; transform: scale(0.9); }
+            20% { opacity: 0.9; transform: scale(1.05); }
+            40% { opacity: 0.6; transform: scale(0.95); }
+            60% { opacity: 1; transform: scale(1.08); }
+            80% { opacity: 0.5; transform: scale(0.92); }
+            100% { opacity: 0.75; transform: scale(1); }
+        }
+        @keyframes glow-pulse {
+            0%, 100% { opacity: 0.6; transform: scale(0.96); box-shadow: 0 0 0.5rem rgba(191, 90, 242, 0.35); }
+            50% { opacity: 1; transform: scale(1.08); box-shadow: 0 0 1rem rgba(191, 90, 242, 0.6); }
+        }
+        @keyframes draw-loop { to { stroke-dashoffset: 0; } }
+        @keyframes slow-blink { 0%, 80%, 100% { transform: scaleY(1); } 90% { transform: scaleY(0.1); } }
+        @keyframes shake-hard {
+            0% { transform: translate(0.0625rem, 0.0625rem) rotate(0deg); }
+            50% { transform: translate(-0.0625rem, -0.0625rem) rotate(1deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+        @keyframes jitter-flux { from { stroke-width: 1.125rem; } to { stroke-width: 1.5rem; } }
+        @keyframes pupil-spin { to { transform: rotate(360deg); } }
+        @keyframes overfit-float {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(-0.625rem) scale(1.05); }
+        }
+        @keyframes sclera-pulse {
+            0% { stroke-width: 1.125rem; filter: drop-shadow(0 0 0.9375rem rgba(255, 152, 0, 0.5)); }
+            100% { stroke-width: 1.5625rem; filter: drop-shadow(0 0 1.875rem rgba(255, 152, 0, 0.8)); }
+        }
+        .pattern-proof {
+            position: static;
+            font-size: 0.625rem;
+            color: rgba(255, 255, 255, 0.5);
+            font-family: "SF Mono", "SF Pro Display", monospace;
+            white-space: nowrap;
+            letter-spacing: 0.02em;
+            line-height: 1;
+            transform: translateY(-0.55rem);
+            text-shadow: 0 0.0625rem 0.25rem rgba(0, 0, 0, 0.45);
+        }
+
+        .glyph {
+            display: none;
+        }
+
+        .emotion-name {
+            font-weight: 700;
+            letter-spacing: -0.03125rem;
+            /* Gradient Text for Artistry */
+            background: linear-gradient(90deg, #fff, rgba(255,255,255,0.5));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Size Logic: Bigger Volume = Bigger Text */
+        .size-l .emotion-name { font-size: 1.75rem; }
+        .size-m .emotion-name { font-size: 1.25rem; }
+        .size-s .emotion-name { font-size: 1rem; opacity: 0.7; }
+
+        .count-badge {
+            font-size: 0.625rem;
+            color: var(--text-dim);
+            font-family: monospace;
+            vertical-align: super;
+        }
+
+        /* 
+           THE MEMORY STREAM (Right Side / Flow)
+           Horizontal scrolling text lines. NO CARDS.
+        */
+        .memory-stream {
+            display: flex;
+            gap: 1.5rem; /* Space between memories */
+            overflow-x: auto;
+            padding-right: 1.5rem;
+            scrollbar-width: none;
+            align-items: flex-start;
+            /* Fade out the right edge */
+            mask-image: linear-gradient(to right, black 85%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+        }
+        .memory-stream::-webkit-scrollbar { display: none; }
+
+        /* The Naked Memory Unit */
+        .memory-node {
+            flex-shrink: 0;
+            width: 15rem;
+            max-width: 15rem;
+            min-height: 3.875rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.1875rem;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            overflow: hidden;
+        }
+
+        .memory-sticker {
+            --r: 108;
+            --g: 176;
+            --b: 210;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0 0.375rem 0 0;
+            border-radius: 999rem;
+            font-family: "SF Mono", "SF Pro Display", monospace;
+            font-size: 0.5625rem;
+            line-height: 1;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: rgba(var(--r), var(--g), var(--b), 0.68);
+            background: rgba(var(--r), var(--g), var(--b), 0.06);
+            border: 0.0625rem solid rgba(var(--r), var(--g), var(--b), 0.18);
+            box-shadow: 0 0 0.5rem rgba(var(--r), var(--g), var(--b), 0.12);
+            vertical-align: baseline;
+            overflow: hidden;
+        }
+
+        .memory-sticker .avatar {
+            width: 0.875rem;
+            height: 0.875rem;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            margin-left: -0.0625rem;
+            border: 0.0625rem solid rgba(var(--r), var(--g), var(--b), 0.28);
+            box-shadow: 0 0 0.375rem rgba(var(--r), var(--g), var(--b), 0.16);
+        }
+        
+        .memory-node:active { opacity: 0.6; }
+
+        /* Time Row (Bottom Right) */
+        .time-row {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 0.25rem;
+            margin-top: 0.125rem;
+        }
+
+        .time-sep {
+            font-size: 0.5625rem;
+            color: rgba(255, 255, 255, 0.34);
+            line-height: 1;
+        }
+
+        .time-stamp {
+            font-size: 0.5625rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: rgba(255, 255, 255, 0.45);
+            font-family: "SF Mono", "SF Pro Display", monospace;
+        }
+
+        /* Time Logic colors */
+        .time-now { color: rgba(255, 255, 255, 0.55); text-shadow: none; }
+        .time-recent { color: rgba(255, 255, 255, 0.4); }
+        .time-old { color: rgba(255, 255, 255, 0.28); }
+
+        /* The Content Text */
+        .node-text {
+            font-family: "Inter Tight", sans-serif;
+            font-size: 1.125rem;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            color: #d4d4d4;
+            font-weight: 400;
+            min-height: calc(1.2em * 2);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            overflow-wrap: anywhere;
+        }
+        
+        /* Fading older memories */
+        .node-text.faded { color: var(--text-mid); }
+        .node-text.ancient { color: var(--text-dim); }
+        .memory-node.definition {
+            background: rgba(0,0,0,0.65);
+            border: 0.0625rem solid rgba(255,255,255,0.08);
+            padding: 0.75rem 0.875rem;
+            border-radius: 0.875rem;
+            max-width: 16.25rem;
+            width: auto;
+            height: auto;
+            overflow: visible;
+        }
+        .definition-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.375rem;
+        }
+        .definition-badge {
+            width: 1.125rem;
+            height: 1.125rem;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #ffffff, #8b5cf6);
+            box-shadow: 0 0 0.625rem rgba(139, 92, 246, 0.5);
+        }
+        .definition-label {
+            font-size: 0.625rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: rgba(255,255,255,0.6);
+        }
+
+        /* 
+           Visual Separators between clusters
+           A very subtle thread.
+        */
+        .thread-line {
+            position: absolute;
+            left: 1.5rem;
+            bottom: -0.625rem;
+            width: 0.0625rem;
+            height: 0.625rem;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.1), transparent);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="phone-shell">
+    <div class="app">
+        <div class="galaxy-bg"></div>
+        <div class="fog-layer" aria-hidden="true"></div>
+        <div class="edge-blur-right" aria-hidden="true"></div>
+
+        <header class="living-header" id="location-status" role="button" tabindex="0" aria-pressed="false">
+            <div class="status-bar" aria-live="polite">
+                <span class="status-dot" aria-hidden="true"></span>
+                <span class="status-text">
+                    <span class="status-primary">Location Off</span>
+                    <span class="status-secondary">Turn on location to see nearby Echo Gatherings</span>
+                </span>
+                <span class="status-action">Tap to enable</span>
+            </div>
+        </header>
+
+        <div class="resonance-sheet">
+
+        <button class="sheet-grabber" type="button" aria-label="Adjust resonance sheet"></button>
+
+        <div class="moment-unit" aria-label="moment">
+            <div class="moment-card">
+                <div class="moment-thumb">
+                    <img class="moment-image" src="../Resource/Pictures For the time of the day/DeePnight.png" alt="Moment scene">
+                </div>
+                <div class="moment-meta">
+                    <div class="moment-date" id="moment-date">Feb,05</div>
+                    <div class="moment-title" id="moment-title">Tuesday Morning</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="feed-container">
+            <div class="terminal-line">
+                Echo: Memories from moments like this. Scanned 14,002 echoes from San Francisco.
+            </div>
+
+            <!-- CLUSTER 1: HIGH VOLUME (Huge) -->
+            <!-- Theme: Overwhelm/Chaos -->
+            <div class="cluster size-l">
+                <div class="cluster-header">
+                    <div class="cluster-title">
+                        <span class="pattern-left">
+                            <span class="pattern-name" aria-label="Happy icon">
+                                <img src="../Resource/happy.png" alt="Happy visualization">
+                            </span>
+                            <span class="pattern-proof">219 people felt happy</span>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="memory-stream">
+                    <!-- Memory 1: NOW -->
+                    <div class="memory-node">
+                        <div class="node-text">
+                            "Everything is loud but nothing is happening."
+                        </div>
+                        <div class="time-row">
+                            <span class="time-stamp time-now">Just Now</span>
+                            <span class="time-sep" aria-hidden="true">·</span>
+                            <span class="memory-sticker" style="--r: 224; --g: 170; --b: 62;">
+                                <img src="https://i.pravatar.cc/100?img=12" alt="" class="avatar">
+                                Rush Noise
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Memory 2: 10m ago -->
+                    <div class="memory-node">
+                        <div class="node-text">
+                            "Screen glare is burning my retinas."
+                        </div>
+                        <div class="time-row">
+                            <span class="time-stamp time-recent">10m ago</span>
+                            <span class="time-sep" aria-hidden="true">·</span>
+                            <span class="memory-sticker" style="--r: 240; --g: 148; --b: 54;">
+                                <img src="https://i.pravatar.cc/100?img=8" alt="" class="avatar">
+                                Light Burn
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Memory 3: 2h ago -->
+                    <div class="memory-node">
+                        <div class="node-text faded">
+                            "我沿着海风很重的街口往前走，耳机里是昨天没听完的播客，手机不断亮起却没有一条真正想回的消息。路灯把人影拉得很长，我突然想起很多年以前同样的傍晚，我们也这样并肩走着，以为未来会一直清晰稳定可以被计划。可后来每一次选择都像在雾里换轨，工作关系和城市都在变，连自己说话的语气都慢慢陌生。此刻我站在斑马线前看着红灯反复倒数，心里只剩一个很小但很固执的愿望：如果不能让时间停下，至少让我在下一次天黑之前，重新相信生活还有温度。"
+                        </div>
+                        <div class="time-row">
+                            <span class="time-stamp time-recent">2h ago</span>
+                            <span class="time-sep" aria-hidden="true">·</span>
+                            <span class="memory-sticker" style="--r: 228; --g: 120; --b: 90;">
+                                <img src="https://i.pravatar.cc/100?img=15" alt="" class="avatar">
+                                Ping Storm
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="thread-line"></div>
+            </div>
+
+            <!-- CLUSTER 2: MEDIUM VOLUME -->
+            <!-- Theme: Existential/Void -->
+            <div class="cluster size-m">
+                <div class="cluster-header">
+                    <div class="cluster-title">
+                        <span class="pattern-left">
+                            <span class="pattern-name" aria-label="Jittering icon">
+                                <img src="../Resource/jittering.png" alt="Jittering visualization">
+                            </span>
+                            <span class="pattern-proof">89 people felt sad</span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="memory-stream">
+                    <!-- Memory 1: 5m ago -->
+                    <div class="memory-node">
+                        <div class="node-text">
+                            "Walking fast to nowhere."
+                        </div>
+                        <div class="time-row">
+                            <span class="time-stamp time-recent">5m ago</span>
+                            <span class="time-sep" aria-hidden="true">·</span>
+                            <span class="memory-sticker" style="--r: 108; --g: 176; --b: 210;">
+                                <img src="https://i.pravatar.cc/100?img=9" alt="" class="avatar">
+                                Drift Walk
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Memory 2: Yesterday -->
+                    <div class="memory-node">
+                        <div class="node-text faded">
+                            "今天的风把整条路都吹成了同一种声音，我在人群里走了很久却一直没有真正到达任何地方。屏幕上的通知一层一层叠上来，像别人正在替我安排情绪和节奏，可我只想安静地看一会儿天色从蓝变灰。很多事情并没有发生剧烈的崩塌，它们只是缓慢地偏移，偏到某个时刻你才发现，原本熟悉的人和目标都已经不在原位。站在路口等红灯的时候，我突然意识到自己并不是真的害怕失去，而是害怕再也找不回那种笃定。可即使如此，我还是想给明天留一点空白，留给新的可能。"
+                        </div>
+                        <div class="time-row">
+                            <span class="time-stamp time-old">Yesterday</span>
+                            <span class="time-sep" aria-hidden="true">·</span>
+                            <span class="memory-sticker" style="--r: 100; --g: 140; --b: 200;">
+                                <img src="https://i.pravatar.cc/100?img=21" alt="" class="avatar">
+                                Fog Mouth
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="thread-line"></div>
+            </div>
+
+            <!-- CLUSTER 3: HISTORICAL (Old/Faded) -->
+            <!-- Theme: Pattern Recognition -->
+            <div class="cluster size-s">
+                <div class="cluster-header">
+                    <div class="cluster-title">
+                        <span class="pattern-left">
+                            <span class="pattern-name" aria-label="Angry icon">
+                                <img src="../Resource/angry.png" alt="Angry visualization">
+                            </span>
+                            <span class="pattern-proof">1.2k people felt angry</span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="memory-stream">
+                    <!-- Memory 1: 1 Month Ago -->
+                    <div class="memory-node">
+                        <div class="node-text ancient">
+                            "Same sunset, different panic."
+                        </div>
+                        <div class="time-row">
+                            <span class="time-stamp time-old">1 Month Ago</span>
+                            <span class="time-sep" aria-hidden="true">·</span>
+                            <span class="memory-sticker" style="--r: 155; --g: 135; --b: 195;">
+                                <img src="https://i.pravatar.cc/100?img=32" alt="" class="avatar">
+                                Loop Sunset
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Memory 2: 2 Months Ago -->
+                    <div class="memory-node">
+                        <div class="node-text ancient">
+                            "两个月前的这个夜里我也在同一条街上停过，橱窗里的光比现在更暖，行人更少，心跳却更快。那时我以为只要再努力一点，很多关系就能被修好，很多问题就会自动找到答案；后来才明白，成长并不是把所有裂缝都补平，而是学会带着裂缝继续生活。最近我常常在很小的瞬间被击中，比如公交车到站前的刹车声、便利店门口微弱的铃声、或者某个人随口说的一句晚安。它们让我短暂地相信，世界仍然愿意把温柔分给我一点点，所以我决定再试一次，再慢一点，也再真一点。"
+                        </div>
+                        <div class="time-row">
+                            <span class="time-stamp time-old">2 Months Ago</span>
+                            <span class="time-sep" aria-hidden="true">·</span>
+                            <span class="memory-sticker" style="--r: 122; --g: 174; --b: 94;">
+                                <img src="https://i.pravatar.cc/100?img=39" alt="" class="avatar">
+                                Pause Wish
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="search-zone">
+            <div class="section-label">
+                <span class="section-indicator">Find a feeling</span>
+            </div>
+            <div class="search-row">
+                <input type="text" class="search-input" placeholder="">
+                <button class="search-btn" type="button">Search</button>
+            </div>
+            <div class="feeling-chips" aria-label="Suggested feelings">
+                <button class="feeling-chip" type="button">restless</button>
+                <button class="feeling-chip" type="button">drained</button>
+                <button class="feeling-chip" type="button">overstimulated</button>
+                <button class="feeling-chip" type="button">hopeful</button>
+            </div>
+        </div>
+        <button class="search-recall" type="button" aria-label="Start search">Start Search</button>
+        </div>
+    </div>
+    </div>
+
+</body>
+<script>
+    const searchZone = document.querySelector(".search-zone");
+    const searchRecall = document.querySelector(".search-recall");
+    const resonanceSheet = document.querySelector(".resonance-sheet");
+    const feedContainer = document.querySelector(".feed-container");
+    const appRoot = document.querySelector(".app");
+    const sheetGrabber = document.querySelector(".sheet-grabber");
+    const promptInput = document.querySelector(".search-input");
+    const feelingChips = document.querySelectorAll(".feeling-chip");
+    const suggestions = [
+        "BDA Neo",
+        "Bouffon Show",
+        "Souza Fan Revolution",
+        "the show you want",
+        "That Tuesday-afternoon drowsiness",
+        "You are you, so what do you see?"
+    ];
+
+    let suggestionIndex = 0;
+    let charIndex = 0;
+    let dots = 0;
+
+    if (appRoot && searchZone && searchZone.parentElement !== appRoot) {
+        appRoot.appendChild(searchZone);
+    }
+    if (appRoot && searchRecall && searchRecall.parentElement !== appRoot) {
+        appRoot.appendChild(searchRecall);
+    }
+
+    function typeLoop() {
+        if (promptInput.value.trim().length > 0) {
+            setTimeout(typeLoop, 300);
+            return;
+        }
+        const text = suggestions[suggestionIndex];
+        if (charIndex <= text.length) {
+            promptInput.setAttribute("placeholder", `“${text.slice(0, charIndex)}”`);
+            charIndex += 1;
+            setTimeout(typeLoop, 60);
+            return;
+        }
+        if (dots < 3) {
+            dots += 1;
+            promptInput.setAttribute("placeholder", `“${text}”${".".repeat(dots)}`);
+            setTimeout(typeLoop, 300);
+            return;
+        }
+        charIndex = 0;
+        dots = 0;
+        suggestionIndex = (suggestionIndex + 1) % suggestions.length;
+        setTimeout(typeLoop, 500);
+    }
+
+    promptInput.addEventListener("input", () => {
+        const hasText = promptInput.value.trim().length > 0;
+        searchZone.classList.toggle("has-text", hasText);
+    });
+    feelingChips.forEach((chip) => {
+        chip.addEventListener("click", () => {
+            promptInput.value = chip.textContent || "";
+            searchZone.classList.add("has-text");
+            promptInput.focus();
+        });
+    });
+    let lastFeedScrollTop = 0;
+    let touchStartY = null;
+    let stageIntentLockUntil = 0;
+    let activePointerId = null;
+    let isDraggingSheet = false;
+    let hasDraggedSheet = false;
+    let dragStartY = 0;
+    let dragStartOffset = 0;
+    let currentSheetOffset = 0;
+    let currentStage = 1;
+    let stageOffsets = [];
+    let maxSheetHeight = 0;
+    let searchInstantTimer = null;
+    const SHEET_CONFIG = {
+        stageRatios: [0.1, 0.52, 0.9],
+        minHeightRatio: 0.1,
+        stageIntentCooldownMs: 260,
+        snapDistancePx: 18,
+        searchCollapseThreshold: 0.72,
+        scrollDeltaTrigger: 6,
+        touchDeltaTrigger: 72,
+        wheelDeltaTrigger: 18
+    };
+
+    function clamp(value, min, max) {
+        return Math.min(Math.max(value, min), max);
+    }
+    function setSheetOffset(offset, animate = true) {
+        if (!resonanceSheet || !stageOffsets.length) return;
+        const minOffset = stageOffsets[stageOffsets.length - 1];
+        const maxOffset = stageOffsets[0];
+        currentSheetOffset = clamp(offset, minOffset, maxOffset);
+        if (!animate && !isDraggingSheet) {
+            resonanceSheet.classList.add("is-dragging");
+            requestAnimationFrame(() => {
+                if (!isDraggingSheet) {
+                    resonanceSheet.classList.remove("is-dragging");
+                }
+            });
+        }
+        resonanceSheet.style.setProperty("--sheet-offset", `${currentSheetOffset}px`);
+        updateSearchPresence();
+    }
+    function updateSearchPresence() {
+        if (!searchZone || !searchRecall || !stageOffsets.length) return;
+        // Keep Search Zone fully visible through min/mid stages.
+        // Start collapsing only when sheet moves from mid -> full.
+        const midOffset = stageOffsets[1] ?? stageOffsets[0] ?? 0;
+        const fullOffset = stageOffsets[stageOffsets.length - 1] ?? 0;
+        const collapseRange = Math.max(1, midOffset - fullOffset);
+        const collapse = clamp((midOffset - currentSheetOffset) / collapseRange, 0, 1);
+        searchZone.style.setProperty("--search-collapse", `${collapse}`);
+        const collapsed = collapse >= SHEET_CONFIG.searchCollapseThreshold;
+        searchZone.classList.toggle("is-collapsed", collapsed);
+        searchRecall.classList.toggle("is-visible", collapsed);
+    }
+    function getNearestStage(offset) {
+        let nearest = 0;
+        let bestDistance = Number.POSITIVE_INFINITY;
+        for (let i = 0; i < stageOffsets.length; i += 1) {
+            const distance = Math.abs(stageOffsets[i] - offset);
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                nearest = i;
+            }
+        }
+        return nearest;
+    }
+    function applyStageVisualState(stageIndex) {
+        currentStage = clamp(stageIndex, 0, stageOffsets.length - 1);
+        appRoot?.classList.toggle("stage-min-active", currentStage === 0);
+        resonanceSheet?.classList.remove("stage-min", "stage-mid", "stage-full");
+        resonanceSheet?.classList.add(currentStage === 0 ? "stage-min" : currentStage === 1 ? "stage-mid" : "stage-full");
+        if (resonanceSheet) {
+            resonanceSheet.dataset.stage = currentStage === 0 ? "min" : currentStage === 1 ? "mid" : "full";
+        }
+        if (currentStage === 0) {
+            brightenImmediately();
+        }
+    }
+    function snapToStage(stageIndex, animate = true) {
+        if (!stageOffsets.length) return;
+        applyStageVisualState(stageIndex);
+        setSheetOffset(stageOffsets[currentStage], animate);
+    }
+    function tryStepStage(direction) {
+        const now = Date.now();
+        if (now < stageIntentLockUntil) return false;
+        const nextStage = clamp(currentStage + direction, 0, stageOffsets.length - 1);
+        if (nextStage === currentStage) return false;
+        stageIntentLockUntil = now + SHEET_CONFIG.stageIntentCooldownMs;
+        snapToStage(nextStage, true);
+        return true;
+    }
+    function recalcSheetStages() {
+        if (!appRoot || !resonanceSheet) return;
+        const hadStages = stageOffsets.length > 0;
+        const prevMaxOffset = hadStages ? stageOffsets[0] : 0;
+        const prevMinOffset = hadStages ? stageOffsets[stageOffsets.length - 1] : 0;
+        const prevOffset = currentSheetOffset;
+        const isFreeOffset = hadStages
+            && Math.abs((stageOffsets[currentStage] ?? prevOffset) - prevOffset) > SHEET_CONFIG.snapDistancePx;
+        const appHeight = appRoot.clientHeight;
+        const sheetBottom = parseFloat(getComputedStyle(resonanceSheet).bottom) || 0;
+        const minStageHeight = Math.round(appHeight * SHEET_CONFIG.minHeightRatio);
+        const maxStageHeight = Math.max(minStageHeight, Math.round(appHeight - sheetBottom - 4));
+        const minHeight = clamp(Math.round((appHeight * SHEET_CONFIG.stageRatios[0]) - sheetBottom), minStageHeight, maxStageHeight);
+        const midHeight = clamp(Math.round((appHeight * SHEET_CONFIG.stageRatios[1]) - sheetBottom), minStageHeight, maxStageHeight);
+        const fullHeight = clamp(Math.round((appHeight * SHEET_CONFIG.stageRatios[2]) - sheetBottom), minStageHeight, maxStageHeight);
+        maxSheetHeight = fullHeight;
+        const stageHeights = [minHeight, midHeight, fullHeight];
+        stageOffsets = stageHeights.map((height) => maxSheetHeight - height);
+        resonanceSheet.style.height = `${maxSheetHeight}px`;
+        if (isFreeOffset) {
+            const prevRange = Math.max(1, prevMaxOffset - prevMinOffset);
+            const progress = clamp((prevOffset - prevMinOffset) / prevRange, 0, 1);
+            const nextMaxOffset = stageOffsets[0];
+            const nextMinOffset = stageOffsets[stageOffsets.length - 1];
+            const mappedOffset = nextMinOffset + ((nextMaxOffset - nextMinOffset) * progress);
+            applyStageVisualState(getNearestStage(mappedOffset));
+            setSheetOffset(mappedOffset, false);
+        } else {
+            snapToStage(currentStage, false);
+        }
+        updateSearchPresence();
+    }
+    function startSheetDrag(clientY, pointerId) {
+        if (!stageOffsets.length) return;
+        isDraggingSheet = true;
+        hasDraggedSheet = false;
+        activePointerId = pointerId;
+        dragStartY = clientY;
+        dragStartOffset = currentSheetOffset;
+        resonanceSheet?.classList.add("is-dragging");
+    }
+    function moveSheetDrag(clientY) {
+        if (!isDraggingSheet) return;
+        const deltaY = clientY - dragStartY;
+        if (Math.abs(deltaY) > 6) {
+            hasDraggedSheet = true;
+        }
+        setSheetOffset(dragStartOffset + deltaY, false);
+    }
+    function endSheetDrag() {
+        if (!isDraggingSheet) return;
+        isDraggingSheet = false;
+        activePointerId = null;
+        resonanceSheet?.classList.remove("is-dragging");
+        const nearestStage = getNearestStage(currentSheetOffset);
+        const nearestDistance = Math.abs(stageOffsets[nearestStage] - currentSheetOffset);
+        if (nearestDistance <= SHEET_CONFIG.snapDistancePx) {
+            snapToStage(nearestStage, true);
+            return;
+        }
+        applyStageVisualState(nearestStage);
+        setSheetOffset(currentSheetOffset, false);
+    }
+
+    function syncSearchZoneState() {
+        if (!searchZone) return;
+        searchZone.classList.remove("is-instant");
+        updateSearchPresence();
+    }
+    function brightenImmediately() {
+        if (!searchZone) return;
+        clearTimeout(searchInstantTimer);
+        searchZone.classList.add("is-instant");
+        searchInstantTimer = setTimeout(() => {
+            searchZone.classList.remove("is-instant");
+        }, 120);
+    }
+
+    if (feedContainer && searchZone) {
+        feedContainer.addEventListener("scroll", () => {
+            const currentTop = feedContainer.scrollTop;
+            const scrollDelta = currentTop - lastFeedScrollTop;
+            if (scrollDelta > SHEET_CONFIG.scrollDeltaTrigger) {
+                if (currentTop < 20) {
+                    tryStepStage(1);
+                }
+            } else if (scrollDelta < -SHEET_CONFIG.scrollDeltaTrigger && currentTop < 18) {
+                tryStepStage(-1);
+            }
+            lastFeedScrollTop = currentTop;
+            syncSearchZoneState();
+        }, { passive: true });
+        feedContainer.addEventListener("touchstart", (event) => {
+            touchStartY = event.touches[0]?.clientY ?? null;
+        }, { passive: true });
+        feedContainer.addEventListener("touchmove", (event) => {
+            if (touchStartY === null) return;
+            const currentY = event.touches[0]?.clientY ?? touchStartY;
+            const deltaY = touchStartY - currentY;
+            if (deltaY > SHEET_CONFIG.touchDeltaTrigger) {
+                if (feedContainer.scrollTop < 20) {
+                    tryStepStage(1);
+                }
+            } else if (deltaY < -SHEET_CONFIG.touchDeltaTrigger && feedContainer.scrollTop < 18) {
+                tryStepStage(-1);
+            }
+        }, { passive: true });
+        feedContainer.addEventListener("touchend", () => {
+            touchStartY = null;
+        }, { passive: true });
+        feedContainer.addEventListener("wheel", (event) => {
+            if (event.deltaY > SHEET_CONFIG.wheelDeltaTrigger) {
+                if (feedContainer.scrollTop < 20) {
+                    tryStepStage(1);
+                }
+            } else if (event.deltaY < -SHEET_CONFIG.wheelDeltaTrigger && feedContainer.scrollTop < 18) {
+                tryStepStage(-1);
+            }
+        }, { passive: true });
+    }
+    if (sheetGrabber && resonanceSheet) {
+        sheetGrabber.addEventListener("pointerdown", (event) => {
+            startSheetDrag(event.clientY, event.pointerId);
+            sheetGrabber.setPointerCapture(event.pointerId);
+        });
+        sheetGrabber.addEventListener("pointermove", (event) => {
+            if (!isDraggingSheet || activePointerId !== event.pointerId) return;
+            moveSheetDrag(event.clientY);
+        });
+        sheetGrabber.addEventListener("pointerup", (event) => {
+            if (activePointerId === event.pointerId) {
+                sheetGrabber.releasePointerCapture(event.pointerId);
+                endSheetDrag();
+            }
+        });
+        sheetGrabber.addEventListener("pointercancel", endSheetDrag);
+        sheetGrabber.addEventListener("click", () => {
+            if (hasDraggedSheet) {
+                hasDraggedSheet = false;
+                return;
+            }
+            const nextStage = currentStage >= stageOffsets.length - 1 ? 0 : currentStage + 1;
+            snapToStage(nextStage, true);
+        });
+    }
+    window.addEventListener("resize", recalcSheetStages, { passive: true });
+    recalcSheetStages();
+    if (searchZone) {
+        searchZone.addEventListener("pointerdown", brightenImmediately);
+    }
+    if (searchRecall) {
+        searchRecall.addEventListener("click", () => {
+            snapToStage(1, true);
+            brightenImmediately();
+            promptInput?.focus();
+        });
+    }
+    if (promptInput) {
+        promptInput.addEventListener("focus", brightenImmediately);
+    }
+    typeLoop();
+</script>
+<script>
+    const statusHeader = document.getElementById("location-status");
+    const bodyEl = document.body;
+    const statusPrimary = statusHeader.querySelector(".status-primary");
+    const statusSecondary = statusHeader.querySelector(".status-secondary");
+    const statusAction = statusHeader.querySelector(".status-action");
+
+    let locationEnabled = false;
+    bodyEl.classList.add("location-off");
+
+    function renderLocationState() {
+        bodyEl.classList.toggle("location-on", locationEnabled);
+        bodyEl.classList.toggle("location-off", !locationEnabled);
+        if (locationEnabled) {
+            statusPrimary.textContent = "Location On";
+            statusSecondary.textContent = "12 online · 48 new memories";
+            statusAction.textContent = "Tap to turn off";
+            statusHeader.setAttribute("aria-pressed", "true");
+        } else {
+            statusPrimary.textContent = "Location Off";
+            statusSecondary.textContent = "Turn on location to see nearby Echo Gatherings";
+            statusAction.textContent = "Tap to enable";
+            statusHeader.setAttribute("aria-pressed", "false");
+        }
+    }
+
+    function requestLocation() {
+        if (!navigator.geolocation) {
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(
+            () => {
+                locationEnabled = true;
+                renderLocationState();
+            },
+            () => {
+                locationEnabled = false;
+                renderLocationState();
+            },
+            { enableHighAccuracy: true, timeout: 8000 }
+        );
+    }
+
+    function handleToggle() {
+        if (locationEnabled) {
+            locationEnabled = false;
+            renderLocationState();
+            return;
+        }
+        statusSecondary.textContent = "Requesting location…";
+        requestLocation();
+    }
+
+    statusHeader.addEventListener("click", handleToggle);
+    statusHeader.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            handleToggle();
+        }
+    });
+
+    renderLocationState();
+</script>
+<script>
+    const momentImage = document.querySelector(".moment-image");
+    const momentDate = document.getElementById("moment-date");
+    const momentTitle = document.getElementById("moment-title");
+
+    const momentImages = [
+        "AFTERNOON.png",
+        "DeePnight.png",
+        "Morning.png",
+        "Predawn.png",
+        "dask.png",
+        "daybreak.png",
+        "early afternoon.png",
+        "evening copy.png",
+        "evening.png",
+        "late afternoon.png",
+        "late morning.png",
+        "late night.png"
+    ];
+
+    function formatMomentDate(date) {
+        return date.toLocaleDateString("en-US", { month: "short", day: "2-digit" }).replace(" ", ",");
+    }
+
+    function formatMomentTitle(date) {
+        const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
+        const hours = date.getHours();
+        const period = hours < 5 ? "Predawn" : hours < 9 ? "Morning" : hours < 12 ? "Late Morning" : hours < 16 ? "Afternoon" : hours < 19 ? "Evening" : "Night";
+        return `${dayName} ${period}`;
+    }
+
+    function updateMomentText() {
+        const now = new Date();
+        momentDate.textContent = formatMomentDate(now);
+        momentTitle.textContent = formatMomentTitle(now);
+    }
+
+    function shuffle(array) {
+        const arr = array.slice();
+        for (let i = arr.length - 1; i > 0; i -= 1) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    let shuffledImages = shuffle(momentImages);
+    let momentIndex = 0;
+
+    function rotateMomentImage() {
+        if (!momentImage) return;
+        momentImage.classList.add("is-fading");
+        setTimeout(() => {
+            const filename = shuffledImages[momentIndex];
+            momentImage.src = `../Resource/Pictures For the time of the day/${filename}`;
+            momentIndex += 1;
+            if (momentIndex >= shuffledImages.length) {
+                shuffledImages = shuffle(momentImages);
+                momentIndex = 0;
+            }
+            momentImage.classList.remove("is-fading");
+        }, 320);
+    }
+
+    updateMomentText();
+    rotateMomentImage();
+    setInterval(() => {
+        rotateMomentImage();
+    }, 4200);
+</script>
+</html>
