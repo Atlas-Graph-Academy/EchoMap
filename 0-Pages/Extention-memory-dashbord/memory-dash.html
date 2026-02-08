@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Memory Log: Infinite Stream</title>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --timeline-white: rgba(255, 255, 255, 0.9);
+            --timeline-glow: 0 0 10px rgba(255, 255, 255, 0.4);
+            --text-primary: #FFFFFF;
+            --text-secondary: rgba(255, 255, 255, 0.4);
+            --accent-orange: #ff9f43;
+            --accent-green: #2ecc71;
+            --surface-glass: rgba(10, 10, 10, 0.7);
+            --node-gap: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* HUD Header */
+        .header-glass {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 120px;
+            background: linear-gradient(to bottom, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 100%);
+            z-index: 100;
+            padding: 50px 24px 0;
+            pointer-events: none;
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            pointer-events: auto;
+        }
+
+        .title { font-size: 34px; font-weight: 800; letter-spacing: -0.5px; }
+        .subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 6px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* The Infinite Scroller */
+        .scroller {
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-top: 140px;
+            padding-bottom: 100px;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            position: relative;
+        }
+
+        /* -----------------------
+           THE PLAYING WHITE TIMELINE
+           ----------------------- */
+        .timeline-axis {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 28px; /* Fixed position from right */
+            width: 2px;
+            background: var(--timeline-white);
+            box-shadow: var(--timeline-glow);
+            z-index: 10;
+        }
+
+        /* Timeline Ticks (Generated via Gradient) */
+        .timeline-ticks {
+            position: absolute;
+            top: 0; bottom: 0; right: 20px; width: 18px;
+            background-image: repeating-linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0.6) 0px,
+                rgba(255, 255, 255, 0.6) 1px,
+                transparent 1px,
+                transparent 20px
+            );
+            mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        /* Memory Container Layout */
+        .memory-feed {
+            padding: 0 44px 0 24px; /* Right padding creates space for timeline */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Date Section */
+        .date-section {
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .date-header {
+            position: sticky;
+            top: 120px;
+            align-self: flex-start;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            letter-spacing: 0.5px;
+            mix-blend-mode: screen;
+            z-index: 20;
+            text-align: right;
+            padding-right: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 4px;
+        }
+
+        /* Node Wrapper: Connects node to timeline */
+        .node-wrapper {
+            display: flex;
+            justify-content: flex-end; /* Align to timeline (right) */
+            align-items: center;
+            margin-bottom: var(--node-gap);
+            position: relative;
+            padding-right: 20px; /* Distance from timeline */
+        }
+
+        /* Visual connection line from Node to Timeline */
+        .node-wrapper::after {
+            content: '';
+            position: absolute;
+            right: -6px; /* Touch the axis */
+            width: 20px;
+            height: 1px;
+            background: rgba(255,255,255,0.2);
+            z-index: 5;
+        }
+
+        /* Node Styles */
+        .node {
+            display: flex;
+            align-items: center;
+            height: 40px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 0 16px;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+            max-width: 85%;
+        }
+
+        .node:active { transform: scale(0.97); }
+
+        /* Type: Locked */
+        .node.locked {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            padding-left: 14px;
+        }
+        .node.locked svg { width: 12px; height: 12px; margin-right: 8px; opacity: 0.5; }
+
+        /* Type: Highlight (Orange) */
+        .node.highlight {
+            background: rgba(255, 159, 67, 0.12);
+            border: 1px solid rgba(255, 159, 67, 0.3);
+            color: var(--accent-orange);
+            box-shadow: 0 0 15px rgba(255, 159, 67, 0.05);
+        }
+
+        /* Type: Tag (Green) */
+        .node.tag {
+            background: rgba(46, 204, 113, 0.1);
+            border: 1px solid rgba(46, 204, 113, 0.25);
+            color: var(--accent-green);
+        }
+
+        /* Type: Text Only (Minimal) */
+        .node.text {
+            background: transparent;
+            color: #fff;
+            justify-content: flex-end;
+            padding-right: 0;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+        }
+
+        /* Floating Controls */
+        .fab {
+            position: fixed;
+            bottom: 40px; left: 24px;
+            width: 56px; height: 56px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 28px; color: #000;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            z-index: 200;
+        }
+
+        /* Animation */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .animate-entry {
+            animation: slideIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            opacity: 0; /* Start hidden */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-glass">
+        <div class="header-content">
+            <div>
+                <div class="subtitle">Memory Log</div>
+                <div class="title">My Timeline</div>
+            </div>
+            <div style="text-align: right;">
+                <div class="subtitle">Total</div>
+                <div class="title" style="font-size: 24px;">3,204</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="scroller" id="scrollContainer">
+        <div class="timeline-axis"></div>
+        <div class="timeline-ticks"></div>
+
+        <div class="memory-feed" id="feed">
+            </div>
+    </div>
+
+    <div class="fab">+</div>
+
+    <script>
+        // ==========================================
+        // DATA GENERATOR (The "Brain")
+        // ==========================================
+        
+        const CONTEXT_WORDS = [
+            "Super Bowl", "Meeting", "Design System", "Echo Launch", 
+            "Coffee @ Blue Bottle", "Midnight Idea", "Ski Trip Plan", 
+            "Server Down", "First Snow", "Nanjing Trip", "Call with Mom", 
+            "Investor Deck", "Quiet", "Rainy SF", "Traffic Ticket", 
+            "New Recipe", "Gym", "Meditation", "Code Review", 
+            "Chris Botti Concert", "Grocery Run", "Lost Keys"
+        ];
+
+        const MEMORY_TYPES = ['locked', 'locked', 'locked', 'highlight', 'tag', 'text'];
+
+        function getRandomDate(daysBack) {
+            const date = new Date();
+            date.setDate(date.getDate() - daysBack);
+            return date;
+        }
+
+        function formatDate(date) {
+            const options = { month: 'short', day: 'numeric', year: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        function createNodeHTML(type, content, delay) {
+            let innerHTML = '';
+            
+            if (type === 'locked') {
+                innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    ${content}`;
+            } else if (type === 'highlight') {
+                innerHTML = `✨ ${content}`;
+            } else if (type === 'tag') {
+                innerHTML = `# ${content}`;
+            } else {
+                innerHTML = content;
+            }
+
+            // Staggered animation delay based on index
+            const style = `animation-delay: ${delay}ms`;
+            
+            return `
+                <div class="node-wrapper animate-entry" style="${style}">
+                    <div class="node ${type}">
+                        ${innerHTML}
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateMemories(totalDays) {
+            const feed = document.getElementById('feed');
+            let html = '';
+            let globalIndex = 0;
+
+            for (let i = 0; i < totalDays; i++) {
+                const currentDate = getRandomDate(i);
+                const dateStr = formatDate(currentDate);
+                
+                // Randomly decide how many memories for this day (0 to 4)
+                // This creates the "Density" and "White Space" effect
+                const count = Math.floor(Math.random() * 5); 
+                
+                if (count > 0) {
+                    html += `<div class="date-section">`;
+                    html += `<div class="date-header">${dateStr}</div>`;
+                    
+                    for (let j = 0; j < count; j++) {
+                        const type = MEMORY_TYPES[Math.floor(Math.random() * MEMORY_TYPES.length)];
+                        const word = CONTEXT_WORDS[Math.floor(Math.random() * CONTEXT_WORDS.length)];
+                        
+                        // Add some variety to text nodes
+                        let content = word;
+                        if (type === 'text' && Math.random() > 0.5) {
+                           content = `"${word}..."`; // Make it look like a thought
+                        }
+
+                        html += createNodeHTML(type, content, globalIndex * 30);
+                        globalIndex++;
+                    }
+                    
+                    html += `</div>`;
+                } else {
+                    // Even empty days take up space in reality, but here we skip to keep UI tight.
+                    // Or we could add a "No Entry" marker for philosophical reasons.
+                }
+            }
+            
+            // Add a "Big Bang" at the end
+            html += `
+                <div class="date-section" style="opacity:0.5; margin-top:50px; text-align:center;">
+                    <div class="date-header" style="text-align:center; padding:0;">The Beginning</div>
+                    <div class="node-wrapper" style="justify-content:center; padding:0;">
+                        <div class="node highlight">Hello World</div>
+                    </div>
+                </div>
+            `;
+
+            feed.innerHTML = html;
+        }
+
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Generate 60 days of history
+            generateMemories(60);
+            
+            // Interaction: Timeline Parallax
+            // When user scrolls, we can subtly move the ticks to enhance depth
+            const scroller = document.getElementById('scrollContainer');
+            const ticks = document.querySelector('.timeline-ticks');
+            
+            scroller.addEventListener('scroll', () => {
+                const scrollY = scroller.scrollTop;
+                // Move ticks slightly to create "heavy" feeling
+                ticks.style.transform = `translateY(${scrollY * 0.1}px)`;
+            });
+        });
+
+    </script>
+</body>
+</html>
