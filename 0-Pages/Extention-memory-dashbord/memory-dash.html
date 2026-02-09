@@ -37,10 +37,10 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 120px;
+            height: 190px;
             background: linear-gradient(to bottom, rgba(0, 0, 0, 1) 20%, rgba(0, 0, 0, 0) 100%);
             z-index: 100;
-            padding: 50px 24px 0;
+            padding: 44px 24px 0;
             pointer-events: none;
             backdrop-filter: blur(2px);
             -webkit-backdrop-filter: blur(2px);
@@ -73,11 +73,59 @@
             height: 100vh;
             overflow-y: auto;
             overflow-x: hidden;
-            padding-top: 140px;
+            padding-top: 206px;
             padding-bottom: 100px;
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
             position: relative;
+        }
+
+        .search-zone {
+            margin-top: 14px;
+            pointer-events: auto;
+        }
+
+        .search-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.45);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 6px;
+        }
+
+        .search-shell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(15, 15, 15, 0.62);
+            border-radius: 14px;
+            padding: 10px 12px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .search-shell input {
+            width: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+        }
+
+        .search-shell input::placeholder {
+            color: rgba(255, 255, 255, 0.38);
+        }
+
+        .search-count {
+            margin-top: 8px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
         }
 
         /* -----------------------
@@ -129,7 +177,7 @@
 
         .date-header {
             position: sticky;
-            top: 120px;
+            top: 192px;
             align-self: flex-start;
             font-size: 12px;
             font-weight: 600;
@@ -150,6 +198,7 @@
             justify-content: flex-end;
             /* Align to timeline (right) */
             align-items: center;
+            gap: 8px;
             margin-bottom: var(--node-gap);
             position: relative;
             padding-right: 20px;
@@ -237,6 +286,77 @@
             opacity: 0.5;
         }
 
+        .node-meta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .node-time {
+            padding: 4px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            background: rgba(0, 0, 0, 0.32);
+            min-width: 48px;
+            text-align: center;
+        }
+
+        .source-icon {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+            text-transform: uppercase;
+        }
+
+        .source-chatgpt {
+            background: rgba(25, 195, 125, 0.25);
+            border-color: rgba(25, 195, 125, 0.55);
+        }
+
+        .source-claude {
+            background: rgba(230, 145, 79, 0.26);
+            border-color: rgba(230, 145, 79, 0.58);
+        }
+
+        .source-gemini {
+            background: rgba(99, 130, 255, 0.26);
+            border-color: rgba(99, 130, 255, 0.58);
+        }
+
+        .source-deepseek {
+            background: rgba(122, 92, 255, 0.26);
+            border-color: rgba(122, 92, 255, 0.58);
+        }
+
+        .empty-state {
+            margin: 16px 0 0;
+            padding: 14px 12px;
+            border-radius: 12px;
+            border: 1px dashed rgba(255, 255, 255, 0.18);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            text-align: center;
+            display: none;
+        }
+
+        .empty-state.show {
+            display: block;
+        }
+
         /* Floating Controls */
         .fab {
             position: fixed;
@@ -285,8 +405,16 @@
             </div>
             <div style="text-align: right;">
                 <div class="subtitle">Total</div>
-                <div class="title" style="font-size: 24px;">3,204</div>
+                <div class="title" id="totalCount" style="font-size: 24px;">3,204</div>
             </div>
+        </div>
+        <div class="search-zone">
+            <div class="search-label">Search memories</div>
+            <div class="search-shell">
+                <span style="opacity: 0.6;">⌕</span>
+                <input id="searchInput" type="text" placeholder="Try: meeting, chatgpt, airport...">
+            </div>
+            <div class="search-count" id="searchCount">Showing all memories</div>
         </div>
     </div>
 
@@ -330,6 +458,15 @@
             { r: 240, g: 200, b: 80 }, // Buttercup
         ];
 
+        const SOURCES = [
+            { id: 'chatgpt', label: 'ChatGPT', short: 'CG' },
+            { id: 'claude', label: 'Claude', short: 'CL' },
+            { id: 'gemini', label: 'Gemini', short: 'GM' },
+            { id: 'deepseek', label: 'DeepSeek', short: 'DS' }
+        ];
+
+        const memoryStore = [];
+
         function getRandomDate(daysBack) {
             const date = new Date();
             date.setDate(date.getDate() - daysBack);
@@ -341,20 +478,28 @@
             return date.toLocaleDateString('en-US', options);
         }
 
-        function createNodeHTML(type, content, delay) {
+        function formatTime(date) {
+            return date.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
+        }
+
+        function createNodeHTML(memory, delay) {
             let innerHTML = '';
             let classes = `tag`;
             let style = '';
 
-            if (type === 'private') {
+            if (memory.type === 'private') {
                 classes += ` tag-private`;
-                innerHTML = `<span class="lock-icon"></span>${content}`;
+                innerHTML = `<span class="lock-icon"></span>${memory.content}`;
             } else {
                 // Public memory - pick random color
-                const color = PALETTE[Math.floor(Math.random() * PALETTE.length)];
+                const color = memory.color;
                 classes += ` tag-public`;
                 style = `--r: ${color.r}; --g: ${color.g}; --b: ${color.b};`;
-                innerHTML = content;
+                innerHTML = memory.content;
             }
 
             // Animation delay
@@ -362,6 +507,10 @@
 
             return `
                 <div class="node-wrapper animate-entry" style="${wrapperStyle}">
+                    <div class="node-meta">
+                        <span class="node-time">${memory.time}</span>
+                        <span class="source-icon source-${memory.source.id}" title="${memory.source.label}">${memory.source.short}</span>
+                    </div>
                     <div class="${classes}" style="${style}">
                         ${innerHTML}
                     </div>
@@ -369,58 +518,121 @@
             `;
         }
 
-        function generateMemories(totalDays) {
-            const feed = document.getElementById('feed');
-            let html = '';
-            let globalIndex = 0;
+        function buildMemories(totalDays) {
+            memoryStore.length = 0;
+            let seq = 0;
 
             for (let i = 0; i < totalDays; i++) {
                 const currentDate = getRandomDate(i);
-                const dateStr = formatDate(currentDate);
                 const count = Math.floor(Math.random() * 5);
 
                 if (count > 0) {
-                    html += `<div class="date-section">`;
-                    html += `<div class="date-header">${dateStr}</div>`;
-
                     for (let j = 0; j < count; j++) {
-                        // 30% chance of being private
                         const isPrivate = Math.random() < 0.3;
                         const type = isPrivate ? 'private' : 'public';
-
                         let word = CONTEXT_WORDS[Math.floor(Math.random() * CONTEXT_WORDS.length)];
 
-                        // Add some variety to text nodes text
                         if (Math.random() > 0.7) {
                             word = `"${word}..."`;
                         }
 
-                        html += createNodeHTML(type, word, globalIndex * 30);
-                        globalIndex++;
-                    }
+                        const hour = Math.floor(Math.random() * 24);
+                        const minute = Math.floor(Math.random() * 60);
+                        const dt = new Date(currentDate);
+                        dt.setHours(hour, minute, 0, 0);
 
-                    html += `</div>`;
+                        memoryStore.push({
+                            id: `m-${seq++}`,
+                            datetime: dt,
+                            dateLabel: formatDate(dt),
+                            time: formatTime(dt),
+                            type,
+                            source: SOURCES[Math.floor(Math.random() * SOURCES.length)],
+                            color: PALETTE[Math.floor(Math.random() * PALETTE.length)],
+                            content: word
+                        });
+                    }
                 }
             }
 
-            // Add a "Big Bang" at the end
-            html += `
-                <div class="date-section" style="opacity:0.5; margin-top:50px; text-align:center;">
-                    <div class="date-header" style="text-align:center; padding:0;">The Beginning</div>
-                    <div class="node-wrapper" style="justify-content:center; padding:0;">
-                        <div class="tag tag-public" style="--r:255; --g:255; --b:255;">Hello World</div>
+            memoryStore.sort((a, b) => b.datetime - a.datetime);
+        }
+
+        function matchesQuery(memory, query) {
+            if (!query) return true;
+            const q = query.toLowerCase().trim();
+            return (
+                memory.content.toLowerCase().includes(q) ||
+                memory.source.label.toLowerCase().includes(q) ||
+                memory.type.toLowerCase().includes(q) ||
+                memory.dateLabel.toLowerCase().includes(q)
+            );
+        }
+
+        function renderMemories(query = '') {
+            const feed = document.getElementById('feed');
+            const searchCount = document.getElementById('searchCount');
+            let html = '';
+            let globalIndex = 0;
+            let currentDate = '';
+
+            const filtered = memoryStore.filter((memory) => matchesQuery(memory, query));
+
+            searchCount.textContent = query.trim()
+                ? `${filtered.length} results for "${query.trim()}"`
+                : `Showing all ${memoryStore.length} memories`;
+
+            if (filtered.length === 0) {
+                feed.innerHTML = `<div class="empty-state show">No matching memories for "${query.trim()}".</div>`;
+                return;
+            }
+
+            for (const memory of filtered) {
+                if (memory.dateLabel !== currentDate) {
+                    if (currentDate !== '') {
+                        html += `</div>`;
+                    }
+                    currentDate = memory.dateLabel;
+                    html += `<div class="date-section">`;
+                    html += `<div class="date-header">${currentDate}</div>`;
+                }
+
+                html += createNodeHTML(memory, globalIndex * 20);
+                globalIndex++;
+            }
+            html += `</div>`;
+
+            if (!query.trim()) {
+                // Add a "Big Bang" at the end only in full timeline mode
+                html += `
+                    <div class="date-section" style="opacity:0.5; margin-top:50px; text-align:center;">
+                        <div class="date-header" style="text-align:center; padding:0;">The Beginning</div>
+                        <div class="node-wrapper" style="justify-content:center; padding:0;">
+                            <div class="tag tag-public" style="--r:255; --g:255; --b:255;">Hello World</div>
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
+            }
 
             feed.innerHTML = html;
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            generateMemories(60);
+            buildMemories(60);
+            renderMemories();
 
             const scroller = document.getElementById('scrollContainer');
             const ticks = document.querySelector('.timeline-ticks');
+            const searchInput = document.getElementById('searchInput');
+            const totalEl = document.getElementById('totalCount');
+
+            if (totalEl) {
+                totalEl.textContent = memoryStore.length.toLocaleString('en-US');
+            }
+
+            searchInput.addEventListener('input', (event) => {
+                renderMemories(event.target.value);
+            });
 
             scroller.addEventListener('scroll', () => {
                 const scrollY = scroller.scrollTop;
