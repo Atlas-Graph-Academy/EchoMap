@@ -85,40 +85,48 @@
         .flow-stack::before {
             content: '';
             position: absolute;
-            left: 16px;
+            left: 25px;
             top: 6px;
-            bottom: 18px;
+            bottom: 10px;
             width: 3px;
             border-radius: 999px;
             background: linear-gradient(to bottom,
-                    rgba(108, 168, 255, 0.4) 0%,
-                    rgba(132, 128, 255, 0.22) 52%,
-                    rgba(108, 168, 255, 0.14) 100%);
-            box-shadow: 0 0 14px rgba(108, 168, 255, 0.24);
+                    rgba(159, 201, 255, 0.52) 0%,
+                    rgba(119, 175, 255, 0.34) 38%,
+                    rgba(94, 137, 210, 0.26) 72%,
+                    rgba(76, 99, 148, 0.18) 100%);
+            box-shadow: 0 0 14px rgba(108, 168, 255, 0.2);
+            z-index: 0;
         }
 
         .flow-stack::after {
             content: '';
             position: absolute;
-            left: 10px;
-            bottom: 8px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            border: 1px solid rgba(108, 168, 255, 0.48);
-            background: rgba(108, 168, 255, 0.22);
-            box-shadow: 0 0 10px rgba(108, 168, 255, 0.26);
+            left: 20px;
+            bottom: 0;
+            width: 13px;
+            height: 13px;
+            clip-path: polygon(50% 100%, 0 0, 100% 0);
+            background: rgba(121, 165, 238, 0.72);
+            filter: drop-shadow(0 0 7px rgba(121, 165, 238, 0.3));
+            z-index: 0;
         }
 
         .flow-step {
             position: relative;
             margin-bottom: 18px;
             padding: 16px 0 14px;
+            z-index: 1;
+            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(142, 184, 255, 0.05), rgba(142, 184, 255, 0.01));
+            padding-left: 14px;
+            padding-right: 12px;
+            overflow: visible;
         }
 
         .flow-node {
             position: absolute;
-            left: -46px;
+            left: -37px;
             top: 14px;
             bottom: 12px;
             width: 18px;
@@ -136,6 +144,18 @@
             width: 24px;
             height: 2px;
             background: linear-gradient(to right, rgba(108, 168, 255, 0.42), rgba(108, 168, 255, 0.12));
+        }
+
+        .flow-step::before {
+            content: '';
+            position: absolute;
+            left: -42px;
+            top: -1px;
+            bottom: -1px;
+            width: 4px;
+            background: #0b1118;
+            z-index: 1;
+            border-radius: 999px;
         }
 
         .flow-node-label {
@@ -158,16 +178,57 @@
             background: linear-gradient(180deg, rgba(142, 171, 255, 0.38), rgba(142, 171, 255, 0.2));
         }
 
+        .flow-step.step-1 {
+            background: linear-gradient(180deg, rgba(154, 196, 255, 0.08), rgba(154, 196, 255, 0.015));
+        }
+
         .flow-step.step-2 .flow-node {
             background: linear-gradient(180deg, rgba(97, 180, 255, 0.4), rgba(97, 180, 255, 0.2));
+        }
+
+        .flow-step.step-2 {
+            background: linear-gradient(180deg, rgba(122, 178, 255, 0.08), rgba(122, 178, 255, 0.012));
         }
 
         .flow-step.step-3 .flow-node {
             background: linear-gradient(180deg, rgba(109, 151, 255, 0.38), rgba(109, 151, 255, 0.2));
         }
 
+        .flow-step.step-3 {
+            background: linear-gradient(180deg, rgba(101, 144, 226, 0.075), rgba(101, 144, 226, 0.01));
+        }
+
         .flow-step.step-4 .flow-node {
             background: linear-gradient(180deg, rgba(130, 139, 255, 0.36), rgba(130, 139, 255, 0.18));
+        }
+
+        .flow-step.step-4 {
+            background: linear-gradient(180deg, rgba(88, 117, 176, 0.08), rgba(88, 117, 176, 0.012));
+        }
+
+        .flow-step::after {
+            content: '';
+            position: absolute;
+            inset: -20px -16px -22px -16px;
+            border-radius: 24px;
+            background:
+                radial-gradient(85% 62% at 50% 20%, rgba(175, 212, 255, 0.12), transparent 68%),
+                radial-gradient(95% 74% at 50% 88%, rgba(109, 146, 210, 0.13), transparent 72%);
+            filter: blur(24px);
+            opacity: 0.95;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .flow-step.context-ready {
+            box-shadow:
+                0 0 0 1px rgba(195, 222, 255, 0.12),
+                0 10px 26px rgba(22, 46, 73, 0.22),
+                0 0 34px rgba(170, 210, 255, 0.22);
+        }
+
+        .flow-step.context-ready .section-sub {
+            color: #ffffff;
         }
 
         .flow-step:last-child {
@@ -191,7 +252,8 @@
             letter-spacing: -0.01em;
         }
 
-        .more-btn {
+        .more-btn,
+        .edit-btn {
             border: 0;
             background: transparent;
             color: rgba(255, 255, 255, 0.58);
@@ -201,6 +263,13 @@
             letter-spacing: 0.08em;
             cursor: pointer;
             flex-shrink: 0;
+        }
+
+        .edit-btn {
+            color: rgba(216, 232, 255, 0.86);
+            text-transform: none;
+            letter-spacing: 0;
+            font-size: 12px;
         }
 
         .memory-list {
@@ -215,15 +284,20 @@
             gap: 8px;
             padding: 4px 0;
             cursor: pointer;
-            transition: opacity 0.18s ease;
+            transition: opacity 0.18s ease, transform 0.18s ease;
         }
 
         .memory-row:hover {
             opacity: 0.92;
+            transform: translateX(1px);
         }
 
         .memory-row.selected {
             opacity: 1;
+        }
+
+        .memory-row.is-closed {
+            display: none;
         }
 
         .memory-tag {
@@ -286,6 +360,35 @@
             font-size: 11px;
             color: var(--muted);
             white-space: nowrap;
+        }
+
+        .close-memory-btn {
+            border: 0;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.58);
+            font-size: 14px;
+            width: 18px;
+            height: 18px;
+            line-height: 1;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-left: 2px;
+        }
+
+        .close-memory-btn:hover {
+            color: rgba(255, 255, 255, 0.88);
+        }
+
+        .section-actions {
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 14px;
+            min-height: 22px;
         }
 
         .related-note {
@@ -412,24 +515,30 @@
                 <div>
                     <p class="section-sub">“I keep going back to the same lonely moment.”</p>
                 </div>
-                <button class="more-btn" type="button" data-more="recent">More</button>
             </div>
             <div class="memory-list">
                 <article class="memory-row selectable" data-pool-label="I feel lonely again at night." data-date="Sun, Feb 9, 2026">
                     <div class="memory-tag tag-private"><span class="lock-icon"></span>I feel lonely again...</div>
                     <img class="source-icon" src="../../Resource/ai/chatgpt.png" alt="ChatGPT" title="ChatGPT">
                     <span class="memory-date">Sun, Feb 9, 2026</span>
+                    <button class="close-memory-btn" type="button" aria-label="Close memory">×</button>
                 </article>
                 <article class="memory-row selectable" data-pool-label="为什么没人懂我在说什么" data-date="Sat, Feb 8, 2026">
                     <div class="memory-tag tag-public" style="--r:200; --g:107; --b:74;">为什么没人懂我...</div>
                     <img class="source-icon" src="../../Resource/ai/claude.png" alt="Claude" title="Claude">
                     <span class="memory-date">Sat, Feb 8, 2026</span>
+                    <button class="close-memory-btn" type="button" aria-label="Close memory">×</button>
                 </article>
                 <article class="memory-row selectable is-extra" data-pool-label="I stopped replying to people again." data-date="Fri, Feb 7, 2026">
                     <div class="memory-tag tag-public" style="--r:142; --g:162; --b:88;">I stopped replying...</div>
                     <img class="source-icon" src="../../Resource/ai/gemini.png" alt="Gemini" title="Gemini">
                     <span class="memory-date">Fri, Feb 7, 2026</span>
+                    <button class="close-memory-btn" type="button" aria-label="Close memory">×</button>
                 </article>
+            </div>
+            <div class="section-actions">
+                <button class="edit-btn" type="button">Edit sentence</button>
+                <button class="more-btn" type="button" data-more="recent">More</button>
             </div>
         </section>
 
@@ -439,24 +548,30 @@
                 <div>
                     <p class="section-sub">“Before loneliness hits, the same emotional tone appears again.”</p>
                 </div>
-                <button class="more-btn" type="button" data-more="resonate">More</button>
             </div>
             <div class="memory-list">
                 <article class="memory-row selectable" data-pool-label="Canceled dinner again this weekend" data-date="Tue, Feb 4, 2026">
                     <div class="memory-tag tag-public" style="--r:240; --g:148; --b:54;">Canceled dinner...</div>
                     <img class="source-icon" src="../../Resource/ai/deepseek.png" alt="DeepSeek" title="DeepSeek">
                     <span class="memory-date">Tue, Feb 4, 2026</span>
+                    <button class="close-memory-btn" type="button" aria-label="Close memory">×</button>
                 </article>
                 <article class="memory-row selectable" data-pool-label="Scroll until 2am, no one to text" data-date="Tue, Jan 7, 2026">
                     <div class="memory-tag tag-private"><span class="lock-icon"></span>Scroll until 2am...</div>
                     <img class="source-icon" src="../../Resource/ai/chatgpt.png" alt="ChatGPT" title="ChatGPT">
                     <span class="memory-date">Tue, Jan 7, 2026</span>
+                    <button class="close-memory-btn" type="button" aria-label="Close memory">×</button>
                 </article>
                 <article class="memory-row selectable is-extra" data-pool-label="Stayed in bed and avoided calls" data-date="Mon, Dec 29, 2025">
                     <div class="memory-tag tag-public" style="--r:100; --g:140; --b:200;">Stayed in bed...</div>
                     <img class="source-icon" src="../../Resource/ai/claude.png" alt="Claude" title="Claude">
                     <span class="memory-date">Mon, Dec 29, 2025</span>
+                    <button class="close-memory-btn" type="button" aria-label="Close memory">×</button>
                 </article>
+            </div>
+            <div class="section-actions">
+                <button class="edit-btn" type="button">Edit sentence</button>
+                <button class="more-btn" type="button" data-more="resonate">More</button>
             </div>
         </section>
 
@@ -466,7 +581,6 @@
                 <div>
                     <p class="section-sub">A compassionate reading from Echo.</p>
                 </div>
-                <button class="more-btn" type="button" data-more="echo">More</button>
             </div>
             <div class="echo-note">The core problem may not be "being alone" itself, but a repeated break in connection rhythm right after emotional fatigue.</div>
             <div class="memory-list">
@@ -474,12 +588,18 @@
                     <div class="memory-tag tag-public" style="--r:142; --g:162; --b:88;">节奏断裂会放大孤单</div>
                     <img class="source-icon" src="../../Resource/ai/gemini.png" alt="Gemini" title="Gemini">
                     <span class="memory-date">Sun, Nov 23, 2025</span>
+                    <button class="close-memory-btn" type="button" aria-label="Close memory">×</button>
                 </article>
                 <article class="memory-row selectable is-extra" data-pool-label="Public memory: I disappear after social overload" data-date="Thu, Oct 30, 2025">
                     <div class="memory-tag tag-public" style="--r:108; --g:176; --b:210;">Disappear after overload</div>
                     <img class="source-icon" src="../../Resource/ai/deepseek.png" alt="DeepSeek" title="DeepSeek">
                     <span class="memory-date">Thu, Oct 30, 2025</span>
+                    <button class="close-memory-btn" type="button" aria-label="Close memory">×</button>
                 </article>
+            </div>
+            <div class="section-actions">
+                <button class="edit-btn" type="button">Edit sentence</button>
+                <button class="more-btn" type="button" data-more="echo">More</button>
             </div>
         </section>
 
@@ -489,7 +609,6 @@
                 <div>
                     <p class="section-sub">Cause → result prediction package. Selected memories drop here as chain context.</p>
                 </div>
-                <button class="more-btn" type="button" data-more="pattern">More</button>
             </div>
 
             <div class="pattern-zone">
@@ -504,6 +623,9 @@
                     <button id="copyChain" class="copy-btn" type="button">Copy Chain</button>
                 </div>
             </div>
+            <div class="section-actions">
+                <button class="edit-btn" type="button">Edit sentence</button>
+            </div>
         </section>
         </div>
     </main>
@@ -514,6 +636,15 @@
         const chainBox = document.getElementById('chainBox');
         const regenChain = document.getElementById('regenChain');
         const copyChain = document.getElementById('copyChain');
+
+        function updateSectionContextState(sectionEl) {
+            const hasSelected = sectionEl.querySelector('.memory-row.selected');
+            sectionEl.classList.toggle('context-ready', Boolean(hasSelected));
+        }
+
+        function updateAllSectionContextState() {
+            document.querySelectorAll('.flow-step').forEach(updateSectionContextState);
+        }
 
         function buildChainFromPicks() {
             if (picks.length === 0) {
@@ -543,10 +674,12 @@
                     .join('');
             }
             chainBox.value = buildChainFromPicks();
+            updateAllSectionContextState();
         }
 
         document.querySelectorAll('.selectable').forEach((item) => {
             item.addEventListener('click', () => {
+                if (item.classList.contains('is-closed')) return;
                 const label = item.getAttribute('data-pool-label');
                 const date = item.getAttribute('data-date');
                 const existingIndex = picks.findIndex((p) => p.label === label && p.date === date);
@@ -559,6 +692,24 @@
             });
         });
 
+        document.querySelectorAll('.close-memory-btn').forEach((btn) => {
+            btn.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const row = btn.closest('.memory-row');
+                if (!row) return;
+                const label = row.getAttribute('data-pool-label');
+                const date = row.getAttribute('data-date');
+
+                row.classList.remove('selected');
+                row.classList.add('is-closed');
+
+                const existingIndex = picks.findIndex((p) => p.label === label && p.date === date);
+                if (existingIndex > -1) picks.splice(existingIndex, 1);
+
+                renderPackage();
+            });
+        });
+
         document.querySelectorAll('.more-btn').forEach((btn) => {
             btn.addEventListener('click', () => {
                 const sectionKey = btn.getAttribute('data-more');
@@ -566,6 +717,19 @@
                 if (!section) return;
                 section.classList.toggle('show-extra');
                 btn.textContent = section.classList.contains('show-extra') ? 'Less' : 'More';
+            });
+        });
+
+        document.querySelectorAll('.edit-btn').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const section = btn.closest('.flow-step');
+                const sub = section?.querySelector('.section-sub');
+                if (!sub) return;
+
+                const next = window.prompt('Edit this section sentence:', sub.textContent.trim());
+                if (next && next.trim()) {
+                    sub.textContent = next.trim();
+                }
             });
         });
 
