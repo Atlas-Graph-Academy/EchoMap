@@ -135,8 +135,8 @@
             position: absolute;
             top: 0;
             bottom: 0;
-            right: 28px;
-            /* Fixed position from right */
+            left: 28px;
+            /* Fixed position from left */
             width: 2px;
             background: var(--timeline-white);
             box-shadow: var(--timeline-glow);
@@ -148,7 +148,7 @@
             position: absolute;
             top: 0;
             bottom: 0;
-            right: 20px;
+            left: 20px;
             width: 18px;
             background-image: repeating-linear-gradient(to bottom,
                     rgba(255, 255, 255, 0.6) 0px,
@@ -163,8 +163,8 @@
 
         /* Memory Container Layout */
         .memory-feed {
-            padding: 0 44px 0 24px;
-            /* Right padding creates space for timeline */
+            padding: 0 20px 0 44px;
+            /* Left padding creates space for timeline */
             display: flex;
             flex-direction: column;
         }
@@ -186,8 +186,8 @@
             letter-spacing: 0.5px;
             mix-blend-mode: screen;
             z-index: 20;
-            text-align: right;
-            padding-right: 20px;
+            text-align: left;
+            padding-left: 20px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             padding-bottom: 4px;
         }
@@ -195,13 +195,13 @@
         /* Node Wrapper: Connects node to timeline */
         .node-wrapper {
             display: flex;
-            justify-content: flex-end;
-            /* Align to timeline (right) */
+            justify-content: flex-start;
+            /* Align to timeline (left) */
             align-items: center;
             gap: 8px;
             margin-bottom: var(--node-gap);
             position: relative;
-            padding-right: 20px;
+            padding-left: 20px;
             /* Distance from timeline */
         }
 
@@ -209,7 +209,7 @@
         .node-wrapper::after {
             content: '';
             position: absolute;
-            right: -6px;
+            left: -6px;
             /* Touch the axis */
             width: 20px;
             height: 1px;
@@ -286,60 +286,13 @@
             opacity: 0.5;
         }
 
-        .node-meta {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-
-        .node-time {
-            padding: 4px 8px;
-            border-radius: 999px;
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.06em;
-            background: rgba(0, 0, 0, 0.32);
-            min-width: 48px;
-            text-align: center;
-        }
-
         .source-icon {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 9px;
-            font-weight: 800;
-            letter-spacing: 0.04em;
-            color: #fff;
-            background: rgba(255, 255, 255, 0.1);
-            text-transform: uppercase;
-        }
-
-        .source-chatgpt {
-            background: rgba(25, 195, 125, 0.25);
-            border-color: rgba(25, 195, 125, 0.55);
-        }
-
-        .source-claude {
-            background: rgba(230, 145, 79, 0.26);
-            border-color: rgba(230, 145, 79, 0.58);
-        }
-
-        .source-gemini {
-            background: rgba(99, 130, 255, 0.26);
-            border-color: rgba(99, 130, 255, 0.58);
-        }
-
-        .source-deepseek {
-            background: rgba(122, 92, 255, 0.26);
-            border-color: rgba(122, 92, 255, 0.58);
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+            opacity: 0.72;
+            filter: grayscale(1) contrast(0.9) brightness(1.05) drop-shadow(0 0 4px rgba(255, 255, 255, 0.08));
+            flex-shrink: 0;
         }
 
         .empty-state {
@@ -459,10 +412,10 @@
         ];
 
         const SOURCES = [
-            { id: 'chatgpt', label: 'ChatGPT', short: 'CG' },
-            { id: 'claude', label: 'Claude', short: 'CL' },
-            { id: 'gemini', label: 'Gemini', short: 'GM' },
-            { id: 'deepseek', label: 'DeepSeek', short: 'DS' }
+            { id: 'chatgpt', label: 'ChatGPT', icon: '../../Resource/ai/chatgpt.png' },
+            { id: 'claude', label: 'Claude', icon: '../../Resource/ai/claude.png' },
+            { id: 'gemini', label: 'Gemini', icon: '../../Resource/ai/gemini.png' },
+            { id: 'deepseek', label: 'DeepSeek', icon: '../../Resource/ai/deepseek.png' }
         ];
 
         const memoryStore = [];
@@ -474,16 +427,8 @@
         }
 
         function formatDate(date) {
-            const options = { month: 'short', day: 'numeric', year: 'numeric' };
+            const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
             return date.toLocaleDateString('en-US', options);
-        }
-
-        function formatTime(date) {
-            return date.toLocaleTimeString('en-US', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-            });
         }
 
         function createNodeHTML(memory, delay) {
@@ -507,13 +452,10 @@
 
             return `
                 <div class="node-wrapper animate-entry" style="${wrapperStyle}">
-                    <div class="node-meta">
-                        <span class="node-time">${memory.time}</span>
-                        <span class="source-icon source-${memory.source.id}" title="${memory.source.label}">${memory.source.short}</span>
-                    </div>
                     <div class="${classes}" style="${style}">
                         ${innerHTML}
                     </div>
+                    <img class="source-icon" src="${memory.source.icon}" alt="${memory.source.label}" title="${memory.source.label}">
                 </div>
             `;
         }
@@ -536,16 +478,13 @@
                             word = `"${word}..."`;
                         }
 
-                        const hour = Math.floor(Math.random() * 24);
-                        const minute = Math.floor(Math.random() * 60);
                         const dt = new Date(currentDate);
-                        dt.setHours(hour, minute, 0, 0);
+                        dt.setHours(12, 0, 0, 0);
 
                         memoryStore.push({
                             id: `m-${seq++}`,
                             datetime: dt,
                             dateLabel: formatDate(dt),
-                            time: formatTime(dt),
                             type,
                             source: SOURCES[Math.floor(Math.random() * SOURCES.length)],
                             color: PALETTE[Math.floor(Math.random() * PALETTE.length)],
