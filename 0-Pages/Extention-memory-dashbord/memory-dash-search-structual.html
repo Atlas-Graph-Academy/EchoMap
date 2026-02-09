@@ -253,7 +253,7 @@
         }
 
         .more-btn,
-        .edit-btn {
+        .copy-btn {
             border: 0;
             background: transparent;
             color: rgba(255, 255, 255, 0.58);
@@ -263,13 +263,6 @@
             letter-spacing: 0.08em;
             cursor: pointer;
             flex-shrink: 0;
-        }
-
-        .edit-btn {
-            color: rgba(216, 232, 255, 0.86);
-            text-transform: none;
-            letter-spacing: 0;
-            font-size: 12px;
         }
 
         .memory-list {
@@ -383,12 +376,11 @@
         }
 
         .section-actions {
-            margin-top: 8px;
+            margin-top: 4px;
             display: flex;
             align-items: center;
-            justify-content: flex-end;
-            gap: 14px;
-            min-height: 22px;
+            justify-content: flex-start;
+            min-height: 18px;
         }
 
         .related-note {
@@ -407,7 +399,13 @@
         }
 
         .pattern-zone {
-            padding: 2px 0 0;
+            margin-top: 8px;
+            width: min(96%, 560px);
+            padding: 10px 10px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(185, 214, 255, 0.16);
+            background: linear-gradient(180deg, rgba(130, 170, 235, 0.06), rgba(130, 170, 235, 0.015));
+            box-shadow: 0 8px 26px rgba(18, 31, 52, 0.22);
         }
 
         .package-title {
@@ -443,7 +441,7 @@
 
         .chain-box {
             width: 100%;
-            min-height: 96px;
+            min-height: 170px;
             border-radius: 6px;
             border: 1px solid rgba(255, 255, 255, 0.12);
             background: transparent;
@@ -457,27 +455,34 @@
         }
 
         .pattern-actions {
-            margin-top: 8px;
+            margin-top: 0;
             display: flex;
-            justify-content: flex-end;
-            gap: 7px;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
         }
 
-        .mini-btn,
-        .copy-btn {
-            border: 0;
-            border-radius: 0;
-            background: transparent;
-            color: rgba(255, 255, 255, 0.7);
+        .token-meta {
             font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            padding: 2px 0;
-            cursor: pointer;
+            color: rgba(216, 232, 255, 0.86);
+            letter-spacing: 0.01em;
         }
 
         .copy-btn {
             color: rgba(216, 232, 255, 0.9);
+            border: 1px solid rgba(216, 232, 255, 0.34);
+            border-radius: 999px;
+            padding: 6px 12px;
+            font-size: 12px;
+            letter-spacing: 0.04em;
+        }
+
+        .token-help {
+            margin-top: 8px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.58);
+            line-height: 1.4;
         }
 
         .is-extra {
@@ -503,7 +508,7 @@
     <main class="page">
         <section class="hero">
             <div class="hero-meta">User Query</div>
-            <h1 class="query">why am I so lonely?</h1>
+            <h1 class="query">how to improve mental stability?</h1>
             <p class="query-note">I keep returning to the same lonely moment. Help me trace what keeps pulling me back.</p>
             <div class="related-note">Related to how I feel right now</div>
         </section>
@@ -537,7 +542,6 @@
                 </article>
             </div>
             <div class="section-actions">
-                <button class="edit-btn" type="button">Edit sentence</button>
                 <button class="more-btn" type="button" data-more="recent">More</button>
             </div>
         </section>
@@ -570,7 +574,6 @@
                 </article>
             </div>
             <div class="section-actions">
-                <button class="edit-btn" type="button">Edit sentence</button>
                 <button class="more-btn" type="button" data-more="resonate">More</button>
             </div>
         </section>
@@ -598,7 +601,6 @@
                 </article>
             </div>
             <div class="section-actions">
-                <button class="edit-btn" type="button">Edit sentence</button>
                 <button class="more-btn" type="button" data-more="echo">More</button>
             </div>
         </section>
@@ -612,19 +614,18 @@
             </div>
 
             <div class="pattern-zone">
+                <div class="pattern-actions">
+                    <button id="copyChain" class="copy-btn" type="button">Copy Whole Chain</button>
+                    <div id="tokenMeta" class="token-meta">Estimated tokens: 0</div>
+                </div>
+
                 <div class="package-title">Memory Package</div>
                 <div class="package-list" id="packageList">No memories selected yet.</div>
 
                 <div class="chain-label">Context Chain</div>
                 <textarea id="chainBox" class="chain-box" aria-label="context-chain">Select memories above to build a cause-result chain you can copy.</textarea>
 
-                <div class="pattern-actions">
-                    <button id="regenChain" class="mini-btn" type="button">Regenerate</button>
-                    <button id="copyChain" class="copy-btn" type="button">Copy Chain</button>
-                </div>
-            </div>
-            <div class="section-actions">
-                <button class="edit-btn" type="button">Edit sentence</button>
+                <div class="token-help">Token count updates from the current chain text. It is an estimate: Chinese usually costs more tokens per character than English words.</div>
             </div>
         </section>
         </div>
@@ -634,8 +635,20 @@
         const picks = [];
         const packageList = document.getElementById('packageList');
         const chainBox = document.getElementById('chainBox');
-        const regenChain = document.getElementById('regenChain');
         const copyChain = document.getElementById('copyChain');
+        const tokenMeta = document.getElementById('tokenMeta');
+
+        function estimateTokens(text) {
+            if (!text || !text.trim()) return 0;
+
+            const cjkChars = (text.match(/[\u3400-\u9FFF]/g) || []).length;
+            const latinWords = (text.match(/[A-Za-z]+(?:'[A-Za-z]+)?/g) || []).length;
+            const numbers = (text.match(/\d+(?:[.,]\d+)*/g) || []).length;
+            const punctuation = (text.match(/[^\s\w\u3400-\u9FFF]/g) || []).length;
+
+            const estimate = cjkChars * 1.2 + latinWords * 1.1 + numbers * 0.8 + punctuation * 0.3;
+            return Math.max(1, Math.round(estimate));
+        }
 
         function updateSectionContextState(sectionEl) {
             const hasSelected = sectionEl.querySelector('.memory-row.selected');
@@ -647,22 +660,32 @@
         }
 
         function buildChainFromPicks() {
-            if (picks.length === 0) {
-                return 'Select memories above to build a cause-result chain you can copy.';
-            }
+            const sections = Array.from(document.querySelectorAll('.flow-step'));
+            const chainLines = ['Full 4-stage context chain:'];
+            let selectedCount = 0;
 
-            const lines = picks.map((pick, idx) => `${idx + 1}. ${pick.label} (${pick.date})`);
-            const first = picks[0]?.label || 'an emotional drop';
-            const last = picks[picks.length - 1]?.label || 'loneliness';
+            sections.forEach((section, index) => {
+                const stepTitle = section.querySelector('.flow-node-label')?.textContent?.trim() || `Stage ${index + 1}`;
+                const sentence = section.querySelector('.section-sub')?.textContent?.trim() || '';
+                const selectedRows = Array.from(section.querySelectorAll('.memory-row.selected'));
+                selectedCount += selectedRows.length;
 
-            return [
-                'Possible chain:',
-                ...lines,
-                '',
-                `Cause hypothesis: ${first} starts a withdrawal loop.`,
-                `Result prediction: if unchanged, ${last} is likely to repeat in the next similar night.`,
-                'Intervention: add one repeatable reconnect action within 30 minutes of emotional dip.'
-            ].join('\n');
+                chainLines.push(`${index + 1}. ${stepTitle}: ${sentence}`);
+                if (selectedRows.length > 0) {
+                    selectedRows.forEach((row, rowIndex) => {
+                        const label = row.getAttribute('data-pool-label') || 'memory';
+                        const date = row.getAttribute('data-date') || '';
+                        chainLines.push(`   - Memory ${rowIndex + 1}: ${label}${date ? ` (${date})` : ''}`);
+                    });
+                } else {
+                    chainLines.push('   - Memory: none selected in this stage');
+                }
+            });
+
+            chainLines.push('');
+            chainLines.push(`Context span: ${sections.length} stages, ${selectedCount} selected memories.`);
+            chainLines.push('Use this chain as the full prompt context for pattern reasoning.');
+            return chainLines.join('\n');
         }
 
         function renderPackage() {
@@ -674,6 +697,7 @@
                     .join('');
             }
             chainBox.value = buildChainFromPicks();
+            tokenMeta.textContent = `Estimated tokens: ${estimateTokens(chainBox.value)}`;
             updateAllSectionContextState();
         }
 
@@ -720,21 +744,8 @@
             });
         });
 
-        document.querySelectorAll('.edit-btn').forEach((btn) => {
-            btn.addEventListener('click', () => {
-                const section = btn.closest('.flow-step');
-                const sub = section?.querySelector('.section-sub');
-                if (!sub) return;
-
-                const next = window.prompt('Edit this section sentence:', sub.textContent.trim());
-                if (next && next.trim()) {
-                    sub.textContent = next.trim();
-                }
-            });
-        });
-
-        regenChain.addEventListener('click', () => {
-            chainBox.value = buildChainFromPicks();
+        chainBox.addEventListener('input', () => {
+            tokenMeta.textContent = `Estimated tokens: ${estimateTokens(chainBox.value)}`;
         });
 
         copyChain.addEventListener('click', async () => {
@@ -742,12 +753,12 @@
                 await navigator.clipboard.writeText(chainBox.value);
                 copyChain.textContent = 'Copied';
                 setTimeout(() => {
-                    copyChain.textContent = 'Copy Chain';
+                    copyChain.textContent = 'Copy Whole Chain';
                 }, 1200);
             } catch (_error) {
                 copyChain.textContent = 'Copy Failed';
                 setTimeout(() => {
-                    copyChain.textContent = 'Copy Chain';
+                    copyChain.textContent = 'Copy Whole Chain';
                 }, 1200);
             }
         });
