@@ -152,6 +152,10 @@ function formatMatchIntro(value) {
   return text;
 }
 
+function formatDateMonD(date) {
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
 function main() {
   if (!fs.existsSync(inputPath)) {
     throw new Error(`Input CSV not found: ${inputPath}`);
@@ -194,6 +198,17 @@ function main() {
       record["Match 1 Promo"] ||
       "You left a memory that strongly resonated with others in Echo.";
     const memoryMangaImage = record.memory_manga_image || record["Highlight Manga"] || "";
+    const expiryDays = String(record.expiry_days || "3");
+    const expiryNum = Number.parseInt(expiryDays, 10);
+    const expiryDate = new Date();
+    if (Number.isFinite(expiryNum)) {
+      expiryDate.setDate(expiryDate.getDate() + expiryNum);
+    }
+    const inviteCode = record.invite_code || "ODLKV";
+    const inviteApplyLink =
+      record.invite_apply_link ||
+      record.invite_copy_link ||
+      `${record.app_url || appUrlDefault}?code=${encodeURIComponent(inviteCode)}`;
     const view = {
       user_display_name: userDisplayName,
       user_name: userName,
@@ -277,10 +292,12 @@ function main() {
       ),
       match3_score: record.match3_score || "84.2%",
       match3_link: record.match3_link || "https://echo.example/match/3",
-      invite_code: record.invite_code || "ODLKV",
-      expiry_days: record.expiry_days || "3",
+      invite_code: inviteCode,
+      expiry_days: expiryDays,
+      invite_expires_on: record.invite_expires_on || formatDateMonD(expiryDate),
+      invite_apply_link: inviteApplyLink,
       app_url: record.app_url || appUrlDefault,
-      kobe_email: record.kobe_email || "kobe@example.com",
+      kobe_email: record.kobe_email || "echo@iditor.com",
     };
 
     const html = applyTemplate(template, view);

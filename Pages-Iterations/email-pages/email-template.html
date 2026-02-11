@@ -32,13 +32,19 @@
               <td style="padding:0 0 16px 0;">
                 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
                   <tr>
-                    <td width="180" style="width:180px;vertical-align:top;padding-right:12px;">
-                      <img src="{{memory_manga_image}}" alt="Memory manga" width="168" style="display:block;width:168px;height:auto;border-radius:8px;" />
+                    <td width="250" style="width:250px;vertical-align:top;padding-right:12px;">
+                      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                        <tr>
+                          <td style="padding:2px 0;font-size:15px;line-height:1.55;color:#374151;">
+                            {{promo_highlight}}<br />
+                            <span style="display:inline-block;margin-top:6px;font-size:12px;color:#6b7280;">{{memory_time}}</span><br />
+                            <a href="{{app_url}}" style="display:inline-block;margin-top:6px;color:#0b57d0;text-decoration:underline;font-size:13px;">Open in Echo</a>
+                          </td>
+                        </tr>
+                      </table>
                     </td>
-                    <td style="vertical-align:top;font-size:15px;color:#374151;">
-                      {{promo_highlight}}<br />
-                      <span style="font-size:12px;color:#6b7280;">{{memory_time}}</span><br />
-                      <a href="{{memory_link}}" style="color:#0b57d0;text-decoration:underline;font-size:13px;">Open in Echo</a>
+                    <td width="180" style="width:180px;vertical-align:top;padding-left:8px;">
+                      <img src="{{memory_manga_image}}" alt="Memory manga" width="168" style="display:block;width:168px;height:auto;border-radius:8px;" />
                     </td>
                   </tr>
                 </table>
@@ -87,7 +93,19 @@
 
             <tr>
               <td style="font-size:17px;padding:12px 0;">
-                They're real people. Real memories. And they're already on Echo.
+                They're real people. Real memories. 
+              </td>
+            </tr>
+
+            <tr>
+              <td style="font-size:17px;padding-bottom:12px;">
+                Echo is now indexing more than <strong>40,000 memories</strong>. These three are your strongest similarity hits across the network.
+              </td>
+            </tr>
+
+            <tr>
+              <td style="font-size:17px;padding-bottom:12px;">
+                My job is simple: help you find people who truly get what you're building. If you want to know exactly why you matched, come ask me and I'll show you.
               </td>
             </tr>
 
@@ -104,35 +122,23 @@
             </tr>
 
             <tr>
-              <td style="font-size:17px;background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:14px 16px;">
-                <strong>Here's your exclusive invite code:</strong> <span style="color:#c2410c;">{{invite_code}}</span><br />
-                ⏳ Expires in {{expiry_days}} days.
+              <td style="font-size:16px;background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:14px 16px;">
+                <strong>Your invite code:</strong>
+                <span style="display:inline-block;margin-left:6px;padding:2px 8px;border-radius:6px;background:#ffffff;border:1px solid #fdba74;color:#9a3412;font-weight:700;letter-spacing:0.5px;">{{invite_code}}</span><br />
+                <span style="color:#9a3412;">⏳ Countdown: {{expiry_days}} days left (until {{invite_expires_on}})</span><br />
               </td>
             </tr>
 
             <tr>
               <td style="font-size:16px;padding-top:14px;">
-                → Download EchoChat: <a href="{{app_url}}" style="color:#0b57d0;text-decoration:underline;">{{app_url}}</a><br />
-                → Sign up with code <strong>{{invite_code}}</strong> to unlock your matches
-              </td>
-            </tr>
-
-            <tr>
-              <td style="font-size:17px;padding:14px 0;">
-                My job is simple: help you find people who truly get what you're building.
-              </td>
-            </tr>
-
-            <tr>
-              <td style="font-size:17px;padding-bottom:14px;">
-                If you want to know why you matched, come ask me. I'll show you.
+                → Download EchoChat: <a href="{{app_url}}" style="color:#0b57d0;text-decoration:underline;">{{app_url}}</a>
               </td>
             </tr>
 
             <tr>
               <td style="font-size:17px;padding-bottom:16px;">
-                Any questions, ideas, or feedback - reach out to Kobe directly at
-                <a href="mailto:{{kobe_email}}" style="color:#0b57d0;text-decoration:underline;">{{kobe_email}}</a>.
+                Any questions, ideas, or feedback - reach out at
+                <a href="mailto:echo@iditor.com" style="color:#0b57d0;text-decoration:underline;">echo@iditor.com</a>.
               </td>
             </tr>
 
