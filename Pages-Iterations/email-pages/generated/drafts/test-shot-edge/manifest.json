@@ -1,0 +1,30 @@
+[
+  {
+    "row_index": "28",
+    "sheet": "cold_email_list",
+    "username": "tonyadastra",
+    "to_email": "ta@firemoon.studio",
+    "subject": "Echo found 3 memory matches for you, Tony Adastra",
+    "html_path": "C:\\Users\\Shi Zhang\\Documents\\GitHub\\EchoMap\\Pages-Iterations\\email-pages\\generated\\drafts\\test-shot-edge\\html\\28-tonyadastra-ta.html",
+    "eml_path": "C:\\Users\\Shi Zhang\\Documents\\GitHub\\EchoMap\\Pages-Iterations\\email-pages\\generated\\drafts\\test-shot-edge\\eml\\28-tonyadastra-ta.eml",
+    "raw_b64url_path": "C:\\Users\\Shi Zhang\\Documents\\GitHub\\EchoMap\\Pages-Iterations\\email-pages\\generated\\drafts\\test-shot-edge\\raw\\28-tonyadastra-ta.b64url.txt",
+    "asset_match_mode": "none",
+    "asset_group": "",
+    "missing_local_slots": "highlight|match1|match2|match3",
+    "warnings": "Row 28: no local image group matched 'tonyadastra'."
+  },
+  {
+    "row_index": "29",
+    "sheet": "cold_email_list",
+    "username": "RealTonyMao",
+    "to_email": "eventstonym@gmail.com",
+    "subject": "Echo found 3 memory matches for you, Tony Mao",
+    "html_path": "C:\\Users\\Shi Zhang\\Documents\\GitHub\\EchoMap\\Pages-Iterations\\email-pages\\generated\\drafts\\test-shot-edge\\html\\29-realtonymao-eventstonym.html",
+    "eml_path": "C:\\Users\\Shi Zhang\\Documents\\GitHub\\EchoMap\\Pages-Iterations\\email-pages\\generated\\drafts\\test-shot-edge\\eml\\29-realtonymao-eventstonym.eml",
+    "raw_b64url_path": "C:\\Users\\Shi Zhang\\Documents\\GitHub\\EchoMap\\Pages-Iterations\\email-pages\\generated\\drafts\\test-shot-edge\\raw\\29-realtonymao-eventstonym.b64url.txt",
+    "asset_match_mode": "username",
+    "asset_group": "29_RealTonyMao",
+    "missing_local_slots": "",
+    "warnings": ""
+  }
+]

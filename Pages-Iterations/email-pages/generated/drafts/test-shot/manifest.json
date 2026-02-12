@@ -1,0 +1,44 @@
+[
+  {
+    "row_index": "1",
+    "sheet": "cold_email_list",
+    "username": "TheCEOBooster",
+    "to_email": "aleks.p@jetbase.io",
+    "subject": "Echo found 3 memory matches for you, Alex Padalka",
+    "html_path": "C:\\Users\\Shi Zhang\\Documents\\GitHub\\EchoMap\\Pages-Iterations\\email-pages\\generated\\drafts\\test-shot\\html\\01-theceobooster-aleks-p.html",
+    "eml_path": "C:\\Users\\Shi Zhang\\Documents\\GitHub\\EchoMap\\Pages-Iterations\\email-pages\\generated\\drafts\\test-shot\\eml\\01-theceobooster-aleks-p.eml",
+    "raw_b64url_path": "C:\\Users\\Shi Zhang\\Documents\\GitHub\\EchoMap\\Pages-Iterations\\email-pages\\generated\\drafts\\test-shot\\raw\\01-theceobooster-aleks-p.b64url.txt",
+    "asset_match_mode": "username",
+    "asset_group": "1_TheCEOBooster",
+    "missing_local_slots": "",
+    "warnings": ""
+  },
+  {
+    "row_index": "2",
+    "sheet": "cold_email_list",
+    "username": "SenorAlex__",
+    "to_email": "alexy@modjo.me",
+    "subject": "Echo found 3 memory matches for you, Alexy Joven",
+    "html_path": "C:\\Users\\Shi Zhang\\Documents\\GitHub\\EchoMap\\Pages-Iterations\\email-pages\\generated\\drafts\\test-shot\\html\\02-senoralex-alexy.html",
+    "eml_path": "C:\\Users\\Shi Zhang\\Documents\\GitHub\\EchoMap\\Pages-Iterations\\email-pages\\generated\\drafts\\test-shot\\eml\\02-senoralex-alexy.eml",
+    "raw_b64url_path": "C:\\Users\\Shi Zhang\\Documents\\GitHub\\EchoMap\\Pages-Iterations\\email-pages\\generated\\drafts\\test-shot\\raw\\02-senoralex-alexy.b64url.txt",
+    "asset_match_mode": "username",
+    "asset_group": "2_SenorAlex__",
+    "missing_local_slots": "",
+    "warnings": ""
+  },
+  {
+    "row_index": "3",
+    "sheet": "cold_email_list",
+    "username": "ammaar",
+    "to_email": "ammaarreshi@proton.me",
+    "subject": "Echo found 3 memory matches for you, Ammaar Reshi",
+    "html_path": "C:\\Users\\Shi Zhang\\Documents\\GitHub\\EchoMap\\Pages-Iterations\\email-pages\\generated\\drafts\\test-shot\\html\\03-ammaar-ammaarreshi.html",
+    "eml_path": "C:\\Users\\Shi Zhang\\Documents\\GitHub\\EchoMap\\Pages-Iterations\\email-pages\\generated\\drafts\\test-shot\\eml\\03-ammaar-ammaarreshi.eml",
+    "raw_b64url_path": "C:\\Users\\Shi Zhang\\Documents\\GitHub\\EchoMap\\Pages-Iterations\\email-pages\\generated\\drafts\\test-shot\\raw\\03-ammaar-ammaarreshi.b64url.txt",
+    "asset_match_mode": "username",
+    "asset_group": "3_ammaar",
+    "missing_local_slots": "",
+    "warnings": ""
+  }
+]
