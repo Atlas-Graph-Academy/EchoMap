@@ -48,6 +48,9 @@ class AssetGroup:
 
 def parse_args() -> argparse.Namespace:
     here = Path(__file__).resolve().parent
+    default_template = here / "email-template-new.html"
+    if not default_template.exists():
+        default_template = here / "email-template.html"
     parser = argparse.ArgumentParser(description="Generate Gmail-ready cold email drafts from XLSX.")
     parser.add_argument(
         "--xlsx",
@@ -56,7 +59,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--template",
-        default=str(here / "email-template.html"),
+        default=str(default_template),
         help="Path to HTML template.",
     )
     parser.add_argument(
