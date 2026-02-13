@@ -429,6 +429,26 @@
             border-radius: 0;
         }
 
+        .echo-new-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 30px;
+            height: 20px;
+            padding: 0 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(251, 113, 133, 0.6);
+            background: rgba(127, 29, 29, 0.55);
+            color: #FFE4E6;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .echo-new-count.is-hidden {
+            display: none;
+        }
+
         .echo-header {
             display: flex;
             align-items: center;
@@ -465,6 +485,12 @@
             border-radius: 0;
             padding: 0;
             cursor: pointer;
+        }
+
+        .echo-toggle-right {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .echo-count {
@@ -596,6 +622,22 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        .new-tag {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: fit-content;
+            padding: 1px 6px;
+            border-radius: 999px;
+            border: 1px solid rgba(239, 68, 68, 0.55);
+            background: rgba(127, 29, 29, 0.35);
+            color: #FCA5A5;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
         }
 
         /* Social Pile */
@@ -1075,7 +1117,10 @@
                 <div class="echo-header">
                     <button class="echo-toggle" id="echoDetailsToggle" type="button" aria-expanded="false" aria-controls="echoDetails">
                         <span class="echo-count">Echoed 18 times</span>
-                        <span class="echo-caret" aria-hidden="true">▼</span>
+                        <span class="echo-toggle-right">
+                            <span class="echo-new-count is-hidden" id="newInfoCount">+0</span>
+                            <span class="echo-caret" aria-hidden="true">▼</span>
+                        </span>
                     </button>
                 </div>
                 <div class="echo-subtext">Each view or match counts as an Echo.</div>
@@ -1187,12 +1232,12 @@
 
     const reactionData = {
         fire: [
-            { name: "Neon Quiet", avatar: "https://i.pravatar.cc/150?u=rx-fire-1" },
-            { name: "Soft Static", avatar: "https://i.pravatar.cc/150?u=rx-fire-2" },
+            { name: "Neon Quiet", avatar: "https://i.pravatar.cc/150?u=rx-fire-1", isNew: true },
+            { name: "Soft Static", avatar: "https://i.pravatar.cc/150?u=rx-fire-2", isNew: false },
             { name: "City Afterglow", avatar: "https://i.pravatar.cc/150?u=rx-fire-3" }
         ],
         sad: [
-            { name: "Velvet Rain", avatar: "https://i.pravatar.cc/150?u=rx-sad-1" },
+            { name: "Velvet Rain", avatar: "https://i.pravatar.cc/150?u=rx-sad-1", isNew: true },
             { name: "Echo Field", avatar: "https://i.pravatar.cc/150?u=rx-sad-2" }
         ],
         heart: [
@@ -1219,22 +1264,40 @@
     };
 
     const echoReferences = [
-        { name: "Aurora Hush", avatar: "https://i.pravatar.cc/150?u=ref-aurora", note: "Quoted this memory in your Echo chat." },
-        { name: "Signal in the Snow", avatar: "https://i.pravatar.cc/150?u=ref-signal", note: "Brought this up while discussing creative blocks." },
+        { name: "Aurora Hush", avatar: "https://i.pravatar.cc/150?u=ref-aurora", note: "Quoted this memory in your Echo chat.", isNew: true },
+        { name: "Signal in the Snow", avatar: "https://i.pravatar.cc/150?u=ref-signal", note: "Brought this up while discussing creative blocks.", isNew: true },
         { name: "Ember Corridor", avatar: "https://i.pravatar.cc/150?u=ref-ember", note: "Referenced this memory in a late-night check-in." }
     ];
 
+    const newInfoCount = document.getElementById("newInfoCount");
     const echoDetailsToggle = document.getElementById("echoDetailsToggle");
     const echoDetails = document.getElementById("echoDetails");
     const echoReferenceList = document.getElementById("echoReferenceList");
     const echoReactionSenders = document.getElementById("echoReactionSenders");
     const reactionsPanel = document.getElementById("reactionsPanel");
+    let hasViewedNewInfo = false;
+
+    const getNewInfoCount = () => {
+        const refNew = echoReferences.filter((entry) => entry.isNew).length;
+        const reactionNew = Object.values(reactionData)
+            .flat()
+            .filter((entry) => entry.isNew).length;
+        return refNew + reactionNew;
+    };
+
+    const renderNewInfoState = () => {
+        if (!newInfoCount) return;
+        const count = getNewInfoCount();
+        const shouldShowCount = count > 0 && !hasViewedNewInfo;
+        newInfoCount.textContent = `+${count}`;
+        newInfoCount.classList.toggle("is-hidden", !shouldShowCount);
+    };
 
     const renderEchoReferenceList = () => {
         echoReferenceList.innerHTML = echoReferences
             .map(
                 (entry) =>
-                    `<li><img class="echo-avi" src="${entry.avatar}" alt="${entry.name}"><div class="echo-meta"><span class="echo-name">${entry.name}</span><span class="echo-note">${entry.note}</span></div></li>`
+                    `<li><img class="echo-avi" src="${entry.avatar}" alt="${entry.name}"><div class="echo-meta"><span class="echo-name">${entry.name}</span><span class="echo-note">${entry.note}</span>${entry.isNew ? '<span class="new-tag">New</span>' : ''}</div></li>`
             )
             .join("");
     };
@@ -1251,9 +1314,17 @@
             .slice(0, 6)
             .map(
                 (entry) =>
-                    `<li><img class="echo-avi" src="${entry.avatar}" alt="${entry.name}"><div class="echo-meta"><span class="echo-name">${entry.name}</span><span class="echo-note">Reacted with ${entry.reaction}</span></div></li>`
+                    `<li><img class="echo-avi" src="${entry.avatar}" alt="${entry.name}"><div class="echo-meta"><span class="echo-name">${entry.name}</span><span class="echo-note">Reacted with ${entry.reaction}</span>${entry.isNew ? '<span class="new-tag">New</span>' : ''}</div></li>`
             )
             .join("");
+    };
+
+    const openEchoDetails = () => {
+        echoDetails.classList.add("is-open");
+        echoDetailsToggle.setAttribute("aria-expanded", "true");
+        reactionsPanel.classList.add("is-expanded");
+        hasViewedNewInfo = true;
+        renderNewInfoState();
     };
 
     const closeEchoDetails = () => {
@@ -1264,13 +1335,16 @@
 
     const toggleEchoDetails = () => {
         const isOpen = echoDetails.classList.contains("is-open");
-        echoDetails.classList.toggle("is-open", !isOpen);
-        echoDetailsToggle.setAttribute("aria-expanded", String(!isOpen));
-        reactionsPanel.classList.toggle("is-expanded", !isOpen);
+        if (isOpen) {
+            closeEchoDetails();
+            return;
+        }
+        openEchoDetails();
     };
 
     renderEchoReferenceList();
     renderEchoReactionSenders();
+    renderNewInfoState();
 
     echoDetailsToggle.addEventListener("click", toggleEchoDetails);
 
