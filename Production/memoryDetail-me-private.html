@@ -729,12 +729,40 @@
             pointer-events: none;
         }
 
+        .modal-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
         .modal-title {
             font-size: 26px;
             font-weight: 800;
             color: #FFFFFF;
             letter-spacing: 0.3px;
-            margin-bottom: 10px;
+            margin-bottom: 0;
+        }
+
+        .modal-info-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            border: 1px solid rgba(125, 211, 252, 0.45);
+            background: rgba(56, 189, 248, 0.12);
+            color: #BAE6FD;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
+        }
+
+        .modal-info-btn:hover {
+            filter: brightness(1.08);
         }
 
         .usage-consent {
@@ -1157,6 +1185,36 @@
             cursor: pointer;
         }
 
+        .terms-section {
+            margin-top: 2px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 10px;
+        }
+
+        .terms-section-title {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: rgba(191, 219, 254, 0.85);
+            margin-bottom: 6px;
+        }
+
+        .terms-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .terms-item {
+            font-size: 12px;
+            line-height: 1.45;
+            color: rgba(226, 232, 240, 0.86);
+        }
+
         .success-copy {
             max-width: 340px;
             text-align: center;
@@ -1314,7 +1372,10 @@
 
     <div class="modal-backdrop" id="matchGateModal" aria-hidden="true">
         <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="matchGateTitle">
-            <div class="modal-title" id="matchGateTitle">Open memories</div>
+            <div class="modal-head">
+                <div class="modal-title" id="matchGateTitle">Open memories</div>
+                <button class="modal-info-btn" id="openDisclosureInfo" type="button" aria-label="Open information page">i</button>
+            </div>
             <div class="usage-consent" id="usageConsent">
                 <button class="usage-line" id="openTermsUsage" type="button">By publishing your memory, you agree with our <b>Term of Usage</b>.</button>
             </div>
@@ -1435,8 +1496,23 @@
         <div class="terms-usage-view" id="termsUsageView" aria-hidden="true">
             <div class="terms-title">Term of Usage</div>
             <div class="terms-text">Publishing a memory means it may be discoverable by people with similar experiences through Echo matching.</div>
-            <div class="terms-text">Your published memory can appear in Echo chat and related public memory surfaces.</div>
-            <div class="terms-text">You can stop publishing from your memory settings later.</div>
+            <div class="terms-section">
+                <div class="terms-section-title">Where It Appears</div>
+                <ul class="terms-list">
+                    <li class="terms-item">Journey timeline and profile page.</li>
+                    <li class="terms-item">Memory search and recommendation feed.</li>
+                    <li class="terms-item">Echo conversations when emotionally relevant.</li>
+                    <li class="terms-item">Map and visual generation surfaces if context exists.</li>
+                </ul>
+            </div>
+            <div class="terms-section">
+                <div class="terms-section-title">What We Protect</div>
+                <ul class="terms-list">
+                    <li class="terms-item">Raw conversation text is never shared.</li>
+                    <li class="terms-item">Others see AI-processed emotional summaries only.</li>
+                    <li class="terms-item">You can stop publishing from memory settings anytime.</li>
+                </ul>
+            </div>
             <button class="terms-close" id="closeTermsUsage" type="button">I Understand</button>
         </div>
     </div>
@@ -1460,6 +1536,7 @@
     const successTotalLine = document.getElementById("successTotalLine");
     const usageConsent = document.getElementById("usageConsent");
     const openTermsUsage = document.getElementById("openTermsUsage");
+    const openDisclosureInfo = document.getElementById("openDisclosureInfo");
     const closeTermsUsage = document.getElementById("closeTermsUsage");
     const termsUsageView = document.getElementById("termsUsageView");
 
@@ -1601,6 +1678,13 @@
 
     if (openTermsUsage && termsUsageView) {
         openTermsUsage.addEventListener("click", () => {
+            termsUsageView.classList.add("is-open");
+            termsUsageView.setAttribute("aria-hidden", "false");
+        });
+    }
+
+    if (openDisclosureInfo && termsUsageView) {
+        openDisclosureInfo.addEventListener("click", () => {
             termsUsageView.classList.add("is-open");
             termsUsageView.setAttribute("aria-hidden", "false");
         });
