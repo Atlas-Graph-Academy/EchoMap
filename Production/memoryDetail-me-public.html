@@ -606,6 +606,13 @@
             gap: 2px;
         }
 
+        .echo-name-row {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+        }
+
         .echo-name {
             color: #E5E7EB;
             font-size: 12px;
@@ -1297,7 +1304,7 @@
         echoReferenceList.innerHTML = echoReferences
             .map(
                 (entry) =>
-                    `<li><img class="echo-avi" src="${entry.avatar}" alt="${entry.name}"><div class="echo-meta"><span class="echo-name">${entry.name}</span><span class="echo-note">${entry.note}</span>${entry.isNew ? '<span class="new-tag">New</span>' : ''}</div></li>`
+                    `<li><img class="echo-avi" src="${entry.avatar}" alt="${entry.name}"><div class="echo-meta"><span class="echo-name-row"><span class="echo-name">${entry.name}</span>${entry.isNew ? '<span class="new-tag">New</span>' : ''}</span><span class="echo-note">${entry.note}</span></div></li>`
             )
             .join("");
     };
@@ -1314,7 +1321,7 @@
             .slice(0, 6)
             .map(
                 (entry) =>
-                    `<li><img class="echo-avi" src="${entry.avatar}" alt="${entry.name}"><div class="echo-meta"><span class="echo-name">${entry.name}</span><span class="echo-note">Reacted with ${entry.reaction}</span>${entry.isNew ? '<span class="new-tag">New</span>' : ''}</div></li>`
+                    `<li><img class="echo-avi" src="${entry.avatar}" alt="${entry.name}"><div class="echo-meta"><span class="echo-name-row"><span class="echo-name">${entry.name}</span>${entry.isNew ? '<span class="new-tag">New</span>' : ''}</span><span class="echo-note">Reacted with ${entry.reaction}</span></div></li>`
             )
             .join("");
     };
