@@ -660,8 +660,8 @@
         .modal-backdrop {
             position: absolute;
             inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(6px);
+            background: rgba(0, 0, 0, 0.46);
+            backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -671,79 +671,455 @@
             z-index: 80;
         }
 
+        .modal-backdrop::before {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(219, 234, 254, 0.85) 40%, rgba(255,255,255,0) 70%);
+            transform: translate(-50%, -50%) scale(0.1);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.42s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.42s ease;
+            z-index: 1;
+        }
+
         .modal-backdrop.is-open {
             opacity: 1;
             pointer-events: auto;
         }
 
+        .modal-backdrop.is-confirming::before {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(22);
+        }
+
         .modal-card {
-            width: min(320px, 90%);
-            background: rgba(12, 12, 12, 0.95);
+            width: min(392px, 95%);
+            max-height: calc(100% - 44px);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background: rgba(10, 12, 16, 0.84);
             border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 18px;
-            padding: 18px;
-            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+            border-radius: 22px;
+            padding: 18px 18px 16px;
+            box-shadow:
+                0 18px 38px rgba(0, 0, 0, 0.56),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
             color: #E5E7EB;
+            position: relative;
+            z-index: 2;
+            transition: transform 0.42s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.32s ease, filter 0.32s ease;
+        }
+
+        .modal-backdrop.is-confirming .modal-card {
+            transform: scale(0.62);
+            opacity: 0;
+            filter: blur(2px);
+        }
+
+        .modal-backdrop.is-success .modal-card {
+            transform: scale(0.62);
+            opacity: 0;
+            filter: blur(2px);
+            pointer-events: none;
         }
 
         .modal-title {
-            font-size: 18px;
+            font-size: 26px;
             font-weight: 800;
             color: #FFFFFF;
-            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+            margin-bottom: 10px;
         }
 
         .modal-text {
             font-size: 13px;
             line-height: 1.5;
             color: #C9CDD3;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
-        .modal-list {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 14px;
+        .modal-memory-zone {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 12px 0;
+            margin-bottom: 14px;
+        }
+
+        .modal-select-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding-right: 2px;
+        }
+
+        .modal-select-title {
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+            text-transform: uppercase;
+            color: #EAF2FF;
+        }
+
+        .modal-select-count {
             font-size: 12px;
-            color: #B8BDC6;
+            font-weight: 700;
+            color: rgba(226, 232, 240, 0.78);
         }
 
-        .modal-list li {
-            padding-left: 14px;
-            position: relative;
-            margin-bottom: 6px;
+        .modal-memory-list {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 324px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(125, 211, 252, 0.45) transparent;
         }
 
-        .modal-list li::before {
-            content: "•";
+        .modal-memory-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .modal-memory-list::-webkit-scrollbar-thumb {
+            background: rgba(125, 211, 252, 0.4);
+            border-radius: 999px;
+        }
+
+        .memory-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding-right: 2px;
+        }
+
+        .memory-option.select-all {
+            justify-content: space-between;
+            padding: 2px 2px 8px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
+            margin-bottom: 2px;
+        }
+
+        .select-all-left {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .select-all-text {
+            font-size: 14px;
+            font-weight: 700;
+            color: rgba(237, 242, 247, 0.94);
+        }
+
+        .select-all-hint {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.22px;
+            color: rgba(173, 186, 201, 0.85);
+        }
+
+        .memory-option input {
             position: absolute;
-            left: 0;
-            color: #8BE9F7;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .memory-check {
+            width: 24px;
+            height: 24px;
+            border-radius: 7px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.04);
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: transparent;
+            transition: 0.18s ease;
+            position: relative;
+        }
+
+        .memory-option input:checked + .memory-check {
+            border-color: rgba(125, 211, 252, 0.7);
+            background: linear-gradient(135deg, rgba(97, 190, 255, 0.3), rgba(30, 64, 175, 0.45));
+            color: #EAFBFF;
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.25);
+        }
+
+        .memory-option input:indeterminate + .memory-check {
+            border-color: rgba(125, 211, 252, 0.64);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(30, 41, 59, 0.48));
+            color: rgba(234, 251, 255, 0.92);
+        }
+
+        .memory-option input:checked + .memory-check::before {
+            content: "";
+            width: 10px;
+            height: 6px;
+            border: 2px solid currentColor;
+            border-top: none;
+            border-right: none;
+            transform: rotate(-45deg) translate(1px, -1px);
+        }
+
+        .memory-option input:indeterminate + .memory-check::before {
+            content: "";
+            width: 10px;
+            height: 2px;
+            border-radius: 2px;
+            background: currentColor;
+        }
+
+        .modal-memory-tag {
+            --r: 125;
+            --g: 211;
+            --b: 252;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 36px;
+            padding: 8px 16px;
+            border-radius: 26px;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.24px;
+            transition: all 0.28s cubic-bezier(0.2, 0.7, 0.2, 1);
+            overflow: hidden;
+            color: rgba(244, 245, 247, 0.75);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px dashed rgba(255, 255, 255, 0.16);
+            box-shadow:
+                inset 0px 2px 4px -1px rgba(180, 190, 220, 0.25),
+                inset 0px 8px 14px -4px rgba(150, 160, 210, 0.12),
+                inset 0px -8px 16px -6px rgba(80, 80, 130, 0.12),
+                0 0 14px rgba(255, 255, 255, 0.03),
+                0px 8px 18px -8px rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-memory-tag::before {
+            content: "";
+            position: absolute;
+            inset: -35% -25%;
+            opacity: 0;
+            background: radial-gradient(circle at 28% 26%, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.02) 44%, rgba(255, 255, 255, 0) 70%);
+            transition: opacity 0.22s ease;
+            pointer-events: none;
+        }
+
+        .memory-option input:checked ~ .modal-memory-tag {
+            color: rgb(var(--r), var(--g), var(--b));
+            border: 1px solid rgba(var(--r), var(--g), var(--b), 0.34);
+            background: rgba(var(--r), var(--g), var(--b), 0.12);
+            text-shadow: 0 0 14px rgba(var(--r), var(--g), var(--b), 0.36);
+            box-shadow:
+                inset 0px 3px 5px -1px rgba(var(--r), var(--g), var(--b), 0.24),
+                inset 0px 10px 18px -4px rgba(var(--r), var(--g), var(--b), 0.14),
+                inset 0px -10px 20px -6px rgba(var(--r), var(--g), var(--b), 0.1),
+                0 0 22px rgba(var(--r), var(--g), var(--b), 0.28),
+                0px 12px 24px -10px rgba(0, 0, 0, 0.46);
+        }
+
+        .memory-option input:checked ~ .modal-memory-tag::before {
+            opacity: 0.45;
+            background: radial-gradient(circle at 28% 26%, rgba(var(--r), var(--g), var(--b), 0.36), rgba(var(--r), var(--g), var(--b), 0.08) 44%, rgba(var(--r), var(--g), var(--b), 0) 70%);
+        }
+
+        .modal-memory-tag .lock-icon {
+            width: 12px;
+            height: 12px;
+            opacity: 0.52;
+            transition: opacity 0.2s ease;
+        }
+
+        .memory-option input:checked ~ .modal-memory-tag .lock-icon {
+            opacity: 0;
+            width: 0;
+            margin-right: -2px;
+        }
+
+        .memory-option:hover input:checked ~ .modal-memory-tag {
+            background: rgba(var(--r), var(--g), var(--b), 0.16);
+            box-shadow:
+                inset 0px 3px 6px -1px rgba(var(--r), var(--g), var(--b), 0.28),
+                inset 0px 12px 20px -4px rgba(var(--r), var(--g), var(--b), 0.16),
+                0 0 28px rgba(var(--r), var(--g), var(--b), 0.32),
+                0px 14px 26px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-memory-tag.sticker {
+            font-family: "Special Elite", "JetBrains Mono", monospace;
+            letter-spacing: 0.28px;
         }
 
         .modal-actions {
             display: flex;
-            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             gap: 10px;
         }
 
-        .modal-primary {
-            height: 44px;
-            border-radius: 12px;
-            border: none;
-            background: #0B5C6A;
-            color: #EAFBFF;
+        .action-reward-pill {
+            margin-right: auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(125, 211, 252, 0.34);
+            background: linear-gradient(145deg, rgba(56, 189, 248, 0.14), rgba(37, 99, 235, 0.12));
+            color: rgba(191, 219, 254, 0.95);
+            white-space: nowrap;
+            box-shadow: 0 0 14px rgba(56, 189, 248, 0.18);
+        }
+
+        .action-reward-gift {
+            width: 14px;
+            height: 14px;
+            color: rgba(191, 219, 254, 0.96);
+            flex-shrink: 0;
+        }
+
+        .action-reward-num {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+            min-width: 22px;
+            text-align: right;
+            transition: transform 0.24s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.24s ease;
+        }
+
+        .action-reward-pill.is-updating .action-reward-num {
+            transform: translateY(-2px) scale(1.06);
+            opacity: 0.86;
+        }
+
+        .action-reward-text {
+            font-size: 11px;
             font-weight: 700;
+            letter-spacing: 0.2px;
+            color: rgba(191, 219, 254, 0.88);
+            text-transform: lowercase;
+        }
+
+        .modal-primary {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: 1px solid rgba(125, 211, 252, 0.45);
+            background: rgba(37, 99, 235, 0.2);
+            color: #EAFBFF;
             cursor: pointer;
+            transition: transform 0.2s ease, filter 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-primary:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
         }
 
         .modal-secondary {
-            background: transparent;
-            border: none;
-            color: #9CA3AF;
-            font-size: 12px;
-            font-weight: 600;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(255, 255, 255, 0.03);
+            color: #D1D5DB;
             cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-1px);
+        }
+
+        .modal-primary svg,
+        .modal-secondary svg {
+            width: 14px;
+            height: 14px;
+            stroke-width: 2.4;
+        }
+
+        .publish-success {
+            position: absolute;
+            inset: 0;
+            background: rgba(4, 8, 16, 0.78);
+            opacity: 0;
+            transform: scale(1.01);
+            pointer-events: none;
+            transition: opacity 0.34s ease, transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+            z-index: 3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 36px;
+        }
+
+        .publish-success.is-visible {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+
+        .success-copy {
+            max-width: 340px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .success-line {
+            color: rgba(229, 238, 249, 0.9);
+            text-wrap: balance;
+        }
+
+        .success-line.primary {
+            font-size: 34px;
+            font-weight: 800;
+            letter-spacing: 0.3px;
+            color: #F8FBFF;
+            text-shadow:
+                0 0 14px rgba(56, 189, 248, 0.35),
+                0 0 36px rgba(59, 130, 246, 0.24);
+        }
+
+        .success-line.metric {
+            font-size: 30px;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+            color: #7DD3FC;
+            text-shadow:
+                0 0 12px rgba(56, 189, 248, 0.44),
+                0 0 28px rgba(37, 99, 235, 0.28);
+        }
+
+        .success-line.note {
+            margin-top: 6px;
+            font-size: 11px;
+            line-height: 1.38;
+            color: rgba(190, 204, 220, 0.78);
+            max-width: 320px;
+            align-self: center;
         }
 
     </style>
@@ -861,20 +1237,119 @@
 
     <div class="modal-backdrop" id="matchGateModal" aria-hidden="true">
         <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="matchGateTitle">
-            <div class="modal-title" id="matchGateTitle">See Their Story?</div>
-            <div class="modal-text">
-                To protect everyone's vulnerability, memories are only visible to those who share similar experiences.
-                Make yours visible first — then you'll unlock theirs.
+            <div class="modal-title" id="matchGateTitle">Open memories</div>
+
+            <div class="modal-memory-zone">
+                <div class="modal-select-header">
+                    <div class="modal-select-title">Select memories</div>
+                    <div class="modal-select-count" id="selectionCount">0/0</div>
+                </div>
+                <ul class="modal-memory-list">
+                    <li>
+                        <label class="memory-option select-all">
+                            <span class="select-all-left">
+                                <input type="checkbox" id="selectAllMemories">
+                                <span class="memory-check" aria-hidden="true"></span>
+                                <span class="select-all-text">Select All</span>
+                            </span>
+                            <span class="select-all-hint">They are all from one moment to another.</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="memory-option">
+                            <input type="checkbox" class="memory-item" checked>
+                            <span class="memory-check" aria-hidden="true"></span>
+                            <span class="modal-memory-tag" style="--r: 224; --g: 170; --b: 62;">
+                                <span class="lock-icon" aria-hidden="true"></span>
+                                <span>memory</span>
+                            </span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="memory-option">
+                            <input type="checkbox" class="memory-item" checked>
+                            <span class="memory-check" aria-hidden="true"></span>
+                            <span class="modal-memory-tag sticker" style="--r: 108; --g: 176; --b: 210;">
+                                <span class="lock-icon" aria-hidden="true"></span>
+                                <span>relationship</span>
+                            </span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="memory-option">
+                            <input type="checkbox" class="memory-item" checked>
+                            <span class="memory-check" aria-hidden="true"></span>
+                            <span class="modal-memory-tag" style="--r: 228; --g: 120; --b: 90;">
+                                <span class="lock-icon" aria-hidden="true"></span>
+                                <span>Superbase</span>
+                            </span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="memory-option">
+                            <input type="checkbox" class="memory-item" checked>
+                            <span class="memory-check" aria-hidden="true"></span>
+                            <span class="modal-memory-tag sticker" style="--r: 122; --g: 174; --b: 94;">
+                                <span class="lock-icon" aria-hidden="true"></span>
+                                <span>startup</span>
+                            </span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="memory-option">
+                            <input type="checkbox" class="memory-item" checked>
+                            <span class="memory-check" aria-hidden="true"></span>
+                            <span class="modal-memory-tag" style="--r: 155; --g: 135; --b: 195;">
+                                <span class="lock-icon" aria-hidden="true"></span>
+                                <span>time</span>
+                            </span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="memory-option">
+                            <input type="checkbox" class="memory-item" checked>
+                            <span class="memory-check" aria-hidden="true"></span>
+                            <span class="modal-memory-tag sticker" style="--r: 100; --g: 140; --b: 200;">
+                                <span class="lock-icon" aria-hidden="true"></span>
+                                <span>MBTI</span>
+                            </span>
+                        </label>
+                    </li>
+                </ul>
             </div>
-            <div class="modal-text">Don't worry:</div>
-            <ul class="modal-list">
-                <li>Only people who resonate will ever see this</li>
-                <li>Your friends can see it on your profile</li>
-                <li>You can hide it anytime</li>
-            </ul>
+
             <div class="modal-actions">
-                <button class="modal-primary" id="makeVisibleBtn">Make This Visible</button>
-                <button class="modal-secondary" id="dismissModalBtn">Not Now</button>
+                <div class="action-reward-pill" id="echoRewardPill" aria-live="polite">
+                    <svg class="action-reward-gift" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                        <rect x="3" y="8" width="18" height="13" rx="2"></rect>
+                        <path d="M12 8v13"></path>
+                        <path d="M3 12h18"></path>
+                        <path d="M7.5 8c-1.4 0-2.5-1-2.5-2.3 0-1.2.9-2.2 2.1-2.2 2.1 0 3.5 2.9 4.9 4.5"></path>
+                        <path d="M16.5 8c1.4 0 2.5-1 2.5-2.3 0-1.2-.9-2.2-2.1-2.2-2.1 0-3.5 2.9-4.9 4.5"></path>
+                    </svg>
+                    <span class="action-reward-text">add</span>
+                    <span class="action-reward-num" id="echoRewardNum">30</span>
+                    <span class="action-reward-text">more echoes</span>
+                </div>
+                <button class="modal-secondary" id="dismissModalBtn" aria-label="Cancel">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+                <button class="modal-primary" id="makeVisibleBtn" aria-label="Yes">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="publish-success" id="publishSuccess" aria-hidden="true">
+            <div class="success-copy">
+                <div class="success-line primary" id="successPublishedLine">memory published ✓</div>
+                <div class="success-line metric" id="successGainedLine">+30 ✦</div>
+                <div class="success-line metric" id="successTotalLine">TOTAL 3030</div>
+                <div class="success-line note">Go to memory details to explore similar memories and people you may want to meet.</div>
             </div>
         </div>
     </div>
@@ -887,8 +1362,52 @@
     const dismissModalBtn = document.getElementById("dismissModalBtn");
     const publishBtn = document.getElementById("publishBtn");
     const contentCore = document.getElementById("contentCore");
+    const selectAllMemories = document.getElementById("selectAllMemories");
+    const memoryItems = Array.from(document.querySelectorAll(".memory-item"));
+    const selectionCount = document.getElementById("selectionCount");
+    const echoRewardPill = document.getElementById("echoRewardPill");
+    const echoRewardNum = document.getElementById("echoRewardNum");
+    const publishSuccess = document.getElementById("publishSuccess");
+    const successPublishedLine = document.getElementById("successPublishedLine");
+    const successGainedLine = document.getElementById("successGainedLine");
+    const successTotalLine = document.getElementById("successTotalLine");
+
+    const BASE_TOTAL_ECHOES = 3000;
+    let currentTotalEchoes = BASE_TOTAL_ECHOES;
+    let displayedEchoReward = 30;
+    let successDismissTimer = null;
+
+    const animateValue = (from, to, duration, onUpdate, onDone) => {
+        const startTime = performance.now();
+        const frame = (now) => {
+            const t = Math.min((now - startTime) / duration, 1);
+            const eased = 1 - Math.pow(1 - t, 3);
+            const value = Math.round(from + (to - from) * eased);
+            onUpdate(value);
+            if (t < 1) {
+                requestAnimationFrame(frame);
+            } else if (onDone) {
+                onDone();
+            }
+        };
+        requestAnimationFrame(frame);
+    };
+
+    const resetSuccessState = () => {
+        if (successDismissTimer) {
+            clearTimeout(successDismissTimer);
+            successDismissTimer = null;
+        }
+        matchGateModal.classList.remove("is-confirming");
+        matchGateModal.classList.remove("is-success");
+        if (publishSuccess) {
+            publishSuccess.classList.remove("is-visible");
+            publishSuccess.setAttribute("aria-hidden", "true");
+        }
+    };
 
     const openMatchGate = () => {
+        resetSuccessState();
         matchGateModal.classList.add("is-open");
         matchGateModal.setAttribute("aria-hidden", "false");
     };
@@ -896,13 +1415,93 @@
     const closeMatchGate = () => {
         matchGateModal.classList.remove("is-open");
         matchGateModal.setAttribute("aria-hidden", "true");
+        resetSuccessState();
     };
 
-    document.querySelectorAll('.match-item:not([aria-hidden="true"])').forEach((item) => {
-        item.addEventListener("click", openMatchGate);
+    const syncSelectionUi = () => {
+        if (!selectAllMemories || !selectionCount || !makeVisibleBtn) return;
+        const total = memoryItems.length;
+        const selected = memoryItems.filter((item) => item.checked).length;
+        selectionCount.textContent = `${selected}/${total}`;
+
+        const targetReward = selected * 5;
+        if (echoRewardNum) {
+            const start = displayedEchoReward;
+            const delta = targetReward - start;
+            if (delta !== 0) {
+                if (echoRewardPill) echoRewardPill.classList.add("is-updating");
+                animateValue(start, targetReward, 260, (current) => {
+                    echoRewardNum.textContent = `${current}`;
+                }, () => {
+                    displayedEchoReward = targetReward;
+                    if (echoRewardPill) echoRewardPill.classList.remove("is-updating");
+                });
+            }
+        }
+
+        selectAllMemories.checked = selected === total && total > 0;
+        selectAllMemories.indeterminate = selected > 0 && selected < total;
+        makeVisibleBtn.disabled = selected === 0;
+        makeVisibleBtn.style.opacity = selected === 0 ? "0.5" : "1";
+        makeVisibleBtn.style.cursor = selected === 0 ? "not-allowed" : "pointer";
+    };
+
+    const runPublishSuccess = () => {
+        const selected = memoryItems.filter((item) => item.checked).length;
+        const reward = selected * 5;
+        const targetTotal = currentTotalEchoes + reward;
+        if (successPublishedLine) {
+            successPublishedLine.textContent = "memory published ✓";
+        }
+        if (successGainedLine) {
+            successGainedLine.textContent = `+${reward} ✦`;
+        }
+        if (successTotalLine) {
+            successTotalLine.textContent = `TOTAL ${currentTotalEchoes}`;
+        }
+        matchGateModal.classList.add("is-confirming");
+        setTimeout(() => {
+            matchGateModal.classList.remove("is-confirming");
+            matchGateModal.classList.add("is-success");
+            if (publishSuccess) {
+                publishSuccess.classList.add("is-visible");
+                publishSuccess.setAttribute("aria-hidden", "false");
+            }
+            if (successTotalLine) {
+                animateValue(currentTotalEchoes, targetTotal, 960, (value) => {
+                    successTotalLine.textContent = `TOTAL ${value}`;
+                }, () => {
+                    currentTotalEchoes = targetTotal;
+                });
+            }
+            successDismissTimer = setTimeout(() => {
+                closeMatchGate();
+                if (publishBtn) {
+                    publishBtn.focus();
+                }
+            }, 3000);
+        }, 330);
+    };
+
+    if (selectAllMemories) {
+        selectAllMemories.addEventListener("change", () => {
+            memoryItems.forEach((item) => {
+                item.checked = selectAllMemories.checked;
+            });
+            syncSelectionUi();
+        });
+    }
+
+    memoryItems.forEach((item) => {
+        item.addEventListener("change", syncSelectionUi);
     });
 
     dismissModalBtn.addEventListener("click", closeMatchGate);
+
+    makeVisibleBtn.addEventListener("click", () => {
+        if (makeVisibleBtn.disabled) return;
+        runPublishSuccess();
+    });
 
     const updateCoreScrollState = () => {
         if (!contentCore) return;
@@ -922,23 +1521,22 @@
     }
 
     matchGateModal.addEventListener("click", (event) => {
-        if (event.target === matchGateModal) {
+        if (event.target === matchGateModal && !matchGateModal.classList.contains("is-confirming")) {
             closeMatchGate();
         }
     });
 
-    makeVisibleBtn.addEventListener("click", () => {
-        closeMatchGate();
-        if (publishBtn) {
-            publishBtn.focus();
-        }
-    });
+    if (publishBtn) {
+        publishBtn.addEventListener("click", openMatchGate);
+    }
 
     document.addEventListener("keydown", (event) => {
         if (event.key === "Escape" && matchGateModal.classList.contains("is-open")) {
             closeMatchGate();
         }
     });
+
+    syncSelectionUi();
 </script>
 
 </body>
