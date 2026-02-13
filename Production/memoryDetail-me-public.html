@@ -429,13 +429,62 @@
             border-radius: 0;
         }
 
+        .echo-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .echo-summary-box {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(18, 18, 18, 0.85);
+            border-radius: 12px;
+            padding: 10px;
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .echo-summary-box:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(24, 24, 24, 0.92);
+        }
+
+        .reactions-panel.is-expanded .echo-summary-box {
+            border-color: rgba(6, 182, 212, 0.45);
+            box-shadow: 0 0 0 1px rgba(6, 182, 212, 0.18);
+        }
+
+        .echo-toggle {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            border: none;
+            background: transparent;
+            border-radius: 0;
+            padding: 0;
+            cursor: pointer;
+        }
+
         .echo-count {
             font-size: 12px;
             font-weight: 700;
             color: #C4C9D4;
             letter-spacing: 0.6px;
-            margin-bottom: 6px;
             text-transform: uppercase;
+            margin: 0;
+        }
+
+        .echo-caret {
+            color: #9CA3AF;
+            font-size: 12px;
+            line-height: 1;
+            transition: transform 0.2s ease;
+        }
+
+        .echo-toggle[aria-expanded="true"] .echo-caret {
+            transform: rotate(180deg);
         }
 
         .echo-subtext {
@@ -471,49 +520,82 @@
             color: #E5E7EB;
             font-size: 12px;
             font-weight: 600;
-            cursor: pointer;
         }
 
-        .reaction-pill.active {
-            border-color: rgba(6, 182, 212, 0.45);
-            box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
-        }
-
-        .reaction-list {
+        .echo-details {
             margin-top: 10px;
             padding: 10px;
-            border-radius: 10px;
-            background: rgba(8, 8, 8, 0.9);
+            border-radius: 12px;
+            background: rgba(8, 8, 8, 0.92);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            color: #C9CDD3;
-            font-size: 12px;
             display: none;
         }
 
-        .reaction-list.is-open {
+        .echo-details.is-open {
             display: block;
         }
 
-        .reaction-list ul {
+        .echo-detail-group + .echo-detail-group {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .echo-detail-title {
+            font-size: 10px;
+            color: #9CA3AF;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .echo-detail-list {
             list-style: none;
             padding: 0;
             margin: 0;
             display: flex;
             flex-direction: column;
-            gap: 6px;
-        }
-
-        .reaction-list li {
-            display: flex;
-            align-items: center;
             gap: 8px;
         }
 
-        .reaction-avi {
+        .echo-detail-list li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .echo-avi {
             width: 18px;
             height: 18px;
             border-radius: 50%;
             object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .echo-meta {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .echo-name {
+            color: #E5E7EB;
+            font-size: 12px;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .echo-note {
+            color: #9CA3AF;
+            font-size: 10px;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         /* Social Pile */
@@ -989,17 +1071,31 @@
     <!-- OWNER ACTION DOCK -->
     <div class="dock-area">
         <div class="reactions-panel" id="reactionsPanel">
-            <div class="echo-count">Echoed 18 times</div>
-            <div class="echo-subtext">Each view or match counts as an Echo.</div>
-            <div class="reactions-row" aria-label="Emoji reactions">
-                <button class="reaction-pill" data-reaction="fire" type="button">🔥 12</button>
-                <button class="reaction-pill" data-reaction="sad" type="button">😢 8</button>
-                <button class="reaction-pill" data-reaction="heart" type="button">💜 23</button>
-                <button class="reaction-pill" data-reaction="agree" type="button">👍 14</button>
-                <button class="reaction-pill" data-reaction="careful" type="button">⚠️ 6</button>
-            </div>
-            <div class="reaction-list" id="reactionList" aria-live="polite">
-                <ul id="reactionNames"></ul>
+            <div class="echo-summary-box">
+                <div class="echo-header">
+                    <button class="echo-toggle" id="echoDetailsToggle" type="button" aria-expanded="false" aria-controls="echoDetails">
+                        <span class="echo-count">Echoed 18 times</span>
+                        <span class="echo-caret" aria-hidden="true">▼</span>
+                    </button>
+                </div>
+                <div class="echo-subtext">Each view or match counts as an Echo.</div>
+                <div class="reactions-row" aria-label="Emoji reactions">
+                    <span class="reaction-pill">🔥 12</span>
+                    <span class="reaction-pill">😢 8</span>
+                    <span class="reaction-pill">💜 23</span>
+                    <span class="reaction-pill">👍 14</span>
+                    <span class="reaction-pill">⚠️ 6</span>
+                </div>
+                <div class="echo-details" id="echoDetails">
+                    <div class="echo-detail-group">
+                        <div class="echo-detail-title">Quoted in Echo Chats</div>
+                        <ul class="echo-detail-list" id="echoReferenceList"></ul>
+                    </div>
+                    <div class="echo-detail-group">
+                        <div class="echo-detail-title">Reaction Senders</div>
+                        <ul class="echo-detail-list" id="echoReactionSenders"></ul>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1114,36 +1210,74 @@
         ]
     };
 
-    const reactionButtons = document.querySelectorAll(".reaction-pill");
-    const reactionList = document.getElementById("reactionList");
-    const reactionNames = document.getElementById("reactionNames");
+    const reactionMeta = {
+        fire: "🔥",
+        sad: "😢",
+        heart: "💜",
+        agree: "👍",
+        careful: "⚠️"
+    };
 
-    const renderReactionNames = (key) => {
-        const entries = reactionData[key] || [];
-        reactionNames.innerHTML = entries
+    const echoReferences = [
+        { name: "Aurora Hush", avatar: "https://i.pravatar.cc/150?u=ref-aurora", note: "Quoted this memory in your Echo chat." },
+        { name: "Signal in the Snow", avatar: "https://i.pravatar.cc/150?u=ref-signal", note: "Brought this up while discussing creative blocks." },
+        { name: "Ember Corridor", avatar: "https://i.pravatar.cc/150?u=ref-ember", note: "Referenced this memory in a late-night check-in." }
+    ];
+
+    const echoDetailsToggle = document.getElementById("echoDetailsToggle");
+    const echoDetails = document.getElementById("echoDetails");
+    const echoReferenceList = document.getElementById("echoReferenceList");
+    const echoReactionSenders = document.getElementById("echoReactionSenders");
+    const reactionsPanel = document.getElementById("reactionsPanel");
+
+    const renderEchoReferenceList = () => {
+        echoReferenceList.innerHTML = echoReferences
             .map(
                 (entry) =>
-                    `<li><img class="reaction-avi" src="${entry.avatar}" alt="${entry.name}"><span>${entry.name}</span></li>`
+                    `<li><img class="echo-avi" src="${entry.avatar}" alt="${entry.name}"><div class="echo-meta"><span class="echo-name">${entry.name}</span><span class="echo-note">${entry.note}</span></div></li>`
             )
             .join("");
     };
 
-    reactionButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-            const key = button.dataset.reaction;
-            const isActive = button.classList.contains("active");
+    const renderEchoReactionSenders = () => {
+        const grouped = Object.entries(reactionData).flatMap(([key, entries]) =>
+            entries.map((entry) => ({
+                ...entry,
+                reaction: reactionMeta[key] || ""
+            }))
+        );
 
-            reactionButtons.forEach((btn) => btn.classList.remove("active"));
+        echoReactionSenders.innerHTML = grouped
+            .slice(0, 6)
+            .map(
+                (entry) =>
+                    `<li><img class="echo-avi" src="${entry.avatar}" alt="${entry.name}"><div class="echo-meta"><span class="echo-name">${entry.name}</span><span class="echo-note">Reacted with ${entry.reaction}</span></div></li>`
+            )
+            .join("");
+    };
 
-            if (isActive) {
-                reactionList.classList.remove("is-open");
-                return;
-            }
+    const closeEchoDetails = () => {
+        echoDetails.classList.remove("is-open");
+        echoDetailsToggle.setAttribute("aria-expanded", "false");
+        reactionsPanel.classList.remove("is-expanded");
+    };
 
-            button.classList.add("active");
-            renderReactionNames(key);
-            reactionList.classList.add("is-open");
-        });
+    const toggleEchoDetails = () => {
+        const isOpen = echoDetails.classList.contains("is-open");
+        echoDetails.classList.toggle("is-open", !isOpen);
+        echoDetailsToggle.setAttribute("aria-expanded", String(!isOpen));
+        reactionsPanel.classList.toggle("is-expanded", !isOpen);
+    };
+
+    renderEchoReferenceList();
+    renderEchoReactionSenders();
+
+    echoDetailsToggle.addEventListener("click", toggleEchoDetails);
+
+    document.addEventListener("click", (event) => {
+        if (reactionsPanel && !reactionsPanel.contains(event.target)) {
+            closeEchoDetails();
+        }
     });
 
     const exploreMoreBtn = document.getElementById("exploreMoreBtn");

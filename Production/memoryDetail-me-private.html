@@ -737,6 +737,44 @@
             margin-bottom: 10px;
         }
 
+        .usage-consent {
+            margin-bottom: 12px;
+            padding: 0;
+            border: none;
+            background: transparent;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .usage-consent.is-hidden {
+            display: none;
+        }
+
+        .usage-line {
+            display: block;
+            width: fit-content;
+            border: none;
+            background: transparent;
+            padding: 0;
+            font-family: inherit;
+            font-size: 11px;
+            line-height: 1.4;
+            color: rgba(220, 228, 238, 0.88);
+            text-decoration: none;
+            cursor: pointer;
+            margin-bottom: 0;
+            text-shadow: 0 0 10px rgba(125, 211, 252, 0.12);
+        }
+
+        .usage-line b {
+            color: rgba(186, 230, 253, 0.95);
+            font-weight: 700;
+            text-decoration: underline;
+            text-decoration-color: rgba(186, 230, 253, 0.72);
+            text-underline-offset: 2px;
+        }
+
         .modal-text {
             font-size: 13px;
             line-height: 1.5;
@@ -745,7 +783,6 @@
         }
 
         .modal-memory-zone {
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             padding: 12px 0;
             margin-bottom: 14px;
@@ -1080,6 +1117,46 @@
             pointer-events: auto;
         }
 
+        .terms-usage-view {
+            position: absolute;
+            inset: 0;
+            padding: 18px;
+            display: none;
+            background: rgba(6, 8, 12, 0.96);
+            z-index: 5;
+            border-radius: inherit;
+        }
+
+        .terms-usage-view.is-open {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .terms-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #F8FAFC;
+        }
+
+        .terms-text {
+            font-size: 12px;
+            line-height: 1.45;
+            color: rgba(203, 213, 225, 0.92);
+        }
+
+        .terms-close {
+            margin-top: auto;
+            height: 34px;
+            border-radius: 10px;
+            border: 1px solid rgba(125, 211, 252, 0.34);
+            background: rgba(37, 99, 235, 0.2);
+            color: #EAFBFF;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
         .success-copy {
             max-width: 340px;
             text-align: center;
@@ -1238,6 +1315,9 @@
     <div class="modal-backdrop" id="matchGateModal" aria-hidden="true">
         <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="matchGateTitle">
             <div class="modal-title" id="matchGateTitle">Open memories</div>
+            <div class="usage-consent" id="usageConsent">
+                <button class="usage-line" id="openTermsUsage" type="button">By publishing your memory, you agree with our <b>Term of Usage</b>.</button>
+            </div>
 
             <div class="modal-memory-zone">
                 <div class="modal-select-header">
@@ -1352,6 +1432,13 @@
                 <div class="success-line note">Go to memory details to explore similar memories and people you may want to meet.</div>
             </div>
         </div>
+        <div class="terms-usage-view" id="termsUsageView" aria-hidden="true">
+            <div class="terms-title">Term of Usage</div>
+            <div class="terms-text">Publishing a memory means it may be discoverable by people with similar experiences through Echo matching.</div>
+            <div class="terms-text">Your published memory can appear in Echo chat and related public memory surfaces.</div>
+            <div class="terms-text">You can stop publishing from your memory settings later.</div>
+            <button class="terms-close" id="closeTermsUsage" type="button">I Understand</button>
+        </div>
     </div>
 
 </div>
@@ -1371,6 +1458,10 @@
     const successPublishedLine = document.getElementById("successPublishedLine");
     const successGainedLine = document.getElementById("successGainedLine");
     const successTotalLine = document.getElementById("successTotalLine");
+    const usageConsent = document.getElementById("usageConsent");
+    const openTermsUsage = document.getElementById("openTermsUsage");
+    const closeTermsUsage = document.getElementById("closeTermsUsage");
+    const termsUsageView = document.getElementById("termsUsageView");
 
     const BASE_TOTAL_ECHOES = 3000;
     let currentTotalEchoes = BASE_TOTAL_ECHOES;
@@ -1408,6 +1499,11 @@
 
     const openMatchGate = () => {
         resetSuccessState();
+        if (usageConsent) usageConsent.classList.remove("is-hidden");
+        if (termsUsageView) {
+            termsUsageView.classList.remove("is-open");
+            termsUsageView.setAttribute("aria-hidden", "true");
+        }
         matchGateModal.classList.add("is-open");
         matchGateModal.setAttribute("aria-hidden", "false");
     };
@@ -1502,6 +1598,20 @@
         if (makeVisibleBtn.disabled) return;
         runPublishSuccess();
     });
+
+    if (openTermsUsage && termsUsageView) {
+        openTermsUsage.addEventListener("click", () => {
+            termsUsageView.classList.add("is-open");
+            termsUsageView.setAttribute("aria-hidden", "false");
+        });
+    }
+
+    if (closeTermsUsage && termsUsageView) {
+        closeTermsUsage.addEventListener("click", () => {
+            termsUsageView.classList.remove("is-open");
+            termsUsageView.setAttribute("aria-hidden", "true");
+        });
+    }
 
     const updateCoreScrollState = () => {
         if (!contentCore) return;
