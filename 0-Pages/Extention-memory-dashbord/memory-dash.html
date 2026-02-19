@@ -8,8 +8,6 @@
     <style>
         :root {
             --bg-color: #050505;
-            --timeline-white: rgba(255, 255, 255, 0.9);
-            --timeline-glow: 0 0 10px rgba(255, 255, 255, 0.4);
             --text-primary: #FFFFFF;
             --text-secondary: rgba(255, 255, 255, 0.4);
             --surface-glass: rgba(10, 10, 10, 0.7);
@@ -37,60 +35,75 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 190px;
+            height: 356px;
             background: linear-gradient(to bottom, rgba(0, 0, 0, 1) 20%, rgba(0, 0, 0, 0) 100%);
             z-index: 100;
             padding: 44px 24px 0;
             pointer-events: none;
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
         }
 
         .header-content {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: flex-end;
             pointer-events: auto;
         }
 
-        .title {
-            font-size: 34px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
+        .header-left {
+            flex-shrink: 0;
         }
 
-        .subtitle {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-bottom: 6px;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        .header-right {
+            text-align: right;
+            margin-left: auto;
+            flex-shrink: 0;
         }
 
-        /* The Infinite Scroller */
-        .scroller {
-            height: 100vh;
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding-top: 206px;
-            padding-bottom: 100px;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
+        .header-right .subtitle {
+            margin-bottom: 4px;
+        }
+
+        .header-right .title {
+            font-size: 24px;
+        }
+
+        .time-scale {
             position: relative;
+            margin-top: 16px;
+            z-index: 110;
+            pointer-events: none;
+            padding: 10px 12px;
+            border-radius: 16px;
+            background: rgba(18, 18, 18, 0.62);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(14px) saturate(135%);
+            -webkit-backdrop-filter: blur(14px) saturate(135%);
+            display: inline-flex;
+            align-items: flex-end;
+            gap: 0;
+            width: fit-content;
+            max-width: 86vw;
+            transition: background 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+        }
+
+        .time-stack {
+            display: grid;
+            align-items: end;
+        }
+
+        .time-content {
+            grid-area: 1 / 1;
+            display: inline-flex;
+            align-items: flex-end;
+            will-change: opacity, transform, filter;
         }
 
         .search-zone {
             margin-top: 14px;
             pointer-events: auto;
-        }
-
-        .search-label {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.45);
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            margin-bottom: 6px;
         }
 
         .search-shell {
@@ -120,101 +133,206 @@
             color: rgba(255, 255, 255, 0.38);
         }
 
-        .search-count {
+        .privacy-block {
+            margin-top: 14px;
+            pointer-events: auto;
+        }
+
+        .time-dock {
             margin-top: 8px;
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.5);
-            letter-spacing: 0.06em;
+            display: flex;
+            justify-content: flex-end;
+            padding-right: 38px;
+            pointer-events: none;
+        }
+
+        .privacy-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.82);
+            font-size: 12px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .privacy-track {
+            height: 8px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.14);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .privacy-fill {
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 12%;
+            border-radius: 999px;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.7));
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.24);
+        }
+
+        .privacy-note {
+            margin-top: 8px;
+            color: rgba(255, 255, 255, 0.42);
+            font-size: 12px;
+            letter-spacing: 0.01em;
+        }
+
+        .time-chip {
+            display: inline-flex;
+            align-items: flex-end;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.92);
+            letter-spacing: 0.01em;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .time-chip + .time-chip {
+            margin-left: 12px;
+        }
+
+        .time-week {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: rgba(255, 255, 255, 0.96);
             text-transform: uppercase;
         }
 
-        /* -----------------------
-           THE PLAYING WHITE TIMELINE
-           ----------------------- */
-        .timeline-axis {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 28px;
-            /* Fixed position from left */
-            width: 2px;
-            background: var(--timeline-white);
-            box-shadow: var(--timeline-glow);
-            z-index: 10;
+        .time-date {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            color: rgba(255, 255, 255, 0.52);
         }
 
-        /* Timeline Ticks */
-        .timeline-ticks {
+        .title {
+            font-size: 34px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* The Infinite Scroller */
+        .scroller {
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-top: 378px;
+            padding-bottom: 100px;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            position: relative;
+        }
+
+        .right-rail {
             position: absolute;
             top: 0;
             bottom: 0;
-            left: 20px;
-            width: 18px;
-            background-image: repeating-linear-gradient(to bottom,
-                    rgba(255, 255, 255, 0.6) 0px,
-                    rgba(255, 255, 255, 0.6) 1px,
-                    transparent 1px,
-                    transparent 20px);
-            mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
-            opacity: 0.8;
+            right: 14px;
+            width: 26px;
             pointer-events: none;
+            z-index: 1;
+        }
+
+        .rail-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 12px;
+            width: 2px;
+            background: rgba(255, 255, 255, 0.18);
+            border-radius: 999px;
+        }
+
+        .rail-ticks {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            width: 24px;
+            background-image: repeating-linear-gradient(to bottom,
+                    rgba(255, 255, 255, 0.28) 0px,
+                    rgba(255, 255, 255, 0.28) 1px,
+                    transparent 1px,
+                    transparent 14px);
+            mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%);
+            opacity: 0.7;
         }
 
         /* Memory Container Layout */
         .memory-feed {
-            padding: 0 20px 0 44px;
-            /* Left padding creates space for timeline */
+            padding: 0 42px 0 20px;
             display: flex;
             flex-direction: column;
+            position: relative;
+            z-index: 2;
         }
 
         /* Date Section */
         .date-section {
             margin-bottom: 40px;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
         }
 
         .date-header {
-            position: sticky;
-            top: 192px;
-            align-self: flex-start;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 16px;
-            letter-spacing: 0.5px;
-            mix-blend-mode: screen;
-            z-index: 20;
-            text-align: left;
-            padding-left: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            padding-bottom: 4px;
-        }
-
-        /* Node Wrapper: Connects node to timeline */
-        .node-wrapper {
-            display: flex;
-            justify-content: flex-start;
-            /* Align to timeline (left) */
-            align-items: center;
-            gap: 8px;
-            margin-bottom: var(--node-gap);
             position: relative;
-            padding-left: 20px;
-            /* Distance from timeline */
+            align-self: flex-end;
+            font-size: 14px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.68);
+            margin-bottom: 14px;
+            letter-spacing: 0.03em;
+            z-index: 20;
+            text-align: right;
+            padding: 0 2px 6px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+            transition: opacity 0.08s linear, transform 0.1s ease-out, filter 0.08s linear;
         }
 
-        /* Visual connection line from Node to Timeline */
-        .node-wrapper::after {
-            content: '';
-            position: absolute;
-            left: -6px;
-            /* Touch the axis */
-            width: 20px;
-            height: 1px;
-            background: rgba(255, 255, 255, 0.2);
-            z-index: 5;
+        .date-header.is-replaced {
+            opacity: 0;
+            transform: translateY(-7px) scale(0.985);
+            filter: blur(1.8px);
+            pointer-events: none;
+        }
+
+        .node-wrapper {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 128px;
+            align-items: center;
+            column-gap: 12px;
+            margin-bottom: var(--node-gap);
+            min-width: 0;
+            width: min(100%, 560px);
+            margin-left: auto;
+            --focus-blur: 0px;
+            --focus-opacity: 1;
+            filter: blur(var(--focus-blur));
+            opacity: var(--focus-opacity);
+            transition: filter 0.08s linear, opacity 0.08s linear;
+        }
+
+        .node-wrapper--solo {
+            grid-template-columns: minmax(0, 1fr);
+            justify-items: center;
         }
 
         /* ========================================
@@ -232,19 +350,100 @@
             font-weight: 600;
             letter-spacing: 0.3px;
             cursor: pointer;
-            transition: all 0.2s ease;
             position: relative;
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             white-space: nowrap;
             max-width: 100%;
+            width: auto;
+            justify-self: end;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
         .tag:active {
             transform: scale(0.97);
         }
 
-        /* Lock Icon */
+        .node-wrapper:hover .tag {
+            transform: translateX(2px);
+        }
+
+        .node-meta {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 5px;
+            white-space: nowrap;
+        }
+
+        .meta-pill {
+            height: 24px;
+            min-width: 24px;
+            padding: 0 7px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .meta-pill.source {
+            width: 24px;
+            padding: 0;
+        }
+
+        .meta-icon {
+            width: 12px;
+            height: 12px;
+            color: rgba(255, 255, 255, 0.72);
+            flex-shrink: 0;
+        }
+
+        .meta-icon.echo {
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 9.5c0-3.3 2.7-6 6-6h6a6 6 0 0 1 0 12h-1.6l-3.1 3.1a1 1 0 0 1-1.7-.7v-2.4H9c-3.3 0-6-2.7-6-6Z' fill='black'/%3E%3Cpath d='M10 9.5h6M10 12.5h4' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+            -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 9.5c0-3.3 2.7-6 6-6h6a6 6 0 0 1 0 12h-1.6l-3.1 3.1a1 1 0 0 1-1.7-.7v-2.4H9c-3.3 0-6-2.7-6-6Z' fill='black'/%3E%3Cpath d='M10 9.5h6M10 12.5h4' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+            background: currentColor;
+            mask-repeat: no-repeat;
+            -webkit-mask-repeat: no-repeat;
+            mask-position: center;
+            -webkit-mask-position: center;
+            mask-size: contain;
+            -webkit-mask-size: contain;
+        }
+
+        .meta-icon.react {
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='black'/%3E%3Ccircle cx='8.3' cy='9.5' r='1.1' fill='white'/%3E%3Ccircle cx='15.7' cy='9.5' r='1.1' fill='white'/%3E%3Cpath d='M7.5 14.2c1 .9 2.3 1.4 4.5 1.4 2.2 0 3.5-.5 4.5-1.4' stroke='white' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
+            -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='black'/%3E%3Ccircle cx='8.3' cy='9.5' r='1.1' fill='white'/%3E%3Ccircle cx='15.7' cy='9.5' r='1.1' fill='white'/%3E%3Cpath d='M7.5 14.2c1 .9 2.3 1.4 4.5 1.4 2.2 0 3.5-.5 4.5-1.4' stroke='white' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
+            background: currentColor;
+            mask-repeat: no-repeat;
+            -webkit-mask-repeat: no-repeat;
+            mask-position: center;
+            -webkit-mask-position: center;
+            mask-size: contain;
+            -webkit-mask-size: contain;
+        }
+
+        .meta-source-icon {
+            width: 14px;
+            height: 14px;
+            object-fit: contain;
+            opacity: 0.9;
+            filter: grayscale(1) contrast(0.95) brightness(1.05);
+            flex-shrink: 0;
+        }
+
+        .meta-count {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            color: rgba(255, 255, 255, 0.76);
+            line-height: 1;
+            min-width: 10px;
+            text-align: right;
+        }
+
         .lock-icon {
             width: 14px;
             height: 14px;
@@ -284,15 +483,6 @@
 
         .tag-private .lock-icon {
             opacity: 0.5;
-        }
-
-        .source-icon {
-            width: 20px;
-            height: 20px;
-            object-fit: contain;
-            opacity: 0.72;
-            filter: grayscale(1) contrast(0.9) brightness(1.05) drop-shadow(0 0 4px rgba(255, 255, 255, 0.08));
-            flex-shrink: 0;
         }
 
         .empty-state {
@@ -344,6 +534,74 @@
         .animate-entry {
             animation: slideIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
             opacity: 0;
+            will-change: transform, opacity;
+        }
+
+        @media (max-width: 420px) {
+            .memory-feed {
+                padding-left: 14px;
+                padding-right: 32px;
+            }
+
+            .tag {
+                font-size: 14px;
+                padding: 9px 16px;
+            }
+
+            .node-meta {
+                gap: 6px;
+            }
+
+            .node-wrapper {
+                grid-template-columns: minmax(0, 1fr) 114px;
+                width: min(100%, 100%);
+            }
+
+            .time-scale {
+                margin-top: 12px;
+                padding: 8px 10px;
+            }
+
+            .time-dock {
+                margin-top: 6px;
+                padding-right: 28px;
+            }
+
+            .time-chip + .time-chip {
+                margin-left: 9px;
+            }
+
+            .time-week {
+                font-size: 22px;
+            }
+
+            .time-date {
+                font-size: 12px;
+            }
+
+            .meta-pill {
+                height: 22px;
+                min-width: 22px;
+                padding: 0 6px;
+            }
+
+            .meta-icon {
+                width: 11px;
+                height: 11px;
+            }
+
+            .meta-source-icon {
+                width: 13px;
+                height: 13px;
+            }
+
+            .meta-count {
+                font-size: 10px;
+            }
+
+            .date-header {
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -352,29 +610,51 @@
 
     <div class="header-glass">
         <div class="header-content">
-            <div>
-                <div class="subtitle">Memory Log</div>
+            <div class="header-left">
                 <div class="title">My Timeline</div>
             </div>
-            <div style="text-align: right;">
-                <div class="subtitle">Total</div>
+            <div class="header-right">
+                <div class="subtitle">Total reactions</div>
                 <div class="title" id="totalCount" style="font-size: 24px;">3,204</div>
             </div>
         </div>
         <div class="search-zone">
-            <div class="search-label">Search memories</div>
             <div class="search-shell">
                 <span style="opacity: 0.6;">⌕</span>
                 <input id="searchInput" type="text" placeholder="Try: meeting, chatgpt, airport...">
             </div>
-            <div class="search-count" id="searchCount">Showing all memories</div>
+        </div>
+        <div class="privacy-block">
+            <div class="privacy-head">
+                <span><span id="publishedCount">0</span> Published</span>
+                <span><span id="privateCount">0</span> Private</span>
+            </div>
+            <div class="privacy-track">
+                <div class="privacy-fill" id="privacyFill"></div>
+            </div>
+            <div class="privacy-note" id="privacyNote">Only 0% of your memories are visible.</div>
+        </div>
+        <div class="time-dock">
+            <div class="time-scale" id="timeScale" aria-hidden="true">
+                <div class="time-stack">
+                    <div class="time-content" id="timeContentCurrent">
+                        <div class="time-chip time-week" id="timeWeek">Wed</div>
+                        <div class="time-chip time-date" id="timeDate">02/19/2026</div>
+                    </div>
+                    <div class="time-content" id="timeContentNext">
+                        <div class="time-chip time-week" id="timeWeekNext">Thu</div>
+                        <div class="time-chip time-date" id="timeDateNext">02/20/2026</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="scroller" id="scrollContainer">
-        <div class="timeline-axis"></div>
-        <div class="timeline-ticks"></div>
-
+        <div class="right-rail" aria-hidden="true">
+            <div class="rail-line"></div>
+            <div class="rail-ticks"></div>
+        </div>
         <div class="memory-feed" id="feed">
         </div>
     </div>
@@ -431,6 +711,21 @@
             return date.toLocaleDateString('en-US', options);
         }
 
+        function formatWeekDate(date) {
+            const weekdayMap = {
+                Sun: 'Sun',
+                Mon: 'Mon',
+                Tue: 'Tue',
+                Wed: 'Wed',
+                Thu: 'Thur',
+                Fri: 'Fri',
+                Sat: 'Sat'
+            };
+            const weekdayKey = date.toLocaleDateString('en-US', { weekday: 'short' });
+            const week = weekdayMap[weekdayKey] || weekdayKey;
+            return `${week} ${date.toLocaleDateString('en-US')}`;
+        }
+
         function createNodeHTML(memory, delay) {
             let innerHTML = '';
             let classes = `tag`;
@@ -455,7 +750,21 @@
                     <div class="${classes}" style="${style}">
                         ${innerHTML}
                     </div>
-                    <img class="source-icon" src="${memory.source.icon}" alt="${memory.source.label}" title="${memory.source.label}">
+                    <div class="node-meta">
+                        ${memory.echoedCount > 0 ? `
+                        <span class="meta-pill">
+                            <span class="meta-icon echo" aria-hidden="true"></span>
+                            <span class="meta-count">${memory.echoedCount}</span>
+                        </span>` : ''}
+                        ${memory.smileCount > 0 ? `
+                        <span class="meta-pill">
+                            <span class="meta-icon react" aria-hidden="true"></span>
+                            <span class="meta-count">${memory.smileCount}</span>
+                        </span>` : ''}
+                        <span class="meta-pill source">
+                            <img class="meta-source-icon" src="${memory.source.icon}" alt="">
+                        </span>
+                    </div>
                 </div>
             `;
         }
@@ -485,9 +794,12 @@
                             id: `m-${seq++}`,
                             datetime: dt,
                             dateLabel: formatDate(dt),
+                            dateHeaderLabel: formatWeekDate(dt),
                             type,
                             source: SOURCES[Math.floor(Math.random() * SOURCES.length)],
                             color: PALETTE[Math.floor(Math.random() * PALETTE.length)],
+                            echoedCount: Math.random() < 0.12 ? Math.floor(Math.random() * 6) + 1 : 0,
+                            smileCount: Math.random() < 0.46 ? Math.floor(Math.random() * 9) + 1 : 0,
                             content: word
                         });
                     }
@@ -495,6 +807,21 @@
             }
 
             memoryStore.sort((a, b) => b.datetime - a.datetime);
+
+            // Dev preview: keep the top rows predictable for quick visual QA.
+            if (memoryStore.length >= 3) {
+                // 3 items visible: source + echo + reaction
+                memoryStore[0].echoedCount = 2;
+                memoryStore[0].smileCount = 6;
+
+                // 1 item visible: source only
+                memoryStore[1].echoedCount = 0;
+                memoryStore[1].smileCount = 0;
+
+                // 2 items visible: source + one signal (reaction-first pattern)
+                memoryStore[2].echoedCount = 0;
+                memoryStore[2].smileCount = 4;
+            }
         }
 
         function matchesQuery(memory, query) {
@@ -504,25 +831,22 @@
                 memory.content.toLowerCase().includes(q) ||
                 memory.source.label.toLowerCase().includes(q) ||
                 memory.type.toLowerCase().includes(q) ||
-                memory.dateLabel.toLowerCase().includes(q)
+                memory.dateLabel.toLowerCase().includes(q) ||
+                `echoed x${memory.echoedCount}`.includes(q) ||
+                `echoed ×${memory.echoedCount}`.includes(q)
             );
         }
 
         function renderMemories(query = '') {
             const feed = document.getElementById('feed');
-            const searchCount = document.getElementById('searchCount');
             let html = '';
             let globalIndex = 0;
             let currentDate = '';
 
             const filtered = memoryStore.filter((memory) => matchesQuery(memory, query));
 
-            searchCount.textContent = query.trim()
-                ? `${filtered.length} results for "${query.trim()}"`
-                : `Showing all ${memoryStore.length} memories`;
-
             if (filtered.length === 0) {
-                feed.innerHTML = `<div class="empty-state show">No matching memories for "${query.trim()}".</div>`;
+                feed.innerHTML = `<div class="empty-state show">No matching memories.</div>`;
                 return;
             }
 
@@ -532,8 +856,8 @@
                         html += `</div>`;
                     }
                     currentDate = memory.dateLabel;
-                    html += `<div class="date-section">`;
-                    html += `<div class="date-header">${currentDate}</div>`;
+                    html += `<div class="date-section" data-date="${memory.datetime.toISOString()}">`;
+                    html += `<div class="date-header">${memory.dateHeaderLabel}</div>`;
                 }
 
                 html += createNodeHTML(memory, globalIndex * 20);
@@ -541,17 +865,13 @@
             }
             html += `</div>`;
 
-            if (!query.trim()) {
-                // Add a "Big Bang" at the end only in full timeline mode
-                html += `
-                    <div class="date-section" style="opacity:0.5; margin-top:50px; text-align:center;">
-                        <div class="date-header" style="text-align:center; padding:0;">The Beginning</div>
-                        <div class="node-wrapper" style="justify-content:center; padding:0;">
-                            <div class="tag tag-public" style="--r:255; --g:255; --b:255;">Hello World</div>
-                        </div>
+            html += `
+                <div class="date-section" style="opacity:0.5; margin-top:50px; text-align:center;">
+                    <div class="node-wrapper node-wrapper--solo" style="padding:0;">
+                        <div class="tag tag-public" style="--r:255; --g:255; --b:255;">Hello World</div>
                     </div>
-                `;
-            }
+                </div>
+            `;
 
             feed.innerHTML = html;
         }
@@ -561,22 +881,170 @@
             renderMemories();
 
             const scroller = document.getElementById('scrollContainer');
-            const ticks = document.querySelector('.timeline-ticks');
+            const feed = document.getElementById('feed');
             const searchInput = document.getElementById('searchInput');
+            const timeScale = document.getElementById('timeScale');
             const totalEl = document.getElementById('totalCount');
+            const publishedEl = document.getElementById('publishedCount');
+            const privateEl = document.getElementById('privateCount');
+            const privacyFillEl = document.getElementById('privacyFill');
+            const privacyNoteEl = document.getElementById('privacyNote');
+            const timeWeek = document.getElementById('timeWeek');
+            const timeDate = document.getElementById('timeDate');
+            const timeWeekNext = document.getElementById('timeWeekNext');
+            const timeDateNext = document.getElementById('timeDateNext');
+            const timeContentCurrent = document.getElementById('timeContentCurrent');
+            const timeContentNext = document.getElementById('timeContentNext');
+            let ticking = false;
 
-            if (totalEl) {
-                totalEl.textContent = memoryStore.length.toLocaleString('en-US');
-            }
+            const updateOverviewStats = () => {
+                const total = memoryStore.length;
+                const published = memoryStore.filter((m) => m.type === 'public').length;
+                const privateCount = total - published;
+                const visibleRatio = total > 0 ? Math.round((published / total) * 100) : 0;
+                const totalReactions = memoryStore.reduce((sum, m) => sum + m.echoedCount + m.smileCount, 0);
+
+                if (totalEl) {
+                    totalEl.textContent = totalReactions.toLocaleString('en-US');
+                }
+                if (publishedEl) {
+                    publishedEl.textContent = published.toLocaleString('en-US');
+                }
+                if (privateEl) {
+                    privateEl.textContent = privateCount.toLocaleString('en-US');
+                }
+                if (privacyFillEl) {
+                    privacyFillEl.style.width = `${Math.max(4, visibleRatio)}%`;
+                }
+                if (privacyNoteEl) {
+                    privacyNoteEl.textContent = `Only ${visibleRatio}% of your memories are visible.`;
+                }
+            };
+            updateOverviewStats();
+
+            const formatTimeParts = (activeDate) => {
+                const weekdayMap = {
+                    Sun: 'Sun',
+                    Mon: 'Mon',
+                    Tue: 'Tue',
+                    Wed: 'Wed',
+                    Thu: 'Thur',
+                    Fri: 'Fri',
+                    Sat: 'Sat'
+                };
+                const weekdayKey = activeDate.toLocaleDateString('en-US', { weekday: 'short' });
+                return {
+                    week: weekdayMap[weekdayKey] || weekdayKey,
+                    date: activeDate.toLocaleDateString('en-US')
+                };
+            };
+
+            const updateTimeScale = () => {
+                const sections = feed.querySelectorAll('.date-section[data-date]');
+                if (!sections.length) return;
+
+                const scrollerRect = scroller.getBoundingClientRect();
+                const timeScaleRect = timeScale.getBoundingClientRect();
+                const probeY = scroller.scrollTop + (timeScaleRect.bottom - scrollerRect.top) + 6;
+                let activeIndex = 0;
+
+                for (let i = 0; i < sections.length; i++) {
+                    if (sections[i].offsetTop <= probeY) {
+                        activeIndex = i;
+                    } else {
+                        break;
+                    }
+                }
+
+                const activeSection = sections[activeIndex];
+                const nextSection = sections[activeIndex + 1] || null;
+                const activeIsoDate = activeSection.getAttribute('data-date');
+                const activeDate = activeIsoDate ? new Date(activeIsoDate) : new Date();
+                const activeParts = formatTimeParts(activeDate);
+
+                const replaceThreshold = timeScaleRect.bottom + 14;
+                for (let i = 0; i < sections.length; i++) {
+                    const header = sections[i].querySelector('.date-header');
+                    if (!header) continue;
+                    const rect = header.getBoundingClientRect();
+                    const shouldReplace = rect.top <= replaceThreshold;
+                    header.classList.toggle('is-replaced', shouldReplace);
+                }
+
+                const wrappers = feed.querySelectorAll('.node-wrapper');
+                const focusEdge = timeScaleRect.bottom + 2;
+                for (const wrapper of wrappers) {
+                    const rect = wrapper.getBoundingClientRect();
+                    const centerY = rect.top + rect.height * 0.5;
+                    const delta = centerY - focusEdge;
+
+                    let blur = 0;
+                    let opacity = 1;
+
+                    if (delta >= 18) {
+                        blur = 0;
+                        opacity = 1;
+                    } else if (delta >= 0) {
+                        // Very short transition below the bar so first visible row stays clear.
+                        const t = 1 - (delta / 18);
+                        blur = 0.65 * t;
+                        opacity = 1 - 0.07 * t;
+                    } else {
+                        // Above the bar: stronger blur and dimming for clear depth separation.
+                        const t = Math.min(1, (-delta) / 130);
+                        blur = 1.4 + 5.2 * t;
+                        opacity = 1 - 0.55 * t;
+                    }
+
+                    wrapper.style.setProperty('--focus-blur', `${blur.toFixed(2)}px`);
+                    wrapper.style.setProperty('--focus-opacity', `${opacity.toFixed(3)}`);
+                }
+
+                timeWeek.textContent = activeParts.week;
+                timeDate.textContent = activeParts.date;
+
+                let progress = 0;
+                if (nextSection) {
+                    const start = activeSection.offsetTop;
+                    const end = nextSection.offsetTop;
+                    const span = Math.max(end - start, 1);
+                    progress = Math.max(0, Math.min(1, (probeY - start) / span));
+
+                    const nextIsoDate = nextSection.getAttribute('data-date');
+                    const nextDate = nextIsoDate ? new Date(nextIsoDate) : activeDate;
+                    const nextParts = formatTimeParts(nextDate);
+                    timeWeekNext.textContent = nextParts.week;
+                    timeDateNext.textContent = nextParts.date;
+                }
+
+                const t = progress * progress * (3 - 2 * progress);
+                const currentBlur = (1.8 * t).toFixed(2);
+                const nextBlur = (1.8 * (1 - t)).toFixed(2);
+
+                timeContentCurrent.style.opacity = String(1 - t);
+                timeContentCurrent.style.transform = `translateY(${(1.6 * t).toFixed(2)}px) scale(${(1 - 0.012 * t).toFixed(3)})`;
+                timeContentCurrent.style.filter = `blur(${currentBlur}px)`;
+
+                timeContentNext.style.opacity = nextSection ? String(t) : '0';
+                timeContentNext.style.transform = `translateY(${(1.6 * (1 - t)).toFixed(2)}px) scale(${(0.988 + 0.012 * t).toFixed(3)})`;
+                timeContentNext.style.filter = `blur(${nextBlur}px)`;
+            };
+
+            scroller.addEventListener('scroll', () => {
+                if (ticking) return;
+                ticking = true;
+                requestAnimationFrame(() => {
+                    updateTimeScale();
+                    ticking = false;
+                });
+            });
 
             searchInput.addEventListener('input', (event) => {
                 renderMemories(event.target.value);
+                updateTimeScale();
             });
 
-            scroller.addEventListener('scroll', () => {
-                const scrollY = scroller.scrollTop;
-                ticks.style.transform = `translateY(${scrollY * 0.1}px)`;
-            });
+            updateTimeScale();
         });
 
     </script>
