@@ -28,6 +28,8 @@ https://www.iditor.com/memory-graph
 
 You'll see Lenny Rachitsky's thinking mapped as a constellation — Rory Sutherland on first-principles marketing, Jeff Weinstein's "burning problem" thesis at Stripe, Mihika Kapoor quietly outperforming billion-dollar CTOs in reach.
 
+https://i.imgur.com/BDONbb8.gif
+
 Click any node. Watch the pattern of how one mind actually evolved.
 
 This is the fastest way to understand someone. And we're just getting started.
@@ -55,6 +57,8 @@ EchoChat — San Francisco"""
 <p><a href="https://www.iditor.com/memory-graph" target="_blank">https://www.iditor.com/memory-graph</a></p>
 
 <p>You'll see Lenny Rachitsky's thinking mapped as a constellation — Rory Sutherland on first-principles marketing, Jeff Weinstein's "burning problem" thesis at Stripe, Mihika Kapoor quietly outperforming billion-dollar CTOs in reach.</p>
+
+<p><img src="https://i.imgur.com/BDONbb8.gif" alt="Memory graph visual demo"></p>
 
 <p>Click any node. Watch the pattern of how one mind actually evolved.</p>
 
