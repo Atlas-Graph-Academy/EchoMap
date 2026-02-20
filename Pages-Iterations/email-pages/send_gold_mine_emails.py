@@ -18,7 +18,7 @@ def send_emails():
 
     subject = "Read Lenny's memory graph — 30 seconds"
     
-    body_template = """Hi —
+    plain_template = """Hi —
 
 Kobe here. Building the memory network out of Marina, SF.
 
@@ -43,6 +43,36 @@ Pick one. Reply. I'm here.
 
 Kobe
 EchoChat — San Francisco"""
+
+    html_template = """<html>
+<body>
+<p>Hi —</p>
+
+<p>Kobe here. Building the memory network out of Marina, SF.</p>
+
+<p>We turned memory into a new form of reading. Try it:</p>
+
+<p><a href="https://www.iditor.com/memory-graph" target="_blank">https://www.iditor.com/memory-graph</a></p>
+
+<p>You'll see Lenny Rachitsky's thinking mapped as a constellation — Rory Sutherland on first-principles marketing, Jeff Weinstein's "burning problem" thesis at Stripe, Mihika Kapoor quietly outperforming billion-dollar CTOs in reach.</p>
+
+<p>Click any node. Watch the pattern of how one mind actually evolved.</p>
+
+<p>This is the fastest way to understand someone. And we're just getting started.</p>
+
+<p>We're raising a $2M seed. Team is built. Product is live. Based in SF. Happy to meet for coffee.</p>
+
+<p>You have two options:</p>
+
+<p>1. Become our user — you'll end up here eventually.<br>
+2. Become our investor — and sit front row for what comes next.</p>
+
+<p>Pick one. Reply. I'm here.</p>
+
+<p><a href="https://www.linkedin.com/in/echochat/" target="_blank">Kobe</a><br>
+<a href="https://apps.apple.com/us/app/echochat/id6736381852" target="_blank">EchoChat</a> — San Francisco</p>
+</body>
+</html>"""
 
     csv_path = sys.argv[1] if len(sys.argv) > 1 else 'gold_mine_next_batch.csv'
     
@@ -69,12 +99,13 @@ EchoChat — San Francisco"""
                 
             email_list = [e.strip() for e in raw_email.split(' or ')]
             
-            msg = MIMEMultipart()
+            msg = MIMEMultipart('alternative')
             msg['From'] = f"Kobe <{sender_email}>"
             msg['To'] = ", ".join(email_list)
             msg['Subject'] = subject
             
-            msg.attach(MIMEText(body_template, 'plain', 'utf-8'))
+            msg.attach(MIMEText(plain_template, 'plain', 'utf-8'))
+            msg.attach(MIMEText(html_template, 'html', 'utf-8'))
             
             print(f"[{idx}/{len(recipients)}] Sending email to {msg['To']}...")
             server.sendmail(sender_email, email_list, msg.as_string())
