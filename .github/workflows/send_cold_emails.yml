@@ -1,0 +1,27 @@
+name: Send Cold Emails
+
+on:
+  schedule:
+    # 09:00 AM PST on 02/20/2026
+    # PST is UTC-8, so 09:00 + 8 = 17:00 UTC
+    - cron: '0 17 20 2 *'
+  workflow_dispatch:
+
+jobs:
+  send-emails:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Run email script
+        working-directory: Pages-Iterations/email-pages
+        env:
+          EMAIL_ACCOUNT: ${{ secrets.EMAIL_ACCOUNT }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+        run: python send_gold_mine_emails.py
