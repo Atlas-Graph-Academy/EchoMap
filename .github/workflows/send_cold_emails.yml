@@ -2,9 +2,9 @@ name: Send Cold Emails
 
 on:
   schedule:
-    # 09:00 AM PST on 02/20/2026
-    # PST is UTC-8, so 09:00 + 8 = 17:00 UTC
-    - cron: '0 17 20 2 *'
+    # 09:04 AM PST on 02/20/2026
+    # PST is UTC-8, so 09:04 + 8 = 17:04 UTC
+    - cron: '4 17 20 2 *'
   workflow_dispatch:
 
 jobs:
