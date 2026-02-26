@@ -398,9 +398,9 @@
         }
 
         .unread-toggle {
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(16, 16, 16, 0.72);
-            color: rgba(255, 255, 255, 0.86);
+            border: 1px solid rgba(255, 84, 84, 0.45);
+            background: rgba(55, 10, 10, 0.42);
+            color: rgba(255, 116, 116, 0.98);
             border-radius: 999px;
             padding: 5px 10px;
             font-size: 10px;
@@ -412,10 +412,22 @@
         }
 
         .unread-toggle.is-active {
-            border-color: rgba(240, 176, 58, 0.52);
-            color: rgba(240, 176, 58, 0.96);
-            background: rgba(50, 34, 10, 0.36);
-            box-shadow: 0 0 12px rgba(240, 176, 58, 0.18);
+            border-color: rgba(255, 84, 84, 0.9);
+            color: rgba(255, 180, 180, 1);
+            background: rgba(78, 14, 14, 0.72);
+            box-shadow: 0 0 12px rgba(255, 84, 84, 0.24);
+        }
+
+        .tag-unread-badge {
+            margin-left: 10px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            color: rgba(255, 170, 170, 0.96);
+            border: 1px solid rgba(255, 84, 84, 0.45);
+            background: rgba(76, 10, 10, 0.38);
         }
 
         /* Echo pill: primary metric — amber treatment inherited via .echo-signal */
@@ -967,7 +979,7 @@
                         <span id="reactionLinkCount">0</span>
                     </button>
                 </div>
-                <button class="unread-toggle" id="unreadToggle" type="button">Unread Echoes</button>
+                <button class="unread-toggle" id="unreadToggle" type="button">News</button>
             </div>
         </div>
         <div class="time-dock">
@@ -1070,7 +1082,7 @@
             return `${week} ${date.toLocaleDateString('en-US')}`;
         }
 
-        function createNodeHTML(memory, delay) {
+        function createNodeHTML(memory, delay, showUnreadBadge = false) {
             let innerHTML = '';
             let classes = `tag`;
             let style = '';
@@ -1088,11 +1100,15 @@
 
             // Animation delay
             const wrapperStyle = `animation-delay: ${delay}ms`;
+            const unreadBadge = showUnreadBadge && memory.hasUnreadEcho
+                ? `<span class="tag-unread-badge">NEW +${Math.max(1, memory.echoedCount)}</span>`
+                : '';
 
             return `
                 <div class="node-wrapper animate-entry" style="${wrapperStyle}">
                     <div class="${classes}" style="${style}">
                         ${innerHTML}
+                        ${unreadBadge}
                     </div>
                     <div class="node-meta">
                         ${memory.echoedCount > 0 ? `
@@ -1214,9 +1230,9 @@
                 if (unread.length > 0) {
                     const anchorDate = unread[0].datetime.toISOString();
                     html += `<div class="date-section" data-date="${anchorDate}">`;
-                    html += `<div class="date-header">Unread Echoes</div>`;
+                    html += `<div class="date-header">News</div>`;
                     for (const memory of unread) {
-                        html += createNodeHTML(memory, globalIndex * 20);
+                        html += createNodeHTML(memory, globalIndex * 20, true);
                         globalIndex++;
                     }
                     html += `</div>`;
@@ -1313,7 +1329,7 @@
                 if (connectionDetailEl) connectionDetailEl.textContent = `${total.toLocaleString('en-US')} total`;
                 if (privacyFillEl) privacyFillEl.style.width = `${Math.max(6, visibleRatio)}%`;
                 if (unreadToggleEl) {
-                    unreadToggleEl.textContent = `Unread Echoes${unreadEchoes > 0 ? ` · ${unreadEchoes}` : ''}`;
+                    unreadToggleEl.textContent = unreadEchoes > 0 ? `NEWS + ${unreadEchoes}` : 'NEWS';
                     unreadToggleEl.classList.toggle('is-active', uiState.unreadMode);
                     unreadToggleEl.style.display = unreadEchoes > 0 ? 'inline-flex' : 'none';
                 }
