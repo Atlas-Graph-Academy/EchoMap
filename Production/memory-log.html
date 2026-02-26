@@ -71,11 +71,12 @@
         }
 
         .stat-trio {
-            display: flex;
-            align-items: flex-end;
-            justify-content: flex-end;
-            gap: 18px;
-            margin-bottom: 10px;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            align-items: end;
+            gap: 10px;
+            margin-bottom: 8px;
+            width: 100%;
         }
 
         .trio-block {
@@ -83,14 +84,38 @@
             flex-direction: column;
             align-items: center;
             gap: 4px;
+            min-width: 0;
         }
 
         .trio-number {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
-            letter-spacing: -0.02em;
+            letter-spacing: -0.015em;
             line-height: 1;
             color: rgba(255, 255, 255, 0.74);
+            min-width: 3ch;
+            text-align: center;
+            font-variant-numeric: tabular-nums lining-nums;
+        }
+
+        .trio-number-major {
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .trio-number-secondary {
+            font-size: 23px;
+            font-weight: 760;
+        }
+
+        .trio-number-mid {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.68);
+        }
+
+        .trio-number-minor {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.62);
         }
 
         .trio-echo {
@@ -104,6 +129,10 @@
             text-transform: uppercase;
             color: rgba(255, 255, 255, 0.2);
             line-height: 1;
+        }
+
+        .trio-label-minor {
+            color: rgba(255, 255, 255, 0.16);
         }
 
         .time-scale {
@@ -239,6 +268,15 @@
             box-shadow: 0 0 8px rgba(255, 255, 255, 0.18);
         }
 
+        .privacy-message {
+            margin-top: 9px;
+            font-size: 11px;
+            line-height: 1.35;
+            letter-spacing: 0.015em;
+            color: rgba(255, 255, 255, 0.42);
+            text-align: right;
+        }
+
         /* Echo pill: primary metric — amber treatment inherited via .echo-signal */
 
         .time-chip {
@@ -330,12 +368,15 @@
             position: absolute;
             left: -14px;
             right: -10px;
-            top: -2px;
-            height: 150px;
+            top: -10px;
+            height: 166px;
             border-radius: 22px;
             pointer-events: none;
             z-index: 0;
-            background: linear-gradient(180deg, rgba(64, 86, 188, 0.11) 0%, rgba(64, 86, 188, 0.05) 48%, rgba(0, 0, 0, 0) 100%);
+            background:
+                radial-gradient(120% 52% at 50% 32%, rgba(64, 86, 188, 0.12) 0%, rgba(64, 86, 188, 0.06) 48%, rgba(64, 86, 188, 0) 100%),
+                linear-gradient(180deg, rgba(64, 86, 188, 0) 0%, rgba(64, 86, 188, 0.05) 26%, rgba(64, 86, 188, 0.08) 50%, rgba(64, 86, 188, 0.05) 74%, rgba(64, 86, 188, 0) 100%);
+            filter: blur(1.5px);
         }
 
         .date-section.is-active-focus>* {
@@ -658,6 +699,30 @@
                 padding: 9px 16px;
             }
 
+            .stat-trio {
+                gap: 8px;
+            }
+
+            .trio-number-major {
+                font-size: 24px;
+            }
+
+            .trio-number-secondary {
+                font-size: 20px;
+            }
+
+            .trio-number-mid {
+                font-size: 16px;
+            }
+
+            .trio-number-minor {
+                font-size: 13px;
+            }
+
+            .privacy-message {
+                font-size: 10px;
+            }
+
             .node-meta {
                 gap: 6px;
             }
@@ -729,20 +794,27 @@
         <div class="privacy-block">
             <div class="stat-trio">
                 <div class="trio-block">
-                    <div class="trio-number trio-echo" id="echoTotalCount">0</div>
-                    <div class="trio-label">Echoes</div>
+                    <div class="trio-number trio-number-major trio-echo" id="echoTotalCount">0</div>
+                    <div class="trio-label">Echo+</div>
                 </div>
                 <div class="trio-block">
-                    <div class="trio-number" id="reactionTotalCount">0</div>
+                    <div class="trio-number trio-number-mid" id="reactionTotalCount">0</div>
                     <div class="trio-label">Reactions</div>
                 </div>
                 <div class="trio-block">
-                    <div class="trio-number" id="publishedCount">0</div>
+                    <div class="trio-number trio-number-secondary" id="totalMemoriesCount">0</div>
                     <div class="trio-label">Memories</div>
+                </div>
+                <div class="trio-block">
+                    <div class="trio-number trio-number-minor" id="publicMemoriesCount">0</div>
+                    <div class="trio-label trio-label-minor">Public</div>
                 </div>
             </div>
             <div class="privacy-track">
                 <div class="privacy-fill" id="privacyFill"></div>
+            </div>
+            <div class="privacy-message" id="privacyMessage">
+                Share one more memory. Be someone’s light.
             </div>
         </div>
         <div class="time-dock">
@@ -991,6 +1063,7 @@
             const searchInput = document.getElementById('searchInput');
             const timeScale = document.getElementById('timeScale');
             const privacyFillEl = document.getElementById('privacyFill');
+            const privacyMessageEl = document.getElementById('privacyMessage');
             const timeWeek = document.getElementById('timeWeek');
             const timeDate = document.getElementById('timeDate');
             const timeWeekNext = document.getElementById('timeWeekNext');
@@ -1026,8 +1099,11 @@
                 const totalEchoes = memoryStore.reduce((s, m) => s + m.echoedCount, 0);
                 const totalReactions = memoryStore.reduce((s, m) => s + m.smileCount, 0);
 
-                const publishedEl = document.getElementById('publishedCount');
-                if (publishedEl) publishedEl.textContent = published.toLocaleString('en-US');
+                const totalMemoriesEl = document.getElementById('totalMemoriesCount');
+                if (totalMemoriesEl) totalMemoriesEl.textContent = total.toLocaleString('en-US');
+
+                const publicMemoriesEl = document.getElementById('publicMemoriesCount');
+                if (publicMemoriesEl) publicMemoriesEl.textContent = published.toLocaleString('en-US');
 
                 const echoEl = document.getElementById('echoTotalCount');
                 if (echoEl) echoEl.textContent = totalEchoes.toLocaleString('en-US');
@@ -1036,6 +1112,9 @@
                 if (reactionEl) reactionEl.textContent = totalReactions.toLocaleString('en-US');
 
                 if (privacyFillEl) privacyFillEl.style.width = `${Math.max(4, visibleRatio)}%`;
+                if (privacyMessageEl) {
+                    privacyMessageEl.textContent = `${visibleRatio}% public. Share one more memory.`;
+                }
             };
             updateOverviewStats();
 
