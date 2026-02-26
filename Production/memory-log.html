@@ -211,7 +211,7 @@
 
         .privacy-block {
             margin-top: 10px;
-            pointer-events: none;
+            pointer-events: auto;
             width: 82%;
             margin-left: auto;
             max-height: 120px;
@@ -277,21 +277,36 @@
             margin-bottom: 7px;
         }
 
+        .connection-memory-row {
+            display: inline-flex;
+            align-items: baseline;
+            justify-content: flex-end;
+            gap: 12px;
+            white-space: nowrap;
+        }
+
         .connection-headline {
-            font-size: 15px;
-            font-weight: 650;
-            letter-spacing: 0;
-            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            font-weight: 640;
+            letter-spacing: 0.005em;
+            color: rgba(255, 255, 255, 0.82);
             text-align: right;
+            font-variant-numeric: tabular-nums lining-nums;
         }
 
         .connection-detail {
-            font-size: 11px;
-            font-weight: 560;
-            letter-spacing: 0.02em;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.34);
+            font-size: 14px;
+            font-weight: 640;
+            letter-spacing: 0.005em;
+            color: rgba(255, 255, 255, 0.56);
             text-align: right;
+            font-variant-numeric: tabular-nums lining-nums;
+        }
+
+        .connection-memory-divider {
+            color: rgba(255, 255, 255, 0.28);
+            font-size: 14px;
+            line-height: 1;
         }
 
         .connection-signals {
@@ -328,12 +343,79 @@
         }
 
         .privacy-message {
-            margin-top: 8px;
             font-size: 11px;
             line-height: 1.35;
             letter-spacing: 0.02em;
             color: rgba(255, 255, 255, 0.5);
             text-align: right;
+        }
+
+        .privacy-actions {
+            margin-top: 8px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .engagement-links {
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .engagement-link {
+            border: none;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.7);
+            border-radius: 0;
+            padding: 0;
+            font-size: 11px;
+            font-weight: 650;
+            letter-spacing: 0.01em;
+            line-height: 1;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-variant-numeric: tabular-nums lining-nums;
+        }
+
+        .engagement-link .meta-icon {
+            width: 11px;
+            height: 11px;
+            opacity: 0.8;
+        }
+
+        .engagement-link.echo-link {
+            color: rgba(240, 176, 58, 0.9);
+        }
+
+        .engagement-link.is-active {
+            color: rgba(255, 255, 255, 0.95);
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+        }
+
+        .unread-toggle {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(16, 16, 16, 0.72);
+            color: rgba(255, 255, 255, 0.86);
+            border-radius: 999px;
+            padding: 5px 10px;
+            font-size: 10px;
+            font-weight: 650;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .unread-toggle.is-active {
+            border-color: rgba(240, 176, 58, 0.52);
+            color: rgba(240, 176, 58, 0.96);
+            background: rgba(50, 34, 10, 0.36);
+            box-shadow: 0 0 12px rgba(240, 176, 58, 0.18);
         }
 
         /* Echo pill: primary metric — amber treatment inherited via .echo-signal */
@@ -783,11 +865,16 @@
             }
 
             .connection-headline {
-                font-size: 14px;
+                font-size: 13px;
             }
 
             .connection-detail {
-                font-size: 11px;
+                font-size: 13px;
+            }
+
+            .engagement-link {
+                font-size: 10px;
+                padding: 4px 7px;
             }
 
             .node-meta {
@@ -856,28 +943,31 @@
 
     <div class="header-glass">
         <div class="header-content">
-            <div class="hero-title">Timeline</div>
+            <div class="hero-title">My Memories</div>
         </div>
         <div class="privacy-block">
             <div class="connection-summary">
-                <div class="connection-headline" id="connectionHeadline">0 memories</div>
-                <div class="connection-signals">
-                    <span class="connection-signal echo-signal">
-                        <span class="meta-icon echo" aria-hidden="true"></span>
-                        <span id="echoTotalCountTop">0</span>
-                    </span>
-                    <span class="connection-signal">
-                        <span class="meta-icon react" aria-hidden="true"></span>
-                        <span id="reactionTotalCountTop">0</span>
-                    </span>
+                <div class="connection-memory-row">
+                    <div class="connection-headline" id="connectionHeadline">0 shared</div>
+                    <span class="connection-memory-divider">/</span>
+                    <div class="connection-detail" id="connectionDetail">0 total</div>
                 </div>
-                <div class="connection-detail" id="connectionDetail">0 shared publicly</div>
             </div>
             <div class="privacy-track">
                 <div class="privacy-fill" id="privacyFill"></div>
             </div>
-            <div class="privacy-message" id="privacyMessage">
-                Share one more.
+            <div class="privacy-actions">
+                <div class="engagement-links">
+                    <button class="engagement-link echo-link" id="echoesLink" type="button">
+                        <span class="meta-icon echo" aria-hidden="true"></span>
+                        <span id="echoLinkCount">0</span>
+                    </button>
+                    <button class="engagement-link" id="reactionsLink" type="button">
+                        <span class="meta-icon react" aria-hidden="true"></span>
+                        <span id="reactionLinkCount">0</span>
+                    </button>
+                </div>
+                <button class="unread-toggle" id="unreadToggle" type="button">Unread Echoes</button>
             </div>
         </div>
         <div class="time-dock">
@@ -948,6 +1038,11 @@
         ];
 
         const memoryStore = [];
+        const uiState = {
+            query: '',
+            unreadMode: false,
+            signalFilter: null
+        };
 
         function getRandomDate(daysBack) {
             const date = new Date();
@@ -1049,6 +1144,7 @@
                             color: PALETTE[Math.floor(Math.random() * PALETTE.length)],
                             echoedCount: Math.random() < 0.12 ? Math.floor(Math.random() * 6) + 1 : 0,
                             smileCount: Math.random() < 0.46 ? Math.floor(Math.random() * 9) + 1 : 0,
+                            hasUnreadEcho: false,
                             content: word
                         });
                     }
@@ -1071,6 +1167,12 @@
                 memoryStore[2].echoedCount = 0;
                 memoryStore[2].smileCount = 4;
             }
+
+            for (const memory of memoryStore) {
+                memory.hasUnreadEcho = memory.echoedCount > 0 && Math.random() < 0.46;
+            }
+            const firstWithEcho = memoryStore.find((m) => m.echoedCount > 0);
+            if (firstWithEcho) firstWithEcho.hasUnreadEcho = true;
         }
 
         function matchesQuery(memory, query) {
@@ -1086,33 +1188,70 @@
             );
         }
 
-        function renderMemories(query = '') {
+        function renderMemories(query = uiState.query) {
             const feed = document.getElementById('feed');
             let html = '';
             let globalIndex = 0;
             let currentDate = '';
+            let hasOpenDateSection = false;
 
-            const filtered = memoryStore.filter((memory) => matchesQuery(memory, query));
+            const filtered = memoryStore.filter((memory) => {
+                if (!matchesQuery(memory, query)) return false;
+                if (uiState.signalFilter === 'echo') return memory.echoedCount > 0;
+                if (uiState.signalFilter === 'reaction') return memory.smileCount > 0;
+                return true;
+            });
 
             if (filtered.length === 0) {
                 feed.innerHTML = `<div class="empty-state show">No matching memories.</div>`;
                 return;
             }
 
-            for (const memory of filtered) {
-                if (memory.dateLabel !== currentDate) {
-                    if (currentDate !== '') {
-                        html += `</div>`;
+            if (uiState.unreadMode) {
+                const unread = filtered.filter((m) => m.hasUnreadEcho);
+                const normal = filtered.filter((m) => !m.hasUnreadEcho);
+
+                if (unread.length > 0) {
+                    const anchorDate = unread[0].datetime.toISOString();
+                    html += `<div class="date-section" data-date="${anchorDate}">`;
+                    html += `<div class="date-header">Unread Echoes</div>`;
+                    for (const memory of unread) {
+                        html += createNodeHTML(memory, globalIndex * 20);
+                        globalIndex++;
                     }
-                    currentDate = memory.dateLabel;
-                    html += `<div class="date-section" data-date="${memory.datetime.toISOString()}">`;
-                    html += `<div class="date-header">${memory.dateHeaderLabel}</div>`;
+                    html += `</div>`;
                 }
 
-                html += createNodeHTML(memory, globalIndex * 20);
-                globalIndex++;
+                currentDate = '';
+                for (const memory of normal) {
+                    if (memory.dateLabel !== currentDate) {
+                        if (currentDate !== '') {
+                            html += `</div>`;
+                        }
+                        currentDate = memory.dateLabel;
+                        hasOpenDateSection = true;
+                        html += `<div class="date-section" data-date="${memory.datetime.toISOString()}">`;
+                        html += `<div class="date-header">${memory.dateHeaderLabel}</div>`;
+                    }
+                    html += createNodeHTML(memory, globalIndex * 20);
+                    globalIndex++;
+                }
+            } else {
+                for (const memory of filtered) {
+                    if (memory.dateLabel !== currentDate) {
+                        if (currentDate !== '') {
+                            html += `</div>`;
+                        }
+                        currentDate = memory.dateLabel;
+                        hasOpenDateSection = true;
+                        html += `<div class="date-section" data-date="${memory.datetime.toISOString()}">`;
+                        html += `<div class="date-header">${memory.dateHeaderLabel}</div>`;
+                    }
+                    html += createNodeHTML(memory, globalIndex * 20);
+                    globalIndex++;
+                }
             }
-            html += `</div>`;
+            if (hasOpenDateSection) html += `</div>`;
 
             feed.innerHTML = html;
         }
@@ -1126,11 +1265,13 @@
             const searchInput = document.getElementById('searchInput');
             const timeScale = document.getElementById('timeScale');
             const privacyFillEl = document.getElementById('privacyFill');
-            const privacyMessageEl = document.getElementById('privacyMessage');
+            const unreadToggleEl = document.getElementById('unreadToggle');
+            const echoesLinkEl = document.getElementById('echoesLink');
+            const reactionsLinkEl = document.getElementById('reactionsLink');
             const connectionHeadlineEl = document.getElementById('connectionHeadline');
             const connectionDetailEl = document.getElementById('connectionDetail');
-            const echoTotalCountTopEl = document.getElementById('echoTotalCountTop');
-            const reactionTotalCountTopEl = document.getElementById('reactionTotalCountTop');
+            const echoLinkCountEl = document.getElementById('echoLinkCount');
+            const reactionLinkCountEl = document.getElementById('reactionLinkCount');
             const timeWeek = document.getElementById('timeWeek');
             const timeDate = document.getElementById('timeDate');
             const timeWeekNext = document.getElementById('timeWeekNext');
@@ -1162,17 +1303,22 @@
             const updateOverviewStats = () => {
                 const total = memoryStore.length;
                 const published = memoryStore.filter((m) => m.type === 'public').length;
+                const unreadEchoes = memoryStore.filter((m) => m.hasUnreadEcho).length;
                 const visibleRatio = total > 0 ? Math.round((published / total) * 100) : 0;
                 const totalEchoes = memoryStore.reduce((s, m) => s + m.echoedCount, 0);
                 const totalReactions = memoryStore.reduce((s, m) => s + m.smileCount, 0);
-                if (connectionHeadlineEl) connectionHeadlineEl.textContent = `${total.toLocaleString('en-US')} memories`;
-                if (echoTotalCountTopEl) echoTotalCountTopEl.textContent = totalEchoes.toLocaleString('en-US');
-                if (reactionTotalCountTopEl) reactionTotalCountTopEl.textContent = totalReactions.toLocaleString('en-US');
-                if (connectionDetailEl) connectionDetailEl.textContent = `${published.toLocaleString('en-US')} shared publicly`;
+                if (connectionHeadlineEl) connectionHeadlineEl.textContent = `${published.toLocaleString('en-US')} shared`;
+                if (echoLinkCountEl) echoLinkCountEl.textContent = totalEchoes.toLocaleString('en-US');
+                if (reactionLinkCountEl) reactionLinkCountEl.textContent = totalReactions.toLocaleString('en-US');
+                if (connectionDetailEl) connectionDetailEl.textContent = `${total.toLocaleString('en-US')} total`;
                 if (privacyFillEl) privacyFillEl.style.width = `${Math.max(6, visibleRatio)}%`;
-                if (privacyMessageEl) {
-                    privacyMessageEl.textContent = 'Share one more.';
+                if (unreadToggleEl) {
+                    unreadToggleEl.textContent = `Unread Echoes${unreadEchoes > 0 ? ` · ${unreadEchoes}` : ''}`;
+                    unreadToggleEl.classList.toggle('is-active', uiState.unreadMode);
+                    unreadToggleEl.style.display = unreadEchoes > 0 ? 'inline-flex' : 'none';
                 }
+                if (echoesLinkEl) echoesLinkEl.classList.toggle('is-active', uiState.signalFilter === 'echo');
+                if (reactionsLinkEl) reactionsLinkEl.classList.toggle('is-active', uiState.signalFilter === 'reaction');
             };
             updateOverviewStats();
 
@@ -1320,10 +1466,44 @@
             });
 
             searchInput.addEventListener('input', (event) => {
-                renderMemories(event.target.value);
+                uiState.query = event.target.value;
+                renderMemories(uiState.query);
                 updateHeaderCompression();
                 updateTimeScale();
             });
+
+            if (unreadToggleEl) {
+                unreadToggleEl.addEventListener('click', () => {
+                    uiState.unreadMode = !uiState.unreadMode;
+                    renderMemories(uiState.query);
+                    scroller.scrollTop = 0;
+                    updateOverviewStats();
+                    updateHeaderCompression();
+                    updateTimeScale();
+                });
+            }
+
+            if (echoesLinkEl) {
+                echoesLinkEl.addEventListener('click', () => {
+                    uiState.signalFilter = uiState.signalFilter === 'echo' ? null : 'echo';
+                    renderMemories(uiState.query);
+                    scroller.scrollTop = 0;
+                    updateOverviewStats();
+                    updateHeaderCompression();
+                    updateTimeScale();
+                });
+            }
+
+            if (reactionsLinkEl) {
+                reactionsLinkEl.addEventListener('click', () => {
+                    uiState.signalFilter = uiState.signalFilter === 'reaction' ? null : 'reaction';
+                    renderMemories(uiState.query);
+                    scroller.scrollTop = 0;
+                    updateOverviewStats();
+                    updateHeaderCompression();
+                    updateTimeScale();
+                });
+            }
 
             updateHeaderCompression();
             updateTimeScale();
