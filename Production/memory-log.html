@@ -12,6 +12,8 @@
             --text-secondary: rgba(255, 255, 255, 0.4);
             --surface-glass: rgba(10, 10, 10, 0.7);
             --node-gap: 12px;
+            --header-height: 248px;
+            --header-collapse: 0;
         }
 
         * {
@@ -23,6 +25,8 @@
 
         body {
             background-color: var(--bg-color);
+            background-image: radial-gradient(ellipse at 60% 0%, rgba(60, 30, 90, 0.18) 0%, transparent 65%),
+                radial-gradient(ellipse at 20% 100%, rgba(20, 40, 80, 0.14) 0%, transparent 60%);
             color: var(--text-primary);
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
             height: 100vh;
@@ -35,13 +39,14 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 302px;
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0) 100%);
+            height: var(--header-height);
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.98) 72%, rgba(0, 0, 0, 0) 100%);
             z-index: 100;
-            padding: 44px 24px 0;
+            padding: 28px 24px 0;
             pointer-events: none;
             backdrop-filter: none;
             -webkit-backdrop-filter: none;
+            transition: height 0.15s linear, background 0.15s linear;
         }
 
         .header-content {
@@ -50,22 +55,53 @@
             align-items: flex-end;
             gap: 8px;
             pointer-events: auto;
+            transform-origin: right top;
+            transform: translateY(calc(-10px * var(--header-collapse))) scale(calc(1 - 0.08 * var(--header-collapse)));
+            opacity: calc(1 - 0.58 * var(--header-collapse));
+            transition: transform 0.14s linear, opacity 0.14s linear;
         }
 
         .hero-title {
-            font-size: 34px;
+            font-size: 32px;
             font-weight: 800;
             letter-spacing: -0.02em;
             line-height: 1;
             text-align: right;
         }
 
-        .reactions-line {
-            color: rgba(255, 255, 255, 0.48);
-            font-size: 14px;
-            letter-spacing: 0.08em;
+        .stat-trio {
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            gap: 18px;
+            margin-bottom: 10px;
+        }
+
+        .trio-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .trio-number {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1;
+            color: rgba(255, 255, 255, 0.86);
+        }
+
+        .trio-echo {
+            color: rgba(240, 176, 58, 0.94);
+        }
+
+        .trio-label {
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
-            font-weight: 500;
+            color: rgba(255, 255, 255, 0.26);
             line-height: 1;
         }
 
@@ -114,12 +150,13 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(10, 10, 10, 0.62);
+            border: 1px solid rgba(255, 255, 255, 0.32);
+            background: rgba(14, 14, 14, 0.72);
             border-radius: 999px;
             padding: 14px 16px;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(20px) saturate(140%);
+            -webkit-backdrop-filter: blur(20px) saturate(140%);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
         }
 
         .search-shell input {
@@ -138,56 +175,66 @@
         }
 
         .privacy-block {
-            margin-top: 18px;
-            pointer-events: auto;
-            width: 78%;
+            margin-top: 12px;
+            pointer-events: none;
+            width: 82%;
             margin-left: auto;
+            max-height: 120px;
+            overflow: hidden;
+            transform-origin: right top;
+            transform: translateY(calc(-12px * var(--header-collapse))) scale(calc(1 - 0.18 * var(--header-collapse)));
+            opacity: calc(1 - 0.68 * var(--header-collapse));
+            transition: max-height 0.2s ease, margin-top 0.2s ease, transform 0.14s linear, opacity 0.14s linear, filter 0.14s linear;
         }
 
         .time-dock {
-            margin-top: 10px;
+            max-height: 0;
+            overflow: hidden;
+            margin-top: 0;
             display: flex;
             justify-content: flex-end;
             padding-right: 2px;
             pointer-events: none;
+            opacity: 0;
+            transform: translateY(-8px) scale(0.985);
+            filter: blur(2px);
+            transition: max-height 0.2s ease, margin-top 0.2s ease, opacity 0.18s ease, transform 0.18s ease, filter 0.18s ease;
         }
 
-        .privacy-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            margin-bottom: 6px;
-            color: rgba(255, 255, 255, 0.76);
-            font-size: 10px;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            font-weight: 600;
-            gap: 8px;
+        body.is-peek-time .time-dock {
+            max-height: 72px;
+            margin-top: calc(6px - 2px * var(--header-collapse));
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+        }
+
+        body.is-peek-time .privacy-block {
+            max-height: 0;
+            margin-top: 0;
+            opacity: 0;
+            transform: translateY(-16px) scale(0.9);
+            filter: blur(2.2px);
         }
 
         .privacy-track {
-            height: 8px;
+            height: 5px;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.14);
+            background: rgba(255, 255, 255, 0.08);
             overflow: hidden;
             position: relative;
         }
 
         .privacy-fill {
             position: absolute;
-            inset: 0 auto 0 0;
+            inset: 0 0 0 auto;
             width: 12%;
             border-radius: 999px;
-            background: linear-gradient(to right, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.7));
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.24);
+            background: linear-gradient(to left, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.36));
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.18);
         }
 
-        .privacy-note {
-            margin-top: 6px;
-            color: rgba(255, 255, 255, 0.42);
-            font-size: 11px;
-            letter-spacing: 0.01em;
-        }
+        /* Echo pill: primary metric — amber treatment inherited via .echo-signal */
 
         .time-chip {
             display: inline-flex;
@@ -199,7 +246,7 @@
             white-space: nowrap;
         }
 
-        .time-chip + .time-chip {
+        .time-chip+.time-chip {
             margin-left: 12px;
         }
 
@@ -238,7 +285,7 @@
             height: 100vh;
             overflow-y: auto;
             overflow-x: hidden;
-            padding-top: 324px;
+            padding-top: calc(var(--header-height) + 10px);
             padding-bottom: 132px;
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
@@ -263,7 +310,7 @@
 
         /* Date Section */
         .date-section {
-            margin-bottom: 40px;
+            margin-bottom: 34px;
             position: relative;
             display: flex;
             flex-direction: column;
@@ -360,32 +407,44 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 5px;
+            gap: 0;
             white-space: nowrap;
         }
 
-        .meta-pill {
-            height: 24px;
-            min-width: 24px;
-            padding: 0 7px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+        .meta-signal {
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            gap: 5px;
+            gap: 4px;
+            padding: 0 6px;
+            position: relative;
         }
 
-        .meta-pill.source {
-            width: 24px;
-            padding: 0;
+        /* dot separator between signals */
+        .meta-signal+.meta-signal::before {
+            content: '·';
+            position: absolute;
+            left: -1px;
+            color: rgba(255, 255, 255, 0.16);
+            font-size: 11px;
+            line-height: 1;
+        }
+
+        .meta-signal.echo-signal .meta-count {
+            color: rgba(240, 176, 58, 0.92);
+        }
+
+        .meta-signal.echo-signal .meta-icon {
+            color: rgba(240, 176, 58, 0.7);
+        }
+
+        .meta-signal.src-signal {
+            padding-left: 8px;
         }
 
         .meta-icon {
-            width: 12px;
-            height: 12px;
-            color: rgba(255, 255, 255, 0.72);
+            width: 13px;
+            height: 13px;
+            color: rgba(255, 255, 255, 0.5);
             flex-shrink: 0;
         }
 
@@ -417,19 +476,17 @@
             width: 14px;
             height: 14px;
             object-fit: contain;
-            opacity: 0.9;
-            filter: grayscale(1) contrast(0.95) brightness(1.05);
+            opacity: 0.55;
+            filter: grayscale(1) contrast(0.9) brightness(1.1);
             flex-shrink: 0;
         }
 
         .meta-count {
             font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.02em;
-            color: rgba(255, 255, 255, 0.76);
+            font-weight: 600;
+            letter-spacing: 0.01em;
+            color: rgba(255, 255, 255, 0.6);
             line-height: 1;
-            min-width: 10px;
-            text-align: right;
         }
 
         .lock-icon {
@@ -527,9 +584,12 @@
         }
 
         @media (max-width: 420px) {
+            :root {
+                --header-height: 230px;
+            }
+
             .header-glass {
-                height: 286px;
-                padding: 38px 16px 0;
+                padding: 24px 16px 0;
             }
 
             .hero-title {
@@ -545,7 +605,6 @@
             }
 
             .scroller {
-                padding-top: 304px;
                 padding-bottom: 126px;
             }
 
@@ -580,11 +639,15 @@
             }
 
             .time-dock {
-                margin-top: 6px;
+                margin-top: 0;
                 padding-right: 0;
             }
 
-            .time-chip + .time-chip {
+            body.is-peek-time .time-dock {
+                margin-top: 4px;
+            }
+
+            .time-chip+.time-chip {
                 margin-left: 9px;
             }
 
@@ -628,17 +691,25 @@
     <div class="header-glass">
         <div class="header-content">
             <div class="hero-title">My Timeline</div>
-            <div class="reactions-line"><span id="totalCount">8</span> Total reactions</div>
         </div>
         <div class="privacy-block">
-            <div class="privacy-head">
-                <span><span id="publishedCount">0</span> Published</span>
-                <span><span id="privateCount">0</span> Private</span>
+            <div class="stat-trio">
+                <div class="trio-block">
+                    <div class="trio-number trio-echo" id="echoTotalCount">0</div>
+                    <div class="trio-label">Echoes</div>
+                </div>
+                <div class="trio-block">
+                    <div class="trio-number" id="reactionTotalCount">0</div>
+                    <div class="trio-label">Reactions</div>
+                </div>
+                <div class="trio-block">
+                    <div class="trio-number" id="publishedCount">0</div>
+                    <div class="trio-label">Memories</div>
+                </div>
             </div>
             <div class="privacy-track">
                 <div class="privacy-fill" id="privacyFill"></div>
             </div>
-            <div class="privacy-note" id="privacyNote">Only 0% of your memories are visible.</div>
         </div>
         <div class="time-dock">
             <div class="time-scale" id="timeScale" aria-hidden="true">
@@ -761,16 +832,16 @@
                     </div>
                     <div class="node-meta">
                         ${memory.echoedCount > 0 ? `
-                        <span class="meta-pill">
+                        <span class="meta-signal echo-signal">
                             <span class="meta-icon echo" aria-hidden="true"></span>
                             <span class="meta-count">${memory.echoedCount}</span>
                         </span>` : ''}
                         ${memory.smileCount > 0 ? `
-                        <span class="meta-pill">
+                        <span class="meta-signal">
                             <span class="meta-icon react" aria-hidden="true"></span>
                             <span class="meta-count">${memory.smileCount}</span>
                         </span>` : ''}
-                        <span class="meta-pill source">
+                        <span class="meta-signal src-signal">
                             <img class="meta-source-icon" src="${memory.source.icon}" alt="">
                         </span>
                     </div>
@@ -874,14 +945,6 @@
             }
             html += `</div>`;
 
-            html += `
-                <div class="date-section" style="opacity:0.5; margin-top:50px; text-align:center;">
-                    <div class="node-wrapper node-wrapper--solo" style="padding:0;">
-                        <div class="tag tag-public" style="--r:255; --g:255; --b:255;">Hello World</div>
-                    </div>
-                </div>
-            `;
-
             feed.innerHTML = html;
         }
 
@@ -893,41 +956,52 @@
             const feed = document.getElementById('feed');
             const searchInput = document.getElementById('searchInput');
             const timeScale = document.getElementById('timeScale');
-            const totalEl = document.getElementById('totalCount');
-            const publishedEl = document.getElementById('publishedCount');
-            const privateEl = document.getElementById('privateCount');
             const privacyFillEl = document.getElementById('privacyFill');
-            const privacyNoteEl = document.getElementById('privacyNote');
             const timeWeek = document.getElementById('timeWeek');
             const timeDate = document.getElementById('timeDate');
             const timeWeekNext = document.getElementById('timeWeekNext');
             const timeDateNext = document.getElementById('timeDateNext');
             const timeContentCurrent = document.getElementById('timeContentCurrent');
             const timeContentNext = document.getElementById('timeContentNext');
+            const root = document.documentElement;
             let ticking = false;
+            const isCompactViewport = window.matchMedia('(max-width: 420px)').matches;
+            const HEADER_EXPANDED = isCompactViewport ? 230 : 248;
+            const HEADER_COLLAPSED = isCompactViewport ? 152 : 164;
+            const HEADER_COLLAPSE_DISTANCE = isCompactViewport ? 132 : 150;
+            const PEEK_THRESHOLD = 10;
+            const SNAP_PROGRESS = isCompactViewport ? 0.5 : 0.44;
+
+            const updateHeaderCompression = () => {
+                const scrollTop = scroller.scrollTop;
+                const isPeekTime = scrollTop > PEEK_THRESHOLD;
+                document.body.classList.toggle('is-peek-time', isPeekTime);
+
+                const effectiveScroll = Math.max(0, scrollTop - PEEK_THRESHOLD);
+                const baseProgress = Math.max(0, Math.min(1, effectiveScroll / HEADER_COLLAPSE_DISTANCE));
+                const progress = isPeekTime ? Math.max(SNAP_PROGRESS, baseProgress) : 0;
+                const height = HEADER_EXPANDED - ((HEADER_EXPANDED - HEADER_COLLAPSED) * progress);
+                root.style.setProperty('--header-height', `${height.toFixed(2)}px`);
+                root.style.setProperty('--header-collapse', progress.toFixed(3));
+            };
 
             const updateOverviewStats = () => {
                 const total = memoryStore.length;
                 const published = memoryStore.filter((m) => m.type === 'public').length;
-                const privateCount = total - published;
                 const visibleRatio = total > 0 ? Math.round((published / total) * 100) : 0;
-                const totalReactions = memoryStore.reduce((sum, m) => sum + m.echoedCount + m.smileCount, 0);
+                const totalEchoes = memoryStore.reduce((s, m) => s + m.echoedCount, 0);
+                const totalReactions = memoryStore.reduce((s, m) => s + m.smileCount, 0);
 
-                if (totalEl) {
-                    totalEl.textContent = totalReactions.toLocaleString('en-US');
-                }
-                if (publishedEl) {
-                    publishedEl.textContent = published.toLocaleString('en-US');
-                }
-                if (privateEl) {
-                    privateEl.textContent = privateCount.toLocaleString('en-US');
-                }
-                if (privacyFillEl) {
-                    privacyFillEl.style.width = `${Math.max(4, visibleRatio)}%`;
-                }
-                if (privacyNoteEl) {
-                    privacyNoteEl.textContent = `Only ${visibleRatio}% of your memories are visible.`;
-                }
+                const publishedEl = document.getElementById('publishedCount');
+                if (publishedEl) publishedEl.textContent = published.toLocaleString('en-US');
+
+                const echoEl = document.getElementById('echoTotalCount');
+                if (echoEl) echoEl.textContent = totalEchoes.toLocaleString('en-US');
+
+                const reactionEl = document.getElementById('reactionTotalCount');
+                if (reactionEl) reactionEl.textContent = totalReactions.toLocaleString('en-US');
+
+                if (privacyFillEl) privacyFillEl.style.width = `${Math.max(4, visibleRatio)}%`;
             };
             updateOverviewStats();
 
@@ -951,6 +1025,26 @@
             const updateTimeScale = () => {
                 const sections = feed.querySelectorAll('.date-section[data-date]');
                 if (!sections.length) return;
+                const isPeekTime = document.body.classList.contains('is-peek-time');
+
+                if (!isPeekTime) {
+                    for (let i = 0; i < sections.length; i++) {
+                        const header = sections[i].querySelector('.date-header');
+                        if (header) header.classList.remove('is-replaced');
+                    }
+                    const wrappers = feed.querySelectorAll('.node-wrapper');
+                    for (const wrapper of wrappers) {
+                        wrapper.style.setProperty('--focus-blur', `0px`);
+                        wrapper.style.setProperty('--focus-opacity', `1`);
+                    }
+                    timeContentCurrent.style.opacity = '1';
+                    timeContentCurrent.style.transform = 'translateY(0px) scale(1)';
+                    timeContentCurrent.style.filter = 'blur(0px)';
+                    timeContentNext.style.opacity = '0';
+                    timeContentNext.style.transform = 'translateY(1.6px) scale(0.988)';
+                    timeContentNext.style.filter = 'blur(1.8px)';
+                    return;
+                }
 
                 const scrollerRect = scroller.getBoundingClientRect();
                 const timeScaleRect = timeScale.getBoundingClientRect();
@@ -1044,6 +1138,7 @@
                 if (ticking) return;
                 ticking = true;
                 requestAnimationFrame(() => {
+                    updateHeaderCompression();
                     updateTimeScale();
                     ticking = false;
                 });
@@ -1051,9 +1146,11 @@
 
             searchInput.addEventListener('input', (event) => {
                 renderMemories(event.target.value);
+                updateHeaderCompression();
                 updateTimeScale();
             });
 
+            updateHeaderCompression();
             updateTimeScale();
         });
 
@@ -1061,4 +1158,3 @@
 </body>
 
 </html>
-

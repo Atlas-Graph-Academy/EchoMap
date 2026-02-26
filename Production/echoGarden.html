@@ -1,295 +1,219 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>True to Echo - Font Showcase</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Audiowide&family=Rajdhani:wght@700&family=Exo+2:wght@800;900&family=Chakra+Petch:wght@700&display=swap" rel="stylesheet">
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: #0a0a1a;
-    color: #fff;
-    font-family: sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 40px 20px;
-    gap: 60px;
-  }
-
-  h1 {
-    font-family: 'Exo 2', sans-serif;
-    font-size: 28px;
-    color: #8b9cf7;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    margin-bottom: 20px;
-  }
-
-  .card-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 40px;
-    max-width: 1400px;
-  }
-
-  .card {
-    position: relative;
-    width: 240px;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 0 30px rgba(100, 120, 255, 0.15);
-    transition: transform 0.3s ease;
-  }
-  .card:hover {
-    transform: scale(1.03);
-  }
-
-  .card img {
-    width: 100%;
-    display: block;
-  }
-
-  /* Cover the original text area */
-  .text-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 28%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 10px 12px;
-  }
-
-  /* Solid cover block to hide original text */
-  .text-overlay::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    /* Match the dark sky background */
-    background: linear-gradient(180deg,
-      #1a1a3a 0%,
-      #1a1a3aee 60%,
-      #1a1a3acc 80%,
-      transparent 100%
-    );
-    z-index: 1;
-  }
-
-  .text-overlay span {
-    position: relative;
-    z-index: 2;
-  }
-
-  .label {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(0,0,0,0.75);
-    padding: 10px;
-    text-align: center;
-    font-size: 12px;
-    color: #aab;
-    letter-spacing: 1px;
-    font-family: 'Rajdhani', sans-serif;
-  }
-
-  /* ===== Style 1: Orbitron - Neon Glow ===== */
-  .style-1 span {
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 900;
-    font-size: 22px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: #00f0ff;
-    text-shadow:
-      0 0 7px #00f0ff,
-      0 0 20px #00f0ff,
-      0 0 42px #0080ff,
-      0 0 82px #0040ff;
-    line-height: 1.2;
-  }
-
-  /* ===== Style 2: Audiowide - Holographic ===== */
-  .style-2 span {
-    font-family: 'Audiowide', sans-serif;
-    font-size: 23px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    background: linear-gradient(135deg, #f0f, #0ff, #ff0, #f0f);
-    background-size: 300% 300%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: holo 4s ease infinite;
-    filter: drop-shadow(0 0 12px rgba(0, 255, 255, 0.4));
-    line-height: 1.2;
-  }
-  @keyframes holo {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-  }
-
-  /* ===== Style 3: Rajdhani - Glitch ===== */
-  .style-3 span {
-    font-family: 'Rajdhani', sans-serif;
-    font-weight: 700;
-    font-size: 26px;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: #fff;
-    position: relative;
-    animation: glitch 2.5s infinite;
-    line-height: 1.2;
-  }
-  .style-3 span::before,
-  .style-3 span::after {
-    content: 'TRUE TO ECHO';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-  }
-  .style-3 span::before {
-    color: #ff004d;
-    animation: glitch-1 0.3s infinite;
-    clip-path: inset(20% 0 40% 0);
-  }
-  .style-3 span::after {
-    color: #00f0ff;
-    animation: glitch-2 0.3s infinite;
-    clip-path: inset(60% 0 0% 0);
-  }
-  @keyframes glitch-1 {
-    0% { transform: translate(0); }
-    20% { transform: translate(-3px, 2px); }
-    40% { transform: translate(3px, -1px); }
-    60% { transform: translate(-2px, 1px); }
-    80% { transform: translate(2px, -2px); }
-    100% { transform: translate(0); }
-  }
-  @keyframes glitch-2 {
-    0% { transform: translate(0); }
-    20% { transform: translate(3px, -1px); }
-    40% { transform: translate(-2px, 2px); }
-    60% { transform: translate(3px, -2px); }
-    80% { transform: translate(-3px, 1px); }
-    100% { transform: translate(0); }
-  }
-
-  /* ===== Style 4: Exo 2 - Dreamy Float ===== */
-  .style-4 span {
-    font-family: 'Exo 2', sans-serif;
-    font-weight: 800;
-    font-size: 24px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: #e8b0ff;
-    text-shadow:
-      0 0 10px #c060ff,
-      0 0 30px #8030cc,
-      0 0 60px #6020aa;
-    animation: float 3s ease-in-out infinite;
-    line-height: 1.2;
-  }
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
-  }
-
-  /* ===== Style 5: Chakra Petch - Electric Pulse ===== */
-  .style-5 span {
-    font-family: 'Chakra Petch', sans-serif;
-    font-weight: 700;
-    font-size: 25px;
-    letter-spacing: 5px;
-    text-transform: uppercase;
-    color: #fff;
-    animation: pulse-glow 2s ease-in-out infinite;
-    line-height: 1.2;
-  }
-  @keyframes pulse-glow {
-    0%, 100% {
-      text-shadow:
-        0 0 4px #fff,
-        0 0 11px #0ff,
-        0 0 30px #0ff,
-        0 0 60px #00a2ff;
-      color: #fff;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Echo Garden - Minimal Alpino</title>
+  <style>
+    @font-face {
+      font-family: "Alpino Variable";
+      src: local("Alpino Variable"), local("Alpino");
+      font-style: normal;
+      font-weight: 100 900;
     }
-    50% {
-      text-shadow:
-        0 0 2px #fff,
-        0 0 6px #00ffe0,
-        0 0 15px #00ffe0,
-        0 0 30px #00c8ff;
-      color: #c8f8ff;
+
+    :root {
+      --display-font: "Alpino Variable", "Alpino", "Manrope", sans-serif;
     }
-  }
-</style>
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #070f1f;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      overflow: hidden;
+      font-family: var(--display-font);
+    }
+
+    .stage {
+      width: min(1200px, 100%);
+      aspect-ratio: 16 / 9;
+      min-height: 420px;
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.45);
+      isolation: isolate;
+    }
+
+    .stage img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transform: scale(1.03);
+      filter: contrast(1.06) saturate(1.08);
+    }
+
+    .stage::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(70% 45% at 50% 46%, rgba(255, 255, 240, 0.12), transparent 72%),
+        linear-gradient(to bottom, rgba(2, 8, 16, 0.34), rgba(2, 8, 16, 0.54));
+      z-index: 1;
+    }
+
+    .stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(58% 42% at 50% 30%, rgba(196, 235, 255, 0.22), transparent 72%),
+        linear-gradient(166deg, rgba(178, 224, 255, 0.12) 0%, rgba(178, 224, 255, 0) 52%),
+        linear-gradient(12deg, rgba(165, 214, 255, 0.1) 0%, rgba(165, 214, 255, 0) 46%);
+      mix-blend-mode: screen;
+      filter: blur(1px);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .title-wrap {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 2;
+      transform-style: preserve-3d;
+      perspective: 1400px;
+      pointer-events: none;
+      text-align: center;
+    }
+
+    .title-wrap::before,
+    .title-wrap::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .title-wrap::before {
+      width: min(94vw, 1000px);
+      height: clamp(130px, 22vw, 220px);
+      border-radius: 999px;
+      background: radial-gradient(circle at center, rgba(214, 245, 255, 0.42), rgba(175, 226, 255, 0.15) 42%, transparent 76%);
+      filter: blur(12px);
+    }
+
+    .title-wrap::after {
+      width: min(96vw, 1080px);
+      height: clamp(180px, 28vw, 320px);
+      transform: translate(-50%, -57%);
+      background:
+        conic-gradient(
+          from 235deg at 50% 90%,
+          rgba(189, 231, 255, 0.16) 0deg,
+          rgba(189, 231, 255, 0.04) 10deg,
+          transparent 22deg,
+          transparent 42deg,
+          rgba(189, 231, 255, 0.12) 56deg,
+          rgba(189, 231, 255, 0.03) 70deg,
+          transparent 88deg,
+          transparent 122deg,
+          rgba(189, 231, 255, 0.12) 142deg,
+          rgba(189, 231, 255, 0.04) 158deg,
+          transparent 172deg,
+          transparent 360deg
+        );
+      mask-image: radial-gradient(ellipse at center, black 24%, transparent 80%);
+      -webkit-mask-image: radial-gradient(ellipse at center, black 24%, transparent 80%);
+      filter: blur(2px);
+      opacity: 0.92;
+    }
+
+    .title,
+    .title-depth,
+    .title-rim {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      font-family: var(--display-font);
+      font-size: clamp(46px, 9.6vw, 134px);
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      line-height: 0.92;
+      white-space: nowrap;
+      transform-origin: center center;
+      width: max-content;
+    }
+
+    .title-depth {
+      color: rgba(76, 86, 94, 0.56);
+      transform: translate3d(-50%, 1px, -14px) rotateX(4deg);
+      filter: blur(0.35px);
+      opacity: 0.64;
+      z-index: 1;
+    }
+
+    .title-rim {
+      color: transparent;
+      -webkit-text-stroke: 0.95px rgba(242, 252, 255, 0.66);
+      text-shadow:
+        0 0 10px rgba(230, 249, 255, 0.52),
+        0 0 22px rgba(196, 236, 255, 0.42),
+        0 0 40px rgba(147, 214, 255, 0.26);
+      transform: translate3d(-50%, 0, 10px);
+      z-index: 2;
+    }
+
+    .title {
+      color: #fffef7;
+      -webkit-text-stroke: 0.7px rgba(16, 21, 28, 0.66);
+      text-shadow:
+        0 -1px 0 rgba(255, 255, 250, 0.85),
+        0 1px 0 rgba(245, 241, 220, 0.92),
+        0 2px 0 rgba(224, 217, 191, 0.82),
+        0 0 16px rgba(238, 250, 255, 0.62),
+        0 0 32px rgba(191, 231, 255, 0.38),
+        0 6px 10px rgba(0, 0, 0, 0.28),
+        0 14px 22px rgba(0, 0, 0, 0.17);
+      transform: translate3d(-50%, 0, 21px);
+      z-index: 3;
+    }
+
+    @media (max-width: 640px) {
+      .stage {
+        aspect-ratio: auto;
+        min-height: 560px;
+      }
+
+      .title-wrap {
+        left: 0;
+        top: 48%;
+        width: 100%;
+      }
+
+      .title,
+      .title-depth,
+      .title-rim {
+        width: min(88vw, 560px);
+        white-space: normal;
+        font-size: clamp(42px, 14vw, 72px);
+      }
+    }
+  </style>
 </head>
 <body>
-
-<h1>True to Echo — Font Showcase</h1>
-
-<div class="card-grid">
-
-  <!-- Style 1: Neon Glow -->
-  <div class="card style-1">
-    <img src="../Resource/garden.png" alt="Echo Garden">
-    <div class="text-overlay">
-      <span>TRUE TO<br>ECHO</span>
+  <main class="stage" aria-label="Echo Garden minimal scene">
+    <img src="../Resource/garden.png" alt="Echo garden background">
+    <div class="title-wrap">
+      <h1 class="title-depth" aria-hidden="true">Choose your echo</h1>
+      <h1 class="title-rim" aria-hidden="true">Choose your echo</h1>
+      <h1 class="title">Choose your echo</h1>
     </div>
-    <div class="label">STYLE 1 — NEON GLOW (Orbitron)</div>
-  </div>
-
-  <!-- Style 2: Holographic -->
-  <div class="card style-2">
-    <img src="../Resource/garden.png" alt="Echo Garden">
-    <div class="text-overlay">
-      <span>TRUE TO<br>ECHO</span>
-    </div>
-    <div class="label">STYLE 2 — HOLOGRAPHIC (Audiowide)</div>
-  </div>
-
-  <!-- Style 3: Glitch -->
-  <div class="card style-3">
-    <img src="../Resource/garden.png" alt="Echo Garden">
-    <div class="text-overlay">
-      <span>TRUE TO<br>ECHO</span>
-    </div>
-    <div class="label">STYLE 3 — GLITCH (Rajdhani)</div>
-  </div>
-
-  <!-- Style 4: Dreamy Float -->
-  <div class="card style-4">
-    <img src="../Resource/garden.png" alt="Echo Garden">
-    <div class="text-overlay">
-      <span>TRUE TO<br>ECHO</span>
-    </div>
-    <div class="label">STYLE 4 — DREAMY FLOAT (Exo 2)</div>
-  </div>
-
-  <!-- Style 5: Electric Pulse -->
-  <div class="card style-5">
-    <img src="../Resource/garden.png" alt="Echo Garden">
-    <div class="text-overlay">
-      <span>TRUE TO<br>ECHO</span>
-    </div>
-    <div class="label">STYLE 5 — ELECTRIC PULSE (Chakra Petch)</div>
-  </div>
-
-</div>
-
+  </main>
 </body>
 </html>
