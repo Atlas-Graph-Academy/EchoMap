@@ -12,7 +12,7 @@
             --text-secondary: rgba(255, 255, 255, 0.4);
             --surface-glass: rgba(10, 10, 10, 0.7);
             --node-gap: 12px;
-            --header-height: 248px;
+            --header-height: 188px;
             --header-collapse: 0;
         }
 
@@ -31,6 +31,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
             height: 100vh;
             overflow: hidden;
+            overscroll-behavior-y: none;
         }
 
         /* HUD Header */
@@ -42,7 +43,7 @@
             height: var(--header-height);
             background: linear-gradient(to bottom, rgba(0, 0, 0, 0.98) 72%, rgba(0, 0, 0, 0) 100%);
             z-index: 100;
-            padding: 28px 24px 0;
+            padding: 14px 24px 0;
             pointer-events: none;
             backdrop-filter: none;
             -webkit-backdrop-filter: none;
@@ -89,11 +90,11 @@
             font-weight: 700;
             letter-spacing: -0.02em;
             line-height: 1;
-            color: rgba(255, 255, 255, 0.86);
+            color: rgba(255, 255, 255, 0.74);
         }
 
         .trio-echo {
-            color: rgba(240, 176, 58, 0.94);
+            color: rgba(240, 176, 58, 0.82);
         }
 
         .trio-label {
@@ -101,7 +102,7 @@
             font-weight: 600;
             letter-spacing: 0.1em;
             text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.26);
+            color: rgba(255, 255, 255, 0.2);
             line-height: 1;
         }
 
@@ -135,6 +136,10 @@
             display: inline-flex;
             align-items: flex-end;
             will-change: opacity, transform, filter;
+        }
+
+        #timeContentNext {
+            display: none;
         }
 
         .search-zone {
@@ -175,7 +180,7 @@
         }
 
         .privacy-block {
-            margin-top: 12px;
+            margin-top: 10px;
             pointer-events: none;
             width: 82%;
             margin-left: auto;
@@ -285,13 +290,16 @@
             height: 100vh;
             overflow-y: auto;
             overflow-x: hidden;
-            padding-top: calc(var(--header-height) + 10px);
+            padding-top: var(--header-height);
             padding-bottom: 132px;
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
             position: relative;
             scrollbar-width: none;
             -ms-overflow-style: none;
+            overscroll-behavior-y: none;
+            overscroll-behavior: none;
+            touch-action: pan-y;
         }
 
         .scroller::-webkit-scrollbar {
@@ -315,6 +323,31 @@
             display: flex;
             flex-direction: column;
             align-items: flex-end;
+        }
+
+        .date-section.is-active-focus::before {
+            content: '';
+            position: absolute;
+            left: -14px;
+            right: -10px;
+            top: -2px;
+            height: 150px;
+            border-radius: 22px;
+            pointer-events: none;
+            z-index: 0;
+            background: linear-gradient(180deg, rgba(64, 86, 188, 0.11) 0%, rgba(64, 86, 188, 0.05) 48%, rgba(0, 0, 0, 0) 100%);
+        }
+
+        .date-section.is-active-focus>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        body.is-peek-time .date-section.is-active-focus .date-header {
+            opacity: 0;
+            transform: translateY(-7px) scale(0.985);
+            filter: blur(1.8px);
+            pointer-events: none;
         }
 
         .date-header {
@@ -585,11 +618,11 @@
 
         @media (max-width: 420px) {
             :root {
-                --header-height: 230px;
+                --header-height: 156px;
             }
 
             .header-glass {
-                padding: 24px 16px 0;
+                padding: 10px 16px 0;
             }
 
             .hero-title {
@@ -602,6 +635,7 @@
 
             .privacy-block {
                 width: 86%;
+                margin-top: 8px;
             }
 
             .scroller {
@@ -966,7 +1000,7 @@
             const root = document.documentElement;
             let ticking = false;
             const isCompactViewport = window.matchMedia('(max-width: 420px)').matches;
-            const HEADER_EXPANDED = isCompactViewport ? 230 : 248;
+            const HEADER_EXPANDED = isCompactViewport ? 156 : 188;
             const HEADER_COLLAPSED = isCompactViewport ? 152 : 164;
             const HEADER_COLLAPSE_DISTANCE = isCompactViewport ? 132 : 150;
             const PEEK_THRESHOLD = 10;
@@ -1029,6 +1063,9 @@
 
                 if (!isPeekTime) {
                     for (let i = 0; i < sections.length; i++) {
+                        sections[i].classList.toggle('is-active-focus', i === 0);
+                    }
+                    for (let i = 0; i < sections.length; i++) {
                         const header = sections[i].querySelector('.date-header');
                         if (header) header.classList.remove('is-replaced');
                     }
@@ -1060,7 +1097,9 @@
                 }
 
                 const activeSection = sections[activeIndex];
-                const nextSection = sections[activeIndex + 1] || null;
+                for (let i = 0; i < sections.length; i++) {
+                    sections[i].classList.toggle('is-active-focus', i === activeIndex);
+                }
                 const activeIsoDate = activeSection.getAttribute('data-date');
                 const activeDate = activeIsoDate ? new Date(activeIsoDate) : new Date();
                 const activeParts = formatTimeParts(activeDate);
@@ -1105,34 +1144,33 @@
 
                 timeWeek.textContent = activeParts.week;
                 timeDate.textContent = activeParts.date;
-
-                let progress = 0;
-                if (nextSection) {
-                    const start = activeSection.offsetTop;
-                    const end = nextSection.offsetTop;
-                    const span = Math.max(end - start, 1);
-                    progress = Math.max(0, Math.min(1, (probeY - start) / span));
-
-                    const nextIsoDate = nextSection.getAttribute('data-date');
-                    const nextDate = nextIsoDate ? new Date(nextIsoDate) : activeDate;
-                    const nextParts = formatTimeParts(nextDate);
-                    timeWeekNext.textContent = nextParts.week;
-                    timeDateNext.textContent = nextParts.date;
-                }
-
-                const t = progress * progress * (3 - 2 * progress);
-                const currentBlur = (1.8 * t).toFixed(2);
-                const nextBlur = (1.8 * (1 - t)).toFixed(2);
-
-                timeContentCurrent.style.opacity = String(1 - t);
-                timeContentCurrent.style.transform = `translateY(${(1.6 * t).toFixed(2)}px) scale(${(1 - 0.012 * t).toFixed(3)})`;
-                timeContentCurrent.style.filter = `blur(${currentBlur}px)`;
-
-                timeContentNext.style.opacity = nextSection ? String(t) : '0';
-                timeContentNext.style.transform = `translateY(${(1.6 * (1 - t)).toFixed(2)}px) scale(${(0.988 + 0.012 * t).toFixed(3)})`;
-                timeContentNext.style.filter = `blur(${nextBlur}px)`;
+                timeContentCurrent.style.opacity = '1';
+                timeContentCurrent.style.transform = 'translateY(0px) scale(1)';
+                timeContentCurrent.style.filter = 'blur(0px)';
+                timeContentNext.style.opacity = '0';
+                timeContentNext.style.transform = 'translateY(0px) scale(1)';
+                timeContentNext.style.filter = 'blur(0px)';
 
             };
+
+            let touchStartY = 0;
+            scroller.addEventListener('touchstart', (event) => {
+                touchStartY = event.touches[0]?.clientY ?? 0;
+            }, { passive: true });
+
+            // Prevent rubber-band overscroll gap at top/bottom on touch devices.
+            scroller.addEventListener('touchmove', (event) => {
+                const currentY = event.touches[0]?.clientY ?? touchStartY;
+                const deltaY = currentY - touchStartY;
+                const atTop = scroller.scrollTop <= 0;
+                const maxScroll = scroller.scrollHeight - scroller.clientHeight;
+                const atBottom = scroller.scrollTop >= maxScroll - 1;
+                const pullingDownAtTop = atTop && deltaY > 0;
+                const pullingUpAtBottom = atBottom && deltaY < 0;
+                if (pullingDownAtTop || pullingUpAtBottom) {
+                    event.preventDefault();
+                }
+            }, { passive: false });
 
             scroller.addEventListener('scroll', () => {
                 if (ticking) return;
