@@ -63,11 +63,12 @@
         }
 
         .hero-title {
-            font-size: 32px;
-            font-weight: 800;
-            letter-spacing: -0.02em;
+            font-size: 28px;
+            font-weight: 740;
+            letter-spacing: -0.015em;
             line-height: 1;
             text-align: right;
+            color: rgba(255, 255, 255, 0.9);
         }
 
         .stat-trio {
@@ -268,12 +269,70 @@
             box-shadow: 0 0 8px rgba(255, 255, 255, 0.18);
         }
 
+        .connection-summary {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 3px;
+            margin-bottom: 7px;
+        }
+
+        .connection-headline {
+            font-size: 15px;
+            font-weight: 650;
+            letter-spacing: 0;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: right;
+        }
+
+        .connection-detail {
+            font-size: 11px;
+            font-weight: 560;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.34);
+            text-align: right;
+        }
+
+        .connection-signals {
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .connection-signal {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: rgba(255, 255, 255, 0.58);
+            font-size: 12px;
+            font-weight: 650;
+            letter-spacing: 0.01em;
+            font-variant-numeric: tabular-nums lining-nums;
+            line-height: 1;
+        }
+
+        .connection-signal .meta-icon {
+            width: 12px;
+            height: 12px;
+            opacity: 0.82;
+        }
+
+        .connection-signal.echo-signal {
+            color: rgba(240, 176, 58, 0.88);
+        }
+
+        .connection-signal.echo-signal .meta-icon {
+            color: rgba(240, 176, 58, 0.74);
+        }
+
         .privacy-message {
-            margin-top: 9px;
+            margin-top: 8px;
             font-size: 11px;
             line-height: 1.35;
-            letter-spacing: 0.015em;
-            color: rgba(255, 255, 255, 0.42);
+            letter-spacing: 0.02em;
+            color: rgba(255, 255, 255, 0.5);
             text-align: right;
         }
 
@@ -425,9 +484,9 @@
 
         .node-wrapper {
             display: grid;
-            grid-template-columns: minmax(0, 1fr) 128px;
+            grid-template-columns: minmax(0, 1fr) 104px;
             align-items: center;
-            column-gap: 12px;
+            column-gap: 10px;
             margin-bottom: var(--node-gap);
             min-width: 0;
             width: min(100%, 560px);
@@ -723,12 +782,20 @@
                 font-size: 10px;
             }
 
+            .connection-headline {
+                font-size: 14px;
+            }
+
+            .connection-detail {
+                font-size: 11px;
+            }
+
             .node-meta {
                 gap: 6px;
             }
 
             .node-wrapper {
-                grid-template-columns: minmax(0, 1fr) 114px;
+                grid-template-columns: minmax(0, 1fr) 92px;
                 width: min(100%, 100%);
             }
 
@@ -789,32 +856,28 @@
 
     <div class="header-glass">
         <div class="header-content">
-            <div class="hero-title">My Timeline</div>
+            <div class="hero-title">Timeline</div>
         </div>
         <div class="privacy-block">
-            <div class="stat-trio">
-                <div class="trio-block">
-                    <div class="trio-number trio-number-major trio-echo" id="echoTotalCount">0</div>
-                    <div class="trio-label">Echo+</div>
+            <div class="connection-summary">
+                <div class="connection-headline" id="connectionHeadline">0 memories</div>
+                <div class="connection-signals">
+                    <span class="connection-signal echo-signal">
+                        <span class="meta-icon echo" aria-hidden="true"></span>
+                        <span id="echoTotalCountTop">0</span>
+                    </span>
+                    <span class="connection-signal">
+                        <span class="meta-icon react" aria-hidden="true"></span>
+                        <span id="reactionTotalCountTop">0</span>
+                    </span>
                 </div>
-                <div class="trio-block">
-                    <div class="trio-number trio-number-mid" id="reactionTotalCount">0</div>
-                    <div class="trio-label">Reactions</div>
-                </div>
-                <div class="trio-block">
-                    <div class="trio-number trio-number-secondary" id="totalMemoriesCount">0</div>
-                    <div class="trio-label">Memories</div>
-                </div>
-                <div class="trio-block">
-                    <div class="trio-number trio-number-minor" id="publicMemoriesCount">0</div>
-                    <div class="trio-label trio-label-minor">Public</div>
-                </div>
+                <div class="connection-detail" id="connectionDetail">0 shared publicly</div>
             </div>
             <div class="privacy-track">
                 <div class="privacy-fill" id="privacyFill"></div>
             </div>
             <div class="privacy-message" id="privacyMessage">
-                Share one more memory. Be someone’s light.
+                Share one more.
             </div>
         </div>
         <div class="time-dock">
@@ -1064,6 +1127,10 @@
             const timeScale = document.getElementById('timeScale');
             const privacyFillEl = document.getElementById('privacyFill');
             const privacyMessageEl = document.getElementById('privacyMessage');
+            const connectionHeadlineEl = document.getElementById('connectionHeadline');
+            const connectionDetailEl = document.getElementById('connectionDetail');
+            const echoTotalCountTopEl = document.getElementById('echoTotalCountTop');
+            const reactionTotalCountTopEl = document.getElementById('reactionTotalCountTop');
             const timeWeek = document.getElementById('timeWeek');
             const timeDate = document.getElementById('timeDate');
             const timeWeekNext = document.getElementById('timeWeekNext');
@@ -1098,22 +1165,13 @@
                 const visibleRatio = total > 0 ? Math.round((published / total) * 100) : 0;
                 const totalEchoes = memoryStore.reduce((s, m) => s + m.echoedCount, 0);
                 const totalReactions = memoryStore.reduce((s, m) => s + m.smileCount, 0);
-
-                const totalMemoriesEl = document.getElementById('totalMemoriesCount');
-                if (totalMemoriesEl) totalMemoriesEl.textContent = total.toLocaleString('en-US');
-
-                const publicMemoriesEl = document.getElementById('publicMemoriesCount');
-                if (publicMemoriesEl) publicMemoriesEl.textContent = published.toLocaleString('en-US');
-
-                const echoEl = document.getElementById('echoTotalCount');
-                if (echoEl) echoEl.textContent = totalEchoes.toLocaleString('en-US');
-
-                const reactionEl = document.getElementById('reactionTotalCount');
-                if (reactionEl) reactionEl.textContent = totalReactions.toLocaleString('en-US');
-
-                if (privacyFillEl) privacyFillEl.style.width = `${Math.max(4, visibleRatio)}%`;
+                if (connectionHeadlineEl) connectionHeadlineEl.textContent = `${total.toLocaleString('en-US')} memories`;
+                if (echoTotalCountTopEl) echoTotalCountTopEl.textContent = totalEchoes.toLocaleString('en-US');
+                if (reactionTotalCountTopEl) reactionTotalCountTopEl.textContent = totalReactions.toLocaleString('en-US');
+                if (connectionDetailEl) connectionDetailEl.textContent = `${published.toLocaleString('en-US')} shared publicly`;
+                if (privacyFillEl) privacyFillEl.style.width = `${Math.max(6, visibleRatio)}%`;
                 if (privacyMessageEl) {
-                    privacyMessageEl.textContent = `${visibleRatio}% public. Share one more memory.`;
+                    privacyMessageEl.textContent = 'Share one more.';
                 }
             };
             updateOverviewStats();
